@@ -1,0 +1,592 @@
+%\section{Viscosity Solution for Impulse Control: Existence}
+\label{section: Viscosity Solution for Impulse Control: Existence}
+In this chapter, we aim to transition from the probabilistic, dynamic programming formulation presented in Chapter \ref{section: Impulse Control of Jump-Diffusion Processes} to the Quasi-Variational Inequality (QVI) formulation. Heuristically, Theorem \ref{trm: Verification for Impulse Control} suggests that within the continuation region, the value function is determined through the PIDE
+\begin{equation*}
+    \partial_t u + \InfinitesimalGenerator u + f = 0.
+\end{equation*}
+On the other hand, if immediate intervention is optimal, then
+\begin{equation*}
+    u = \InterveneOper u
+\end{equation*}
+must be satisfied. Combining these two choices yields QVI
+\begin{equation*}
+    \min \big\{-(\partial_t u + \InfinitesimalGenerator u + f), u - \InterveneOper u \big\} = 0.
+\end{equation*}
+However, we need to show that the solution $u$ to the above QVI is indeed the value function, i.e., $u=v$. Moreover, the solution $u$ is not expected to be sufficiently smooth for a classical interpretation of the QVI\footnote{Or, at least, not everywhere in $[0,T] \times \R^d$.}. This is because the intervention operator produces kinks between the continuation and intervention regions, which results in the value function being non-differentiable on these points or regions. In addition, since the underlying state process is a jump-diffusion, the QVI contains a generator with a nonlocal integral term. In light of this, a weaker solution in the form of \textit{viscosity solutions} is required to treat the QVI.
+
+Roughly speaking, viscosity solutions allow the QVI to be interpreted through smooth test functions without requiring the value function itself to be classically differentiable. In this chapter, we formulate the QVI and show that a viscosity solution to the QVI exists. We rely on the theory provided by \textcite{seydel2010generalexistenceuniquenessviscosity} and, as such, the structure of this chapter is identical to Section 4 in Seydel with the exception that we do not consider continuous controls. Nevertheless, some of the proofs presented in this chapter have, to some extent, been extended for clarity. 
+
+\section{Impulse control via QVI and further assumptions}
+\label{section: Impulse Control via QVI and Further Assumptions}
+% presentere QVI
+\subsection{Impulse control via QVI}
+Recall the finite-horizon impulse control problem \eqref{eqn: optimal value function}, that is,
+\begin{equation}
+    v(t,x) = \sup_{\alpha \in \AdmissibleSet} J^{(\alpha)}(t,x), \quad \text{for } (t,x)\in [0,T]\times \Solvency.
+    \label{eqn: impulse control problem}
+\end{equation}
+For a stopping time $\tau':=\tau_\Solvency \wedge T$, where $T<\infty$ the time horizon, the performance criterion $J$ is given by
+\begin{equation*}
+    J^{(\alpha)}(t,x) = \Etx \left[ \int_t^{\tau'} f(s,X^{(\alpha)}(s)) \diff s + g(\tau', X^{(\alpha)}(\tau')) + \sum_{t \leq \tau_j < \tau'} K(\tau_j, \check{X}^{(\alpha)}(\tau_j^-), \zeta_j) \right].
+\end{equation*}
+The functions $f$, $g$, and $K$ are assumed to satisfy the integrability conditions in \eqref{eqn: well-behavedness of f}–\eqref{eqn: well-behavedness of K}. These conditions ensure that the performance criterion is finite for every admissible control $\alpha \in \AdmissibleSet$ and every $(t,x) \in [0,T] \times \Solvency$. The uncontrolled process $X$ follows the SDE \eqref{eqn: jump-diffusion SDE}, with drift, diffusion, and jump-amplitude functions satisfying \eqref{eqn: Lipschitz condition}--\eqref{eqn: lgb condition}, and the controlled process $\Xa$ is given by \eqref{eqn: (9.1.2) in ØS}--\eqref{eqn: (9.1.4) in ØS}. Furthermore, recall that the intervention operator $\InterveneOper$, introduced in Definition \ref{def: Intervention Operator}, is given by
+\begin{equation*}
+    \InterveneOper v(t,x) = \sup_{\zeta \in \mathcal{Z}} \big\{ v\big(t,\Gamma(t,x,\zeta)\big) + K(t,x,\zeta) \big\}
+\end{equation*}
+and that the infinitesimal generator of the uncontrolled process $X$ is given by
+\begin{align}
+    \InfinitesimalGenerator u(t,x) &= \langle \mu(t,x), \nabla_x u(t,x) \rangle + \frac{1}{2} \Tr (\sigma(t,x)\sigma^\top(t,x)H_xu(t,x)) \nonumber\\
+    &+ \int_{\R^\ell} \{u(t,x+\gamma(t,x,z)) - u(t,x) - \langle \nabla u(t,x), \gamma(t,x,z) \rangle \ind{|z|<1}\} \nu(\diff z).
+    \label{eqn: infinitesimal generator (short form)}
+\end{align}
+Here, $H_x$ denotes the Hessian operator in $x$ and is defined as
+\begin{equation*}
+    H_x u(t,x) = (\partial_{x_i x_j}u(t,x))_{i,j=1}^d \in \R^{d \times d}.
+\end{equation*}
+We consider the parabolic QVI given by
+\begin{subequations}
+    \label{eqn: QVI}
+    \begin{align}
+    \min \{-(\partial_t u + \InfinitesimalGenerator u + f), u - \InterveneOper u \} = 0 & \quad \text{in } [0,T) \times \Solvency \label{eqn: QVI a} \\
+    \min \{u-g, u - \InterveneOper u \} = 0 & \quad \text{in } [0,T) \times (\R^d \backslash \Solvency ) \label{eqn: QVI b} \\
+    u = \max \{g, \InterveneOper g \} & \quad \text{on } \{T\} \times \R^d \label{eqn: QVI c}
+\end{align}
+\end{subequations}
+The hope is to find the value function by solving the \eqref{eqn: QVI}.
+
+We now provide an interpretation for the QVI \eqref{eqn: QVI}. Consider \eqref{eqn: QVI a}, where the Hamiltonian $-(\partial_t u + \InfinitesimalGenerator u + f)$ is compared against the intervention gain $u-\InterveneOper u$. We note that by condition $(x)$ in Theorem \ref{trm: Verification for Impulse Control}, the Hamiltonian must be zero inside the continuation region 
+$$D=\{(t,x) \in [0,T)\times \Solvency: u(t,x)>\InterveneOper u(t,x)\}.$$
+Otherwise, the Hamiltonian is positive outside of the continuation region and the controller intervenes, see conditions $(ii)$ and $(vi)$ in Theorem \ref{trm: Verification for Impulse Control}. 
+
+The boundary condition \eqref{eqn: QVI b} compares the value of intervening outside of the solvency region $\Solvency$ versus immediately collecting the reward $g$. The reason we consider $v$ on $\R^d$, as opposed to the region of interest $\Solvency$, is because the process $X$ has jumps. As \textcite{seydel2010generalexistenceuniquenessviscosity} discusses, it is not possible to stay a positive amount of time outside $\Solvency$ since the problem is stopped at $\tau_\Solvency$. However, if we consider the infinitesimally small amount of time between an exogenous (Poisson) jump and an intervention, the controller can push the controlled state back into $\Solvency$ through an impulse before the stopping time $\tau_\Solvency$ takes notice. This is illustrated in Example \ref{ex: solvency time notice}. Hence, defining $v$ outside of $\Solvency$ is needed to be able to decide whether a jump back to solvency is worthwhile. 
+
+Finally, condition \eqref{eqn: QVI c} formalises the terminal condition, where one either collects a terminal reward $g$, or undertakes an impulse and collects $\InterveneOper g$. 
+
+\begin{example}
+\label{ex: solvency time notice}
+    Let $X^{(\alpha)}$ be a controlled process and recall that impulses are allowed to be taken only after the exogenous Poisson jump takes place, see Definition \ref{def: Post-Jump, Pre-Intervention State}. Before intervening, the state we consider is therefore the post-jump, pre-intervention state $\check{X}^{(\alpha)}$. At an intervention time $\tau$, the controlled process is moved to the post-intervention state $\Gamma(\tau, \check{X}^{(\alpha)}(\tau^-), \zeta) = \check{X}^{(\alpha)}(\tau^-) + \zeta$. 
+
+    Now suppose that $X^{(\alpha)}$ models the cash account of a profitable business. Let $\Solvency = (0,\infty)$ and $X^{(\alpha)}(\tau^-) = 1 \in \Solvency$ be such that the firm begins in a solvent state. If a negative size shock $-4$ occurs at time $\tau$, the post-jump pre-intervention state is $\check{X}^{(\alpha)}(\tau^-) = 1-4 = -3 \notin \Solvency$ and the profitable business has run out of capital. To push the state back into the solvency region, investors may inject capital into the firm through an impulse, say $\zeta=5$. Then the state jumps back into solvency, i.e. $\Gamma(\tau, \check{X}^{(\alpha)},\zeta) = -3 + 5 = 2 \in \Solvency$. Thus, the business becomes solvent again.
+\end{example}
+
+\subsection{Further assumptions}
+Let us now consider the conditions under which the terms $\InfinitesimalGenerator u$ and $\InterveneOper u$ in the QVI \eqref{eqn: QVI} are well-defined. We begin by noting that the integral operator $\InfinitesimalGenerator$ \eqref{eqn: infinitesimal generator (short form)} behaves like a differential operator of up to second order, given that $\nu$ is singular. This behaviour can be observed by subtracting the first-order compensation term and then applying the Taylor expansion on the function $u \in C^{1,2}([0,T) \times \R^d)$ for some $0 < \delta < 1$. In other words,
+\begin{align}
+    \int_{|z|<\delta} & \big| u\big(t,x+\gamma(t,x,z)\big) -u(t,x) - \langle \nabla u(t,x), \gamma(t,x,z) \ind{|z|<1} \rangle \big| \nu(\diff z) \nonumber \\
+    & \leq \int_{|z|<\delta} \big| \gamma(t,x,z) \big|^2 \big| H_xu(t,\tilde x) \big| \nu(\diff z)
+    \label{eqn: (12) in Seydel}
+\end{align}
+for some $\tilde x \in B(x,\sup_{|z|<\delta} \gamma(t,x,z))$. Here, $B(x,\rho)$ denotes a (open) ball of radius $\rho>0$ around the point $x$. 
+
+As discussed in Chapter \ref{section: Preliminaries}, we assume that the basic regularity conditions \eqref{eqn: Lévy measure condition} and \eqref{eqn: assumption for chapter 4} are satisfied. Then, with \eqref{eqn: assumption for chapter 4} and according to \cite{seydel2010generalexistenceuniquenessviscosity}, the Hamiltonian $\partial_t u + \InfinitesimalGenerator u + f$ is well-defined if, for instance, the following conditions are satisfied
+\begin{enumerate}
+    \item $u \in C^{1,2}([0,T) \times \R^d)$, and
+    \item One of the following inequalities hold locally in $(t,x) \in [0,T) \times \Solvency$ for a constant $C_{t,x}$ dependent on $t$ and $x$:
+    \begin{enumerate}[label=(\alph*)]
+        \item $|\gamma(t,x,z)| \leq C_{t,x}$ if $\nu(\R^d) < \infty$
+        \item $|\gamma(t,x,z)| \leq C_{t,x}|z|$ and $|u(t,z)| \leq C(1+|z|^{p^*})$, where $C$ is independent of $t$
+        \item Or more generally, for $a,b>0$ such that $ab \leq p^*$: $|\gamma(t,x,z)| \leq C_{t,x}(1+|z|^a)$, $|u(t,z)| \leq C(1+|z|^b)$ on $|z|\geq1$. Furthermore, $|\gamma(t,x,z)| \leq C_{t,x} |z|^{q^*/2}$ on $|z|<1$. 
+    \end{enumerate}
+\end{enumerate}
+For the rest of the thesis, we assume that one of the above conditions on $\gamma$ is met. Furthermore, recall Definition \ref{def: Space of Polynomially Bounded Functions}, where the space of polynomially bounded functions $\PB$ is defined. In the following, we formalise the assumptions necessary for the existence proof\footnote{Note that some of these assumptions will also be used in the uniqueness proof as well.}.
+
+\begin{assumption}[{\cite[Assumption 2.1]{seydel2010generalexistenceuniquenessviscosity}}]
+    \label{ass: Assumption 2.1 in Seydel}
+    \begin{enumerate}[label=(\textup{V}\arabic*), ref=(\textup{V}\arabic*)]
+        \item \label{ass: V1} The functions $\Gamma$ and $K$ are continuous.
+        \item \label{ass: V2} The set of admissible impulses $\mathcal{Z}(t,x)$ is non-empty and compact for each $(t,x) \in [0,T] \times \R^d$. For a converging sequence $(t_n,x_n) \rightarrow (t,x)$ in $[0,T] \times \R^d$ (with $\mathcal{Z}(t_n,x_n)$ non-empty), $\mathcal{Z}(t_n,x_n)$ converges to $\mathcal{Z}(t,x)$ in the Hausdorff metric.
+        \item \label{ass: V3} $\mu$, $\sigma$, $\gamma$, $f$ are continuous.
+        \item \label{ass: V4} $\gamma$ satisfies one of the conditions detailed above, and $\PB$ is fixed accordingly.
+    \end{enumerate}
+\end{assumption}
+\begin{remark}
+    Note that conditions \assitemrange{ass: V1}{ass: V3} have, in a form or another, been addressed in Chapters \ref{section: Preliminaries} and \ref{section: Impulse Control of Jump-Diffusion Processes}.
+\end{remark}
+
+Let the parabolic, non-local ``boundary'' be defined as $\partial^+ \Solvency_T:= \big( [0,T) \times (\R^d \backslash \Solvency) \big) \cup \big( \{T\} \times \R^d \big)$, and define $\partial^* \Solvency_T := ([0,T) \times \Solvency) \cup \big( \{T\}\times \Bar{\Solvency} \big)$. In addition to conditions \assitemrange{ass: V1}{ass: V4}, Assumption \ref{ass: Assumption 2.2 in Seydel} is required for the existence proof.
+\begin{assumption}[{\cite[Assumption 2.2]{seydel2010generalexistenceuniquenessviscosity}}]
+    \label{ass: Assumption 2.2 in Seydel}
+    \begin{enumerate}[label=(\textup{E}\arabic*), ref=(\textup{E}\arabic*)]
+        \item \label{ass: E1} The value function $v$ is in $\PB([0,T] \times \R^d)$.
+        \item \label{ass: E2} $g$ is continuous.
+        \item \label{ass: E3} For every $(t,x) \in \partial^* \Solvency_T$ and all sequences $(t_n,x_n)_n \subset [0,T) \times \Solvency$ converging to $(t,x)$, the value function $v$ satisfies
+        \begin{equation*}
+            \liminf_{n \rightarrow \infty} v(t_n,x_n) \geq g(t,x).
+        \end{equation*}
+        If $v(t_n,x_n) > \InterveneOper v(t_n,x_n)$ for all $n \in \mathbb N$, the value function satisfies
+        \begin{equation*}
+            \limsup_{n\rightarrow \infty} v(t_n,x_n) \leq g(t,x).
+        \end{equation*}
+    \end{enumerate}
+\end{assumption}
+\begin{remark}
+    Condition \assitemref{ass: E3} is typically satisfied if the stochastic process is regular at the boundary $\partial \Solvency$ (see \cite[Section 4.1]{seydel2010generalexistenceuniquenessviscosity}). 
+\end{remark}
+
+Before moving on to the existence proof, let us briefly discuss  Assumptions \ref{ass: Assumption 2.1 in Seydel} and \ref{ass: Assumption 2.2 in Seydel}. Assumptions \assitemref{ass: V1} and \assitemref{ass: V2} concern the intervention operator $\InterveneOper$. As $\Gamma$  and $K$ are continuous, and the set $\mathcal{Z}(t,x)$ is compact and continuous in the Hausdorff metric, $\InterveneOper$ maps locally bounded functions to locally bounded functions and preserves continuity whenever the function, on which $\InterveneOper$ is applied, is continuous. This will be shown in Lemma \ref{lemma: Lemma 4.3 in Seydel} later in this chapter. 
+
+Assumptions \assitemref{ass: V3} and \assitemref{ass: V4} concern the Hamiltonian $\partial_t u + \InfinitesimalGenerator u + f$ in the QVI \eqref{eqn: QVI}. Specifically, for every test function $\varphi \in C^{1,2}([0,T) \times \R^d)$, \assitemref{ass: V3} gives the required continuity of the functions $\mu$, $\sigma$, $\gamma$, and $f$, while \assitemref{ass: V4} fixes $\PB$ so that the Lévy integral in \eqref{eqn: infinitesimal generator (short form)} is finite. Hence, the Hamiltonian is well-defined and continuous in $[0,T) \times \Solvency$. 
+
+Finally, condition \assitemref{ass: E3} imposes a compatibility condition between the value function inside the solvency region and the boundary payoff. If a sequence of interior points $(t_n,x_n) \in [0,T) \times \Solvency$ approaches a boundary point $(t,x) \in \partial^* \Solvency_T$, then the value should not fall below the exit payoff $g(t,x)$. Moreover, if immediate intervention is not optimal along the sequence, i.e., if $v(t_n,x_n) > \InterveneOper v(t_n,x_n)$, then there are no impulses near the boundary and the problem locally reduces to a stochastic control problem with exit payoff $g$. In that case boundary regularity of the underlying process implies that the exit time tends to $t$ and the value converges to $g(t,x)$. Thus, \assitemref{ass: E3} rules out potential discontinuities caused by boundary behaviour in the continuation region. 
+
+\section{Existence result}
+\label{section: Existence}
+We now aim to define viscosity solutions and show that there exists a viscosity solution that solves the QVI \eqref{eqn: QVI}. As the definition of the viscosity solution requires the use of lower and upper semi-continuous functions, concepts not yet defined in this thesis, we provide these notions in Definitions \ref{def: lower semi-continuous functions} and \ref{def: upper semi-continuous functions}.
+
+\begin{definition}[Lower Semi-Continuous Functions]
+\label{def: lower semi-continuous functions}
+    Let $T>0$ be a finite time horizon, and let $u: [0,T] \times \R^d \rightarrow \R$ be a function. We say $u$ is lower semi-continuous on $[0,T] \times \R^d$, if for every $(t,x) \in [0,T] \times \R^d$ and every sequence $(t_n,x_n) \rightarrow (t,x)$ in $(t,x) \in [0,T] \times \R^d$, 
+    \begin{equation*}
+        u(t,x) \leq \liminf_{n \rightarrow \infty} u(t_n,x_n)
+    \end{equation*}
+    The lower envelope is denoted by $u_*(t,x) = \liminf_{n \rightarrow \infty} u(t_n,x_n)$ for any $(t,x) \in [0,T] \times \R^d$.
+\end{definition}
+
+\begin{definition}[Upper Semi-Continuous Functions]
+\label{def: upper semi-continuous functions}
+    Let $T>0$ be a finite time horizon, and let $u: [0,T] \times \R^d \rightarrow \R$ be a function. We say $u$ is upper semi-continuous on $[0,T] \times \R^d$, if for every $(t,x) \in [0,T] \times \R^d$ and every sequence $(t_n,x_n) \rightarrow (t,x)$ in $(t,x) \in [0,T] \times \R^d$, 
+    \begin{equation*}
+        u(t,x) \geq \limsup_{n \rightarrow \infty} u(t_n,x_n)
+    \end{equation*}
+    The upper envelope is denoted by $u_*(t,x) = \limsup_{n \rightarrow \infty} u(t_n,x_n)$ for any $(t,x) \in [0,T] \times \R^d$.
+\end{definition}
+
+Throughout, we denote by $\LSC(\mathcal{C})$ and $\USC(\mathcal{C})$ the set of measurable functions on the set $\mathcal{C}$ that are, respectively, lower semi-continuous and upper semi-continuous. Furthermore, denote by $\PB := \PB([0,T]\times \R^d)$ the family of bounded polynomial functions, see Definition \ref{def: Space of Polynomially Bounded Functions}. The definition of viscosity solutions is provided in Definition \ref{def: Definition 4.1 in Seydel (Viscosity solution)}. 
+
+\begin{definition}[{\cite[Definition 4.1]{seydel2010generalexistenceuniquenessviscosity}} Viscosity Solution]
+\label{def: Definition 4.1 in Seydel (Viscosity solution)}
+    Denote $\PB = \PB([0,T]\times \R^d)$. A function $u \in \PB$ is a viscosity subsolution of \eqref{eqn: QVI} if for all $(t_0,x_0) \in [0,T] \times \R^d$ and $\varphi \in \PB \cap C^{1,2}([0,T]\times \R^d)$ with $\varphi(t_0,x_0) = u^*(t_0,x_0)$, where $u^*$ is the upper semi-continuous envelope of $u$ (see Definition \ref{def: upper semi-continuous functions}), and with $\varphi \geq u^*$ on $[0,T] \times \R^d$, we have
+    \begin{align*}
+        \min \big\{-(\partial_t \varphi + \InfinitesimalGenerator \varphi + f), u^* - \InterveneOper u^* \big\} \leq 0 & \quad \text{in } (t_0,x_0) \in [0,T) \times \Solvency \\
+        \min \{ u^*-g, u^* - \InterveneOper u^* \} \leq 0 & \quad \text{in } (t_0,x_0) \in \partial^+ \Solvency_T.
+    \end{align*}
+    
+    A function $u \in \PB$ is a (viscosity) supersolution of \eqref{eqn: QVI} if for all $(t_0,x_0) \in [0,T] \times \R^d$ and $\varphi \in \PB \cap C^{1,2}([0,T) \in \R^d)$ with $\varphi(t_0,x_0) = u_*(t_0,x_0)$, where $u_*$ denotes the lower semi-continuous envelope of $u$ (see Definition \ref{def: lower semi-continuous functions}), and with $\varphi \leq u_*$ on $[0,T] \times \R^d$, we have
+    \begin{align*}
+        \min \big\{-(\partial_t \varphi + \InfinitesimalGenerator \varphi + f), u_* - \InterveneOper u_* \big\} \geq 0 & \quad \text{in } (t_0,x_0) \in [0,T) \times \Solvency \\
+        \min \{ u_*-g, u_* - \InterveneOper u_* \} \geq 0 & \quad \text{in } (t_0,x_0) \in \partial^+ \Solvency_T.
+    \end{align*}
+
+    A function $u$ is a viscosity solution if it is sub- and supersolution. 
+\end{definition}
+\begin{remark}
+    In Seydel \cite{seydel2010generalexistenceuniquenessviscosity}, the author remarks that the conditions on the parabolic boundary are included inside the viscosity solution definition (sometimes called ``strong viscosity solution'', see, e.g., Ishii \cite{ishii1993viscosity}) because of the implicit form of this ``boundary condition''. In $T$ , we choose the implicit form because, otherwise, the comparison result would not hold. The time derivative in $t = 0$ is to be understood as a one-sided derivative.
+\end{remark}
+With the definition of the viscosity solution in place, the below lemma, which is important for the existence proof, follow.
+\begin{lemma}[{\cite[Lemma 4.3]{seydel2010generalexistenceuniquenessviscosity}}]
+\label{lemma: Lemma 4.3 in Seydel}
+    Let \assitemref{ass: V1} and \assitemref{ass: V2} be satisfied. Let $u$ be a locally bounded function\footnote{The function $u$ is locally bounded if for every $x \in \R^d$, there is a neighbourhood $U$ of $x$ and a constant $C>0$ such that $|f(y)| \leq C$ for all $y \in U$.} on $[0,T] \times \R^d$. Then
+    \begin{enumerate}[label=(\roman*)]
+        \item $\InterveneOper u_* \in \LSC ([0,T] \times \R^d)$ and $\InterveneOper u_* \leq (\InterveneOper u_*)_*$.
+        \item $\InterveneOper u^* \in \USC ([0,T] \times \R^d)$ and $\InterveneOper u^* \leq (\InterveneOper u^*)^*$.
+        \item If $u \leq \InterveneOper u$ on $[0,T] \times \R^d$, then $u^* \leq \InterveneOper u^*$ on $[0,T] \times R^d$.
+        \item For an approximating sequence $(t_n,x_n) \rightarrow (t,x)$, $(t_n,x_n) \subset [0,T]\times \R^d$ with $u(t_n,x_n) \rightarrow u^*(t,x)$: \newline \indent If $u^*(t,x) > \InterveneOper u^*(t,x)$, then there exists $N \in \mathbb N$ such that 
+        \begin{equation*}
+            u(t_n,x_n) \rightarrow \InterveneOper u(t_n,x_n) \quad \text{for all } n \geq N.
+        \end{equation*}
+        \item $\InterveneOper$ is monotonous, that is, for two functions $u,w$ satisfying $u \geq w$, $\InterveneOper u \geq \InterveneOper w$. In particular, for the value function $v$, $\InterveneOper^n v$ for all $n \geq 1$. 
+    \end{enumerate}
+\end{lemma}
+\begin{proof}
+    We provide a separate proof for each point in the above Lemma. 
+    \begin{enumerate}[label=(\roman*)]
+        \item Let $(t_n,x_n)_{n \geq 1}$ be a sequence in $[0,T] \times \R^d$ converging to $(t,x)$. For an arbitrary $\varepsilon > 0$, select an $\varepsilon$-optimal impulse $\zeta^{(\varepsilon)} \in \mathcal{Z}(t,x)$, i.e. a $\zeta^{(\varepsilon)}$ such that
+        \begin{equation*}
+            u_*(t,\Gamma(t,x, \zeta^{(\varepsilon})) + K(t,x,\zeta^{(\varepsilon})) \geq \InterveneOper u_*(t,x). 
+        \end{equation*}
+        Now let $\zeta_n \in \mathcal{Z}(t_n,x_n)$ be a sequence. Since by \assitemref{ass: V2} $\mathcal{Z}(t,x)$ is non-empty and compact for each $(t,x) \in [0,T] \times \R^d$ and $\mathcal{Z}(t_n,x_n) \rightarrow Z(t,x)$ for $n$ large enough, the sequence converges to $\zeta^{(\varepsilon)}$ for all $n$ by the Hausdorff convergence theorem \cite[Chapter 7]{burago2001course}. Then
+        \begin{align*}
+            \liminf_{n \rightarrow \infty} \InterveneOper u_*(t_n,x_n) & \liminf_{n \rightarrow \infty} \Big\{ \sup_{\zeta \in \mathcal{Z}(t_n,x_n)}\big\{u_*(t,\Gamma(t_n,x_n,\zeta)) + K(t_n,x_n,\zeta)\big\} \Big\}\\
+            & \geq \liminf_{n \rightarrow \infty} \big\{u_*(t,\Gamma(t_n,x_n,\zeta_n)) + K(t_n,x_n,\zeta_n)\big\} \\
+            & \geq u_*(t,\Gamma(t,x,\zeta^{(\varepsilon)})) + K(t,x,\zeta^{(\varepsilon)}) \\
+            & \InterveneOper u_* (t,x) - \varepsilon.
+        \end{align*}
+        Since $\varepsilon > 0$ is arbitrary, it follows by the definition of lower semi-continuous functions (see Definition \ref{def: lower semi-continuous functions}), that 
+        \begin{equation*}
+            \InterveneOper u_* \in \LSC([0,T] \times \R^d). 
+        \end{equation*}
+        
+        For the second assertion in $(i)$, we begin by noting that 
+        \begin{equation*}
+            \InterveneOper u(t,x) \geq \InterveneOper u_*(t,x) \quad \text{for all } (t,x) \in [0,T] \times \R^d,
+        \end{equation*}
+        because $u \geq u_*$ by Definition \ref{def: lower semi-continuous functions}. Thus, for any $(t,x) \in [0,T] \times \R^d$
+        \begin{align*}
+            (\InterveneOper u(t,x))_* & \geq (\InterveneOper u_*(t,x))_* \\
+            &= \Big( \sup_{\zeta \in \mathcal{Z}(t,x)} \big\{ u_*(t,\Gamma(t,x,\zeta)) + K(t,x,\zeta) \big\} \Big)_* \\
+            &= \sup_{\zeta \in \mathcal{Z}(t,x)} \big\{ u_*(t,x\Gamma(t,x,\zeta)) + K(t,x,\zeta) \big\} \\
+            &= \InterveneOper u_*(t,x),
+        \end{align*}
+        as $K$ is continuous by \assitemref{ass: V1}.
+    \item Fix some $(t,x) \in [0,T] \times \R^d$ and, for $n \in \mathbb N$, let the sequence $(t_n,x_n) \in [0,T] \times \R^d$ converge to $(t,x)$. Because $u^*$ is upper semicontinuous and the functions $K$ and $\Gamma$ are continuous by \assitemref{ass: V1}, the maximum in $\InterveneOper u^*(t_n,x_n)$ is achieved for each fixed $n$. That is, there exists $\zeta_n \in \mathcal{Z}(t_n,x_n)$ such that 
+    \begin{equation*}
+        \InterveneOper u^*(t_n,x_n) = u^*(t_n, \Gamma(t_n,x_n,\zeta_n)) + K(t_n,x_n,\zeta_n).
+    \end{equation*}
+    Since $\mathcal{Z}(\cdot,\cdot)$ is a compact set by \assitemref{ass: V2}, $\mathcal{Z}(\cdot,\cdot)$ is bounded and closed. Hence, $\zeta_n \in \mathcal{Z}(t_n,x_n)$ is contained inside a bounded set for all $n\in \mathbb N$. In other words, the sequence $\{\zeta_n\}_{n\in \mathbb N}$ has a convergent subsequence with limit $\hat{\zeta} \in \mathcal{Z}(t,x)$ (this can be shown by the Hausdorff convergence theorem, see {\cite[Chapter 7]{burago2001course}}). Note that the limit $\hat{\zeta}$ is not necessarily optimal, so
+    \begin{align*}
+        \InterveneOper u^*(t,x) &= u^*(t,\Gamma(t,x,\hat{\zeta})) + K(t,x,\hat{\zeta}) \\
+        & \geq \limsup_{n \rightarrow \infty} \big\{ u^*(t_n,\Gamma(t_n,x_n,\zeta_n)) + K(t_n,x_n,\zeta_n) \big\} \\
+        &= \limsup_{n \rightarrow \infty} \InterveneOper u^* (t_n,x_n),
+    \end{align*}
+    which shows that $\InterveneOper u^* \in \USC([0,T] \times \R^d)$. Moreover, for the second assertion, we note that since
+    \begin{equation*}
+        \InterveneOper u \leq \InterveneOper u^* \quad \text{in } [0,T] \times \R^d,
+    \end{equation*}
+    we get, in a similar manner as in $(ii)$, 
+    \begin{equation*}
+        \InterveneOper u^* \leq (\InterveneOper u^*)^* = \InterveneOper u^* \quad \text{in } [0,T] \times \R^d. 
+    \end{equation*}
+
+    \item This result follows from $(ii)$. If $u \leq \InterveneOper u$ on $[0,T] \times \R^d$, then
+        \begin{equation*}
+            \InterveneOper u^* \leq (\InterveneOper u^*)^* = \InterveneOper u^* \quad \text{in } [0,T] \times \R^d. 
+        \end{equation*}
+    
+    \item This results is shown by contradiction. To this end, assume that 
+        \begin{equation}
+            u(t_n,x_n) \leq \InterveneOper u(t_n,x_n)
+            \label{eqn: Lemma 4.3iv Contradiction Assumption}
+        \end{equation}
+        for infinitely many $n$. Then, by convergence along a subsequence, 
+        \begin{equation*}
+            u^*(t,x) \leq \limsup_{n \rightarrow \infty} \InterveneOper u(t_n,x_n) \leq (\InterveneOper u)^*(t,x) \leq \InterveneOper u^*(t,x).
+        \end{equation*}
+        However, this is is a contradiction since the above inequality forces
+        \begin{equation*}
+            u^*(t,x) \leq \InterveneOper u^*(t,x).    
+        \end{equation*}
+        Therefore, the assumption \eqref{eqn: Lemma 4.3iv Contradiction Assumption} does not hold, i.e. there must exist $N$ such that for all $n \geq N$,
+        \begin{equation*}
+            u(t_n,x_n) > \InterveneOper u(t_n,x_n). 
+        \end{equation*}
+    \item The monotonicity follows directly from the definition of $\InterveneOper$. $\InterveneOper v \leq v$ is necessary for the value function $v$, because $v$ is already optimal, and $\InterveneOper^n v \leq v$ for all $n \geq 1$ the follows by induction.
+    \end{enumerate}
+    With (i)--(v) proven, the proof is concluded. 
+\end{proof}
+
+Using Lemma \ref{lemma: Lemma 4.3 in Seydel}, we now prove the existence of a viscosity solution in the form of Theorem \ref{trm: Existence of the Viscosity Solution}. However, before turning to the existence proof, we note that the existence proof frequently makes use of localisation by stopping times to ensure that a stochastic process $X$, started at $X(t^-)=x$, is contained in some (small) set. A standard choice of such a stopping time is, for radius $\rho_1>0$ and a (sufficiently) small time cut-off  $\rho_2>0$,
+\begin{equation*}
+    \tau := \{s \geq t: |X(s)-x| \geq \rho_1 \} \wedge (t+\rho_2).
+\end{equation*}
+$\tau$ is to be understood as the minimum between the first exit time from the spatial ball $B(x,\rho_1)$ and the time $t+\rho_2$. If $X$ has continuous paths (i.e. no jumps), then
+\begin{equation*}
+    |X(\tau) - x| \leq \rho_1 \quad \text{a.s.},
+\end{equation*}
+and, in fact, $|X(\tau)-x| = \rho_1$ on the event $\{\tau < t + \rho_2\}$. However, if $X$ has non-predictable jumps, one may think that the exit from the ball $B(x,\rho_1)$ may occur by a jump, leading to an overshoot $|X(\tau)-x|>\rho_1$. Fortunately, a key property of Lévy processes is that they are stochastically continuous, see Definition \ref{def: Lévy process}. Hence, for each fixed $\rho_1>0$, 
+\begin{equation*}
+    \Prob \big( |X(\tau)-x|> \rho_1 \big) \rightarrow 0 \quad \text{as } \rho_2 \rightarrow 0.
+\end{equation*}
+Thus, localisation can be enforced with probability arbitrarily close to one by choosing $\rho_2$ sufficiently small. To use this uniformly in the proof of Theorem \ref{trm: Existence of the Viscosity Solution}, we follow Seydel \cite{seydel2010generalexistenceuniquenessviscosity} and make use of the fact that stochastic continuity on a compact time interval is uniform, see Lemma \ref{lemma: Lemma 7.2 in Seydel}.
+
+\begin{theorem}[{\cite[Theorem 4.2]{seydel2010generalexistenceuniquenessviscosity}} Existence of the Viscosity Solution]
+\label{trm: Existence of the Viscosity Solution}
+    Let Assumptions \ref{ass: Assumption 2.1 in Seydel} and \ref{ass: Assumption 2.2 in Seydel} be satisfied. Then, the value function $v$ is a viscosity solution of \eqref{eqn: QVI} as defined above.
+\end{theorem}
+\begin{proof}
+    The proof is split in two parts: $v$ is a supersolution and $v$ is a subsolution. If $v$ is both super- and subsolution, then, by Definition \ref{def: Definition 4.1 in Seydel (Viscosity solution)}, the value function is a viscosity solution. 
+    
+    $v$ \textbf{is a supersolution}. Recall that for any $(t_0,x_0) \in [0,T] \times \R^d$, the inequality 
+    \begin{equation*} 
+        v(t_0,x_0) \geq \InterveneOper v(t_0,x_0)
+    \end{equation*} 
+    must hold because $v(t_0,x_0)$ is the supremum over all admissible impulse controls, i.e.
+    \begin{equation*} 
+        v(t_0,x_0) = \sup_{\alpha \AdmissibleSet} J^{(\alpha)}(t_0,x_0).
+    \end{equation*} 
+    By Lemma \ref{lemma: Lemma 4.3 in Seydel}(i), we then have
+    \begin{equation}
+        \InterveneOper v_*(t_0,x_0) \leq (\InterveneOper v(t_0,x_0))_* \leq v_*(t_0,x_0). 
+        \label{eqn: v is supersolution, part 1}
+    \end{equation}
+    With this in mind, we now verify the condition on the parabolic boundary. We know that on the boundary, we can either jump back to $\Solvency$ or do nothing, in which case we collect the reward $g$. Since $v$ is optimal,
+    \begin{equation*}
+        v \geq g \quad \text{on } \partial^+ \Solvency_T.
+    \end{equation*}
+    Together with \assitemref{ass: E2} and \assitemref{ass: E3} in Assumption \ref{ass: Assumption 2.2 in Seydel}, we therefore have that
+    \begin{equation}
+        v_* \geq g \quad \text{on } \partial^+ \Solvency_T.
+        \label{eqn: v is supersolution, part 2}
+    \end{equation}
+    It therefore remains to show that 
+    \begin{equation*}
+        \partial_t \varphi + \mathcal L \varphi + f \leq 0
+    \end{equation*}
+    in a fixed $(t_0,x_0) \in [0,T) \times \Solvency$ and for $\varphi \in  \PB \cap C^{1,2}([0,T] \times \R^d)$, where $\varphi$ satisfies $\varphi (t_0,x_0) = v_*(t_,x_0)$ and $\varphi \leq v_*$ on $[0,T] \times \R^d$. 
+    
+    From the definition of the lower semi-continuous function $v_*$, there exists a sequence $(t_n,x_n) \in [0,T) \times \Solvency$ such that $(t_n,x_n) \rightarrow (t_0,x_0)$, $\varphi(t_n,x_n) \rightarrow \varphi_*(t_0,x_0)$ for $n \rightarrow \infty$. By continuity of $\varphi$, the sequence 
+    \begin{equation}
+        \delta_n := v(t_n,x_n) - \varphi(t_n,x_n) 
+        \label{eqn: Theorem 4.9, definition of delta_n}
+    \end{equation}
+    converges from above to zero as $n \rightarrow \infty$. In addition, because $t_0,x_0) \in [0,T)\times \Solvency$, there exists some $\rho>0$ such that for $n$ large enough, $t_n<T$ and $B(x_n,\rho) \subset B(x_0, 2 \rho) = \{|y-x_0| < 2 \rho\} \subset \Solvency$. Here, $B(x_0,\rho)$ denotes an open ball of radius $\rho>0$ around $x$. 
+
+    Let us now consider an uncontrolled process $X^{(t_n,x_n)}$ starting in $t_n,x_n)$. Furthermore, choose a strictly positive sequence $\{h_n\}_{n \in \mathbb N}$ such that $h_n \rightarrow 0$ and $\delta_n / h_n \rightarrow 0$ as $n \rightarrow \infty$, i.e. $\delta_n \rightarrow 0$ faster than $h_n \rightarrow 0$ as $n \rightarrow \infty$. Then, for the stopping time
+    \begin{equation*}
+        \Bar{\tau}_n := \inf \{ s \geq t_n : |X^{(t_n,x_n)} - x_n| \geq \rho\} \wedge (t_n + h_n) \wedge T,
+        %\label{eqn: Theorem 4.9, definition of bar tau_n}
+    \end{equation*}
+    we get by the strong Makrov property and the Dynkin formula (see Theorem \ref{trm: Dynkin formula}), for $\rho$ sufficiently small,
+    \begin{align}
+        v & (t_n,x_n) \geq \E^{(t_n,x_n)} \left[ \int_{t_n}^{\Bar{\tau}_n} f(s,X(s)) \diff s + v (\bar \tau_n, \check{X}(\tau_n^-)) \right] \nonumber \\
+        & \geq \E^{(t_n,x_n)} \left[ \int_{t_n}^{\Bar{\tau}_n} f(s,X(s)) \diff s + \varphi(\bar \tau_n, \check{X}(\tau_n^-)) \right] \nonumber \\
+        & \overset{\text{Dynkin}}{=} \varphi(t_n,x_n) + \E^{(t_n,x_n)} \left[ \int_{t_n}^{\bar \tau_n} \big\{ f(s,X(s)) + \partial_s\varphi(s,X(s)) + \mathcal L \varphi(s,X(s)) \big\} \diff s \right],
+        \label{eqn: Theorem 4.9, temporary result 1}
+    \end{align}
+    Combining \eqref{eqn: Theorem 4.9, definition of delta_n} with \eqref{eqn: Theorem 4.9, temporary result 1}, we then obtain 
+    \begin{equation}
+        \frac{\delta_n}{h_n} \geq E^{(t_n,x_n)} \left[ \frac{1}{h_n} \int_{t_n}^{\Bar{\tau}_n} \big\{ f(s,X(s)) + \partial_s \varphi(s,X(s)) + \mathcal{L} \varphi(s,X(s)) \big\} \diff s \right].
+        \label{eqn: (21) in Seydel}
+    \end{equation}
+    We now aim to let $n \rightarrow \infty$ in \eqref{eqn: (21) in Seydel}. However, note that it is not possible to apply the mean value theorem as, for some fixed event $\omega \in \Omega$, the map $s \mapsto f(s,X(s))$  is in general not continuous as $X$ is a jump-diffusion process. We therefore proceed by choosing some $\varepsilon \in (0, \rho)$. Then, by Lemma \ref{lemma: Lemma 7.2 in Seydel},
+    \begin{equation*}
+        \Prob \left( \sup_{t_n \leq s \leq r} |X^{(t_n,x_n)}(s) - x_n| > \varepsilon \right) \rightarrow 0 \quad \text{for } r \downarrow t_n. 
+    \end{equation*}
+    Define the set
+    \begin{equation*}
+        A_{n,\varepsilon} := \{ \omega : \sup_{t_n \leq s \leq t_n + h_n} |X^{(t_n,x_n)}(s) - x_n| \leq \varepsilon \},
+    \end{equation*}
+    as well as its complement
+    \begin{equation*}
+        A_{n,\varepsilon}^c := \{ \omega : \sup_{t_n \leq s \leq t_n + h_n} |X^{(t_n,x_n)}(s) - x_n| > \varepsilon \}.
+    \end{equation*}
+    Using the sets $A_{n,\varepsilon}$ and $A_{n,\varepsilon}^c$, the integral in \eqref{eqn: (21) in Seydel} is split with
+    \begin{equation}
+        \left( \int_{t_n}^{t_n+h_n}\right) = \left( \int_{t_n}^{t_n+h_n}\right) \ind{A_{n,\varepsilon}} + \left( \int_{t_n}^{\bar \tau_n}\right) \ind{A_{n,\varepsilon}^c}.
+        \label{eqn: Theorem 4.9, split equation}
+    \end{equation}
+    On the set $A_{n,\varepsilon}$, for the integrand $G(t,x) := f(t,x) + \partial_t \varphi (t,x) + \mathcal L \varphi(t,x)$ on the right-hand side of \eqref{eqn: (21) in Seydel}, we obtain
+    \begin{align}
+        \left| G(t_0,x_0) - \frac{1}{h_n} \int_{t_n}^{t_n+h_n} G(s,X(s)) \diff s \right| &\leq \frac{1}{h_n} \int_{t_n}^{t_n+h_n} \big| G(t_0,x_0) - G(s,X(s))\big| \diff s \nonumber \\
+        & \leq \left| G(t_0,x_0) - G(\hat{t}_{n,\varepsilon},\hat{x}_{n,\varepsilon}) \right|,
+        \label{eqn: (22) in Seydel}
+    \end{align}
+    the latter of which is because the integrand $G$ is continuous by \assitemref{ass: V3} and the assumption on $\varphi \in \PB \cap C^{1,2}([0,T] \times \R^d)$, and the maximum distance of $|G(t_0,x_0) - G(\cdot, \cdot)|$ is assumed in a $(\hat{t}_{n,\varepsilon},\hat{x}_{n,\varepsilon}) \in [t_n, t_n + h_n] \times \overline{B(x_n,\varepsilon)}$\footnote{Note that the set $[t_n,t_n+h_n] \times \overline{B(x_n,\varepsilon)}$ is compact and Weierstrass' theorem, see \cite[Theorem 3.12 (Extreme-value theorem)]{ProtterMorrey1991FirstCourseRealAnalysis}, implies that the supremum is attained within the compact set.}.
+
+    On the set $A_{n,\varepsilon}^c$,
+    \begin{align*}
+        \frac{1}{h_n} & \left( \int_{t_n}^{\bar \tau_n} \big\{f(s,X(s)) + \partial_s \varphi(s,X(s)) + \mathcal{L}\varphi(s,X(s)) \big\} \diff s \right) \ind{A_{n,\varepsilon}^c} \\
+        & \leq \esssup_{t_n \leq s \leq \Bar{\tau}_n} \Big| f(s,X(s)) + \partial_s \varphi(s,X(s)) + \mathcal L \varphi(s,X(s)) \Big| \ind{A_{n,\varepsilon}^c},
+    \end{align*}
+    which is bounded by the same arguments as above and because a jump in $\bar \tau_n$ does not affect the essential supremum. 
+
+    Now because $h_n \rightarrow 0$ and $(t_n,x_n) \rightarrow (t_0,x_0)$ for $n \rightarrow \infty$ and by stochastic continuity,
+    \begin{equation*}
+        \Prob(A_{n,\varepsilon}) \rightarrow 1 \quad \text{as } n \rightarrow \infty
+    \end{equation*}
+    for any $\varepsilon >0$, or, equivalently,
+    \begin{equation}
+        \ind{A_{n,\varepsilon}} \rightarrow 1 \quad \text{a.s.,} \quad \text{as } n \rightarrow \infty,
+        \label{eqn: Theorem 4.9, temporary result 2}
+    \end{equation}
+    for any $\varepsilon >0$. \eqref{eqn: Theorem 4.9, temporary result 2} also implies that on the complementary set $A_{n,\varepsilon}^c$, 
+    \begin{equation}
+        \ind{A_{n,\varepsilon}^c} \rightarrow 0 \quad \text{a.s.,} \quad \text{as } n \rightarrow \infty.
+        \label{eqn: Theorem 4.9, temporary result 3}
+    \end{equation}
+    
+    Hence by \eqref{eqn: (21) in Seydel} and combining \eqref{eqn: Theorem 4.9, split equation}--\eqref{eqn: Theorem 4.9, temporary result 3}, we obtain
+    \begin{align*}
+        0 &= \lim_{n \rightarrow \infty} \frac{\delta_n}{h_n} \\
+        & \geq \lim_{n \rightarrow \infty} \E^{(t_n,x_n)} \left[ \frac{1}{h_n} \int_{t_n}^{\bar \tau_n} \big\{f(s,X(s)) + \partial_s \varphi(s,X(s)) + \mathcal L \varphi(s,X(s))\big\} \diff s \right] \\
+        & = \lim_{n \rightarrow \infty} \E^{(t_n,x_n)} \left[ \left\{ \frac{1}{h_n} \int_{t_n}^{t_n+h_n} \big\{ f(s,X(s)) + \partial_s \varphi(s,X(s)) + \mathcal L \varphi (s,X(s)) \big\} \right\} \ind{A_{n,\varepsilon}}\right] \\
+        & \quad + \lim_{n \rightarrow \infty} \E^{(t_n,x_n)} \left[ \left\{ \frac{1}{h_n} \int_{t_n}^{\bar \tau_n} \big\{ f(s,X(s)) + \partial_s \varphi(s,X(s)) + \mathcal L \varphi (s,X(s)) \big\} \right\} \ind{A_{n,\varepsilon}^c}\right] \\
+        &\! \! \overset{\text{DCT}}{=} \lim_{n \rightarrow \infty} \E^{(t_0,x_0)} \left[ \lim_{n \rightarrow \infty} \left\{ \frac{1}{h_n} \int_{t_n}^{t_n+h_n} \big\{ f(s,X(s)) + \partial_s \varphi(s,X(s)) + \mathcal L \varphi (s,X(s)) \big\} \right\} \ind{A_{n,\varepsilon}}\right] \\
+        & \quad +\E^{(t_0,x_0)} \left[ \lim_{n \rightarrow \infty} \left\{ \frac{1}{h_n} \int_{t_n}^{\bar \tau_n} \big\{ f(s,X(s)) + \partial_s \varphi(s,X(s)) + \mathcal L \varphi (s,X(s)) \big\} \right\} \ind{A_{n,\varepsilon}^c}\right] \\
+        & = f(t_0,x_0) + \partial_t \varphi(t_0,x_0) + \mathcal L \varphi (t_0,x_0),
+    \end{align*}
+    by the dominated convergence theorem (DCT). Thus,
+    \begin{equation}
+        \partial_t \varphi + \mathcal L \varphi + f \leq 0 \quad \text{in } [0,T) \times \Solvency.
+        \label{eqn: v is supersolution, part 3}
+    \end{equation}
+    Combining \eqref{eqn: v is supersolution, part 1}--\eqref{eqn: v is supersolution, part 3}, we see that the supersolution criterion in Definition \ref{def: Definition 4.1 in Seydel (Viscosity solution)} is met and $v$ is therefore a supersolution. 
+
+    $v$ \textbf{is a subsolution}. Let $[0,T] \times \R^d$ and $\varphi \in \PB \cap C^{1,2}([0,T] \times \R^d)$ such that $v^*(t_0,x_0) = \varphi (t_0,x_0)$ and $\varphi \geq v^*$ on $[0,T] \times \R^d$. 
+
+    We begin by noting that in the case when
+    \begin{equation*}
+        v^*(t_0,x_0) \leq \InterveneOper v^*(t_0,x_0),
+    \end{equation*}
+    then the subsolution inequality in Definition \ref{def: Definition 4.1 in Seydel (Viscosity solution)}
+    \begin{align*}
+        \min \big\{ -(\partial_t \varphi + \InfinitesimalGenerator \varphi + f), v^* - \InterveneOper v^* \big \} & \leq 0 \quad \text{in } [0,T) \times \Solvency \\
+        \min \{ v^* - g, v^* - \InterveneOper v^*\} & \leq 0 \quad \text{in } \partial^+ \Solvency_T,
+    \end{align*}
+    holds trivially. Therefore, consider from now on the case when 
+    \begin{equation*}
+        v^*(t_0,x_0) > \InterveneOper v^*(t_0,x_0).
+    \end{equation*}
+
+    Consider $(t_0,x_0) \in \partial^+ \Solvency_T$. For an approximating sequence $(t_n,x_n) \rightarrow (t_0,x_0)$ in $[0,T] \times \R^d$ with $v(t_n,x_n) \rightarrow v^*(t_0,x_0)$, the relation 
+    \begin{equation*}
+        v(t_n,x_n) > \InterveneOper v(t_n,x_n)
+    \end{equation*}
+    holds by Lemma \ref{lemma: Lemma 4.3 in Seydel}(iv). Thus, by the continuity of $g$ outside $\bar \Solvency$ and, in the case when $x_0 \in \partial \Solvency$ or $t_0=T$, Assumption \assitemref{ass: E3},
+    \begin{equation*}
+        g(t_0,x_0) = \lim_{n \rightarrow \infty} g(t_n,x_n) = \lim_{n \rightarrow \infty} v(t_n,x_n) = v^*(t_0,x_0). 
+    \end{equation*}
+    
+    Let us now show that for
+    \begin{equation}
+        v^* (t_0,x_0) > \InterveneOper v^*(t_0,x_0),
+        \label{eqn: Theorem 4.8, initial assumption}
+    \end{equation}
+    one obtains
+    \begin{equation*}
+        - (\partial_t \varphi + \InfinitesimalGenerator \varphi + f) \leq 0 \quad \text{in }(t_0,x_0) \in [0,T) \times \Solvency,
+        \label{eqn: Theorem 4.8, main goal subsolution part}
+    \end{equation*}
+    where $\varphi \in \PB \cap C^{1,2}([0,T) \times \R^d)$. To this end, we argue by contradiction and assume that there is an $\eta > 0$ such that 
+    \begin{equation}
+        \partial_t \varphi(t_0,x_0) + \InfinitesimalGenerator \varphi(t_0,x_0) + f(t_0,x_0) < - \eta.
+        \label{eqn: (24) in Seydel}
+    \end{equation}
+    Because $\varphi \in \PB \cap C^{1,2}([0,T] \times \R^d)$ and $\partial_t \varphi + \InfinitesimalGenerator \varphi + f$ is continuous in $(t,x)$ by \assitemref{ass: V3}, we can choose some $\delta > 0$ such that 
+    \begin{equation*}
+        \Big| \partial_t \varphi (t,x) + \InfinitesimalGenerator \varphi (t,x) + f(t,x) - \big( \partial_t \varphi (t_0,x_0) + \InfinitesimalGenerator \varphi (t_0,x_0) + f(t_0,x_0) \big) \Big| < \frac \eta 2
+    \end{equation*}
+    whenever $|(t,x) - (t_0,x_0)| < \delta$. By Assumption \eqref{eqn: (24) in Seydel}, for such $(t,x)$ we have 
+    \begin{align*}
+        \partial_t \varphi (t,x) + \InfinitesimalGenerator \varphi (t,x) + f(t,x) & < \partial_t \varphi (t_0,x_0) + \InfinitesimalGenerator \varphi (t_0,x_0) + f(t_0,x_0) + \frac{\eta}{2} \\
+        &\overset{\eqref{eqn: (24) in Seydel}}{<} - \eta +\frac{\eta}{2} \\
+        &= -\frac{\eta}{2},
+    \end{align*}
+    so there exists an open set $\mathcal O$ surrounding $(t_0,x_0) \in [0,T) \times \Solvency$ such that 
+    \begin{equation}
+        \partial_t \varphi (t,x) + \InfinitesimalGenerator \varphi (t,x) + f(t,x) < - \frac{\eta}{2} \quad \text{for } (t,x) \in \mathcal{O}. 
+        \label{eqn: Theorem 4.8, temporary result 4}
+    \end{equation}
+
+    From the definition of $v^*$, there exists a sequence $(t_n,x_n) \in ([0,T) \times \Solvency) \cap \mathcal{O} $ such that $(t_n,x_n) \rightarrow (t_0,x_0)$, $v(t_n,x_n) \rightarrow v^*(t_0,x_0)$ for $n \rightarrow \infty$. By continuity of $\varphi$, we observe that 
+    \begin{equation*}
+        \delta_n := v(t_n,x_n) - \varphi(t_n,x_n) \rightarrow 0 \quad \text{as } n \rightarrow \infty
+    \end{equation*}
+    since $v(t_n,x_n) \rightarrow v^*(t_0,x_0)$ and $\varphi(t_n,x_n) \rightarrow \varphi(t_0,x_0) = v^*(t_0,x_0)$ as $n \rightarrow \infty$. By the definition of the value funciton, there exists for all $n$ and $\varepsilon>0$ ($\varepsilon = \varepsilon_n$ with $\varepsilon_n \downarrow 0$) a sequence of admissible impulse controls $\alpha^n = (\tau_j^n, \zeta_j^n)_{j \geq 0}$ such that 
+    \begin{equation}
+        v(t_n,x_n) \leq J^{(a^n)}(t_n,x_n) + \varepsilon.
+        \label{eqn: (25) in Seydel}
+    \end{equation}
+    For a $\rho>0$ chosen suitably small, i.e. such that $B(x_n,\rho) \subset B(x_0,2 \rho) \subset \Solvency$ and $t_n + \rho < t_0 + 2 \rho < T$ for large $n$, we define the stopping time $\bar \tau_n := \bar \tau_n^\rho \wedge \tau_1^n$, where 
+    \begin{equation*}
+        \bar \tau_n^\rho  := \inf \big\{ s \geq t_n: |X^{(a^n, t_n,x_n)} - x_n| \big\} \wedge (t_n + \rho),
+    \end{equation*}
+    for $X^{(a^n, t_n,x_n)}$ denoting the controlled process starting at $(t_n,x_n)$, and $\tau_1^n$ is the first time of intervention in the impulse control $\alpha^n$. 
+    
+    With this in mind, we now aim to show that $\bar \tau_n \rightarrow t_0$ in probability. Therefore, we begin by observing that, for some $t,x) \in [0,T] \times \Solvency$, $\tau = \tauS \wedge T$, and $\tilde \tau \leq \tau$, the performance criterion satisfies the following inequality
+    \begin{align}
+        J^{(\alpha)}&(t,x) = \E^{(t,x)} \left[ \int_t^{\tau} f(s,X^{(\alpha)}(s)) \diff s + g(\tau,X^{(\alpha)}(\tau)) + \sum_{\tau_j \leq \tau} K(\tau_j, \check{X}^{(\alpha)}(\tau_j^-), \zeta_j) \right] \nonumber \\
+        &= \Etx \Bigg[ \int_t^{\tilde \tau} f(s,X^{(\alpha)}(s)) \diff s + \sum_{\tau_j \leq \tau} K(\tau_j, \check{X}^{(\alpha)}(\tau_j^-), \zeta_j) \nonumber  \\
+        & \qquad + \E^{(\tilde \tau, \check{X}^{(\alpha)}(\tilde \tau^-))}\bigg[ \int_{\tilde \tau}^{\tau} f(s,X^{(\alpha)}(s)) \diff s + g(\tau, X^{(\alpha)}(\tau)) + \sum_{\tilde \tau \leq \tau_j \leq \tau} K(\tau_j, \check{X}^{(\alpha)}(\tau_j^-),\zeta_j) \bigg] \Bigg] \nonumber \\
+        &= \Etx \Bigg[ \int_t^{\tilde \tau} f(s,X^{(\alpha)}(s)) \diff s + \sum_{\tau_j < \tilde \tau} K(\tau_j, \check{X}^{(\alpha)}(\tau_j^-), \zeta_j) + J^{(\alpha)}(\tilde \tau, \check{X}^{(\alpha)}(\tilde \tau ^-)) \Bigg] \nonumber  \\
+        & \leq \Etx \left[ \int_t^{\tilde \tau} f(s,X^{(\alpha)}(s)) \diff s + \sum_{\tilde \tau_j \leq \tau} K(\tau_j, \check{X}^{(\alpha)}(\tau_j^-),\zeta_j) + c(\tilde \tau, X^{(\alpha)}(\tilde \tau^-) \right]
+        \label{eqn: Theorem 4.8, Markov property}. 
+    \end{align}
+    Hence, from \eqref{eqn: (25) in Seydel} and \eqref{eqn: Theorem 4.8, Markov property}, it follows that
+    \begin{align*}
+        v(t_n,x_n) &\leq E^{(t_n,x_n)} \left[ \int_{t_n}^{\bar \tau_n} f(s,X(s)) \diff s + v(\bar \tau_n, X(\bar \tau_n^-)) \right] + \varepsilon_n \\
+        & \leq \E^{(t_n,x_n)} \left[ \int_{t_n}^{\bar \tau_n} f(s,X(s)) \diff s + \varphi(\bar \tau_n, X(\bar \tau_n^-)) \right] + \varepsilon_n,
+    \end{align*}
+    where $X$ is the uncontrolled process. By Dynkin's formula on $\varphi(\bar \tau_n, X(\bar \tau_n^-)$, using $v(t_n,x_n) 0 = \varphi(t_n,x_n) + \delta_n$, and with \eqref{eqn: Theorem 4.8, temporary result 4} for $\rho>0$ small enough, we get
+    \begin{align*}
+        \delta_n &\leq \E^{(t_n,x_n)} \left[ \int_{t_n}^{\bar \tau_n} \big\{ f(s,X(s)) + \partial_s \varphi(s, X(s)) + \InfinitesimalGenerator \varphi(s, X(s)) \big\}  \diff s \right] + \varepsilon_n \\
+        & \overset{\eqref{eqn: Theorem 4.8, temporary result 4}}{\leq} \E^{(t_n,x_n)} \left[\bar \int_{t_n}^{\bar \tau_n}  \left(- \frac{\eta}{2} \right) \diff s\right] + \varepsilon_n \\
+        & \leq -\frac{\eta}{2} \E^{(t_n,x_n)} [\bar \tau_n - t_n] + \varepsilon_n.
+    \end{align*}
+    Since $\delta_n \rightarrow 0$ as $n \rightarrow \infty$ and $\varepsilon_n$ is arbitrary, this implies that 
+    \begin{equation*}
+        \lim_{n \rightarrow \infty} \E [\bar \tau_n] = \lim_{n \rightarrow \infty} t_n = t_0,
+    \end{equation*}
+    which is equivalent to $\bar \tau_n \rightarrow t_0$ in probability, see Chebyshev's inequality in Appendix \ref{Appendix: Chebyshev's Inequality}, as $\bar \tau_n$ is bounded both from below and above. 
+
+    Now let us continue with our proof. In the following, we again make use of the stochastic continuity of $X^{(t_n,x_n)}$ up until the first impule. We define 
+    \begin{equation*}
+        A_n(\rho) := \big\{ \omega \in \Omega : \sup_{t_n \leq s \leq \bar \tau_n} |X^{(t_n,x_n)}(s) - x_n| \leq \rho\big\}.
+    \end{equation*}
+    \eqref{eqn: (25) in Seydel} combined with the Markov property \eqref{eqn: Theorem 4.8, Markov property} gives us
+    \begin{align}
+        v(t_n,x_n) &\leq \E^{(t_n,x_n)} \left[ \int_{t_n}^{\bar \tau_n} f(s,X(s)) \diff s + K(\tau_1^n, \check X (\tau_1^{n-}), \zeta_1^n) \ind{ \bar \tau_n^\rho \geq \tau_1^n} + v(\bar \tau_n, X^{(\alpha)}(\bar \tau_n)) \right] \nonumber \\
+        & \qquad + \varepsilon_n.
+        \label{eqn: (27) in Seydel}
+    \end{align}
+    and we now aim to find the upper bound for $v(t_n,x_n)$ in \eqref{eqn: (27) in Seydel}. To do so, we make use of indicator functions for three different cases:
+    \begin{align*}
+        &(I): \{\bar \tau_n^\rho < \tau_1^n\} \\
+        &(II): \{\bar \tau_n^\rho \geq \tau_1^n \} \cap A_n(\rho)^c \\
+        &(III): \{\bar \tau_n^\rho \geq \tau_1^n \} \cap A_n(\rho) \\
+    \end{align*}
+    We note that $(III)$ is the predominant set, i.e. it has maximum possible cardinality. To see this, note that 
+    \begin{equation*}
+        \big( \{\bar \tau_n^\rho \geq \tau_1^n \} \cap A_n(\rho) \big)^c \subseteq \{\tau_n^\rho < \tau_1^n \} \cup A_n(\rho)^c,
+    \end{equation*}
+    such that 
+    \begin{align}
+        \Prob(III) &= \Prob \big( \{ \bar \tau_n^\rho \geq \tau_1^n\} \cap A_n(\rho) \big) \nonumber \\
+        &= 1 - \Prob \big( (\{\bar \tau_n^\rho \geq \tau_n^1\} \cup A_n(\rho))^c \big) \nonumber \\
+        & \geq 1 - \Prob\big( \{\bar \tau_n^\rho < \tau_n^1\} \big) - \Prob\big(A_n(\rho)^c\big)
+        \label{eqn: Theorem 4.8, temporary result 5}
+    \end{align}
+    Then, by Lemma \ref{lemma: Lemma 7.2 in Seydel}(iii), 
+    \begin{equation*}
+        \Prob (A_n(\rho)^c) = \Prob(\{ \omega \in \Omega: \sup_{t_n \leq s \leq \bar \tau_n} |X^{(t_n,x_n)}(s) - x_n| > \rho\}) \rightarrow 0 \quad \text{as } n \rightarrow \infty,
+    \end{equation*}
+    because $(t_n,x_n) \rightarrow (t_0,x_0)$, $\bar \tau_n \rightarrow t_0$ in probability as $n \rightarrow \infty$, and $\bar \tau_n \geq t_n$ by definition. Moreover, on the event $\{\bar \tau_n^\rho < \tau_1^n\}$, let $\{\hat \varepsilon_n\}_{n \geq 0}$ be any time sequence such that 
+    \begin{equation*}
+        \{ \bar \tau_n^\rho < \tau_1^n\} \subseteq \{\bar \tau_n^\rho < \hat \varepsilon_n \} \cup \{\tau_1^n \geq \hat \varepsilon_n\}. 
+    \end{equation*}
+    Then, 
+    \begin{equation*}
+        1-\Prob(\bar \tau_n^\rho < \tau_1^n) \geq \Prob(\bar \tau_n^\rho < \hat \varepsilon_n) - \Prob(\tau_1^n \geq \hat \varepsilon_n). 
+    \end{equation*}
+    Choosing $\hat \varepsilon_n \downarrow t_0$ and recalling that $\bar \tau_n \rightarrow t_0$ in probability as $n \rightarrow \infty$, we note that 
+    \begin{equation*}
+        \Prob (\tau_1^n \geq \hat \varepsilon_n) \rightarrow 0 \quad \text{as }  n \rightarrow \infty
+    \end{equation*}
+    and that, for $\rho' < \rho$, 
+    \begin{equation*}
+        \{\bar \tau_n^\rho < \hat \varepsilon\} \subset \big\{ \sup_{t_n \leq s \leq \varepsilon_n} |X^{(t_n,x_n)} - x_n| > \rho' \big\},
+    \end{equation*}
+    where the inclusion comes from the definition of $\bar \tau_n^\rho$ as the first exit from the ball $B(x_n,\rho)$ truncated by $t_n + \rho$. Since $\hat \varepsilon \downarrow t_0$ and $t_n \leq \bar \tau_n^\rho \leq \bar \tau_n \rightarrow t_0$ in probability as $n \rightarrow \infty$, we have by Lemma \ref{lemma: Lemma 7.2 in Seydel}(iii), that 
+    \begin{equation*}
+        \Prob \big( \sup_{t_n \leq s \leq \varepsilon_n} |X^{(t_n,x_n)} - x_n| > \rho' \big) \rightarrow 0 \quad \text{as } n \rightarrow \infty.
+    \end{equation*}
+    Hence, 
+    \begin{equation*}
+        \Prob(\bar \tau_n^\rho < \hat \varepsilon_n) \rightarrow 0 \quad \text{as } n \rightarrow \infty
+    \end{equation*}
+    and \eqref{eqn: Theorem 4.8, temporary result 5} becomes
+    \begin{align*}
+        \Prob(III) &\geq 1 - \Prob(\{\bar \tau_n^\rho < \tau_1^n\})  - \Prob(A_n(\rho)^c)  \\
+        & \geq 1 - \Prob(\bar \tau_n^\rho < \hat \varepsilon_n) - \Prob(\tau_1^n \geq \hat \varepsilon_n) - \Prob(A_n(\rho)^c) \longrightarrow 1 \quad \text{as } n \rightarrow \infty.
+    \end{align*}
+    In particular, 
+    \begin{equation*}
+        \ind{III} \rightarrow 1 \quad \text{a.s.} \quad \text{as } n \rightarrow \infty. 
+    \end{equation*}
+    Thus, using that if there is an impulse in $\bar \tau_n$, i.e. $\bar \tau_n^\rho \geq \tau_1^n$, then
+    \begin{equation*}
+        v(\bar \tau_n, X(\bar \tau_n)) + K(\bar \tau_n, \check X(\bar \tau_n^-)) \leq \InterveneOper v(\bar \tau_n, \check{X}(\bar \tau_n^-)),
+    \end{equation*}
+    and 
+    \begin{align*}
+        v(t_n,x_n) &\leq \sup_{\substack{|t' - t_0| < \rho \\[2pt] |y' - x_0| < \rho}} f(t', y') \E[\bar \tau_n - t_0] + \E \big[|v(\bar \tau_n, X(\bar \tau_n)| \ind{I} \big] \\
+        & + \E\big[ |\InterveneOper v(\bar \tau_n, \check{X}(\bar \tau_n^-))| \ind{II} \big] + \sup_{\substack{|t' - t_0| < \rho \\[2pt] |y' - x_0| < \rho}} \InterveneOper v(t',y') \E [\ind{III}]. 
+        \label{eqn: Theorem 4.8, temporary result 5}
+    \end{align*}
+    To prove the boundedness in term $(I)$ (uniform in $n$), we can assume w.l.o.g. that $\nu(\R^\ell) = 1$, and consider only jumps bounded away from $0$ for $x_0>0$. Then, by Assumption \assitemref{ass: E1},
+    \begin{equation*}
+        \E \big[ \sup_n |v(\bar \tau_n, X(\bar \tau_n))| \big] \leq C \E [1+(x_0,2 \rho + Y)^m]
+    \end{equation*}
+    for a jump $Y$ with distribution $\nu^{\gamma(t_0 + 2\rho, x_0+2 \rho, \cdot)}$, which is finite by the definition of $\PB$. The same is true for $\InterveneOper v(\bar \tau_n,X(\bar \tau_n^-)$. 
+
+    Sending $n \rightarrow \infty$, the terms containing $f$ and $(I)$ in \eqref{eqn: Theorem 4.8, temporary result 5} converge to 0 by the dominated convergence theorem. For the term containing $(II)$ in \eqref{eqn: Theorem 4.8, temporary result 5}, a general version of the dominated convergence theorem shows that it is bounded by 
+    \begin{equation*}
+        \E \big[ \limsup_{n \rightarrow \infty} |\InterveneOper v (\bar \tau_n, \check X(\tau_n^-))| \ind{A_n(\rho)^c} \big], 
+    \end{equation*}
+    and the term with $(III)$ in \eqref{eqn: Theorem 4.8, temporary result 5} becomes $\sup \InterveneOper v(t',y')$. Now we let $\rho \rightarrow 0$ and obtain using \eqref{eqn: Theorem 4.8, temporary result 5} and Lemma \ref{lemma: Lemma 4.3 in Seydel}(ii):
+    \begin{equation*}
+        v^*(t_0,x_0) \leq \lim_{\rho \downarrow 0} \sup_{\substack{|t' - t_0| < \rho \\[2pt] |y' - x_0| < \rho}} \InterveneOper v(t',y') = (\InterveneOper v)^* (t_0,x_0) \leq \InterveneOper v^*(t_0,x_0).
+    \end{equation*}
+    However, this contradicts \eqref{eqn: Theorem 4.8, initial assumption}. As such \eqref{eqn: (24) in Seydel} must be false and \eqref{eqn: Theorem 4.8, main goal subsolution part} must hold. Hence, by Definition \ref{def: Definition 4.1 in Seydel (Viscosity solution)}, the value function $v$ is a viscosity solution.
+\end{proof}
+
+Thus, with Theorem \ref{trm: Existence of the Viscosity Solution}, we have established the existence of a viscosity solution to the QVI without relying on classical $C^{1,2}$ regularity. In the next chapter, we show that this viscosity solution is, indeed, unique. 

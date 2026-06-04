@@ -1,0 +1,152 @@
+%\section{Asset Price Calibration using European Call Options}
+\label{appendix: Calibration Procedure}
+This appendix describes the calibration of the Variance-Gamma stock price model to observed European option prices. The objective is to choose model parameters $\sigma$, $\theta$, and $\nu$ such that the resulting options prices are close to those quoted in the market. In this sense, calibration uses market option prices to determine suitable parameter values for the underlying stock price model.
+
+To make the procedure computationally efficient, option prices are computed using the Fast Fourier Transform (FFT) approach introduced by Carr and Madan \cite{carr1999option}. The calibration problem is then formulated as a numerical minimisation problem, where the distance between model prices and market prices is minimised over the admissible parameter space. The focus of this appendix is on the practical implementation of the calibration procedure. Detailed derivation of the underlying pricing theory is therefore omitted. For further details, see \cite{carr1999option, jarrow2018continuous, madan1998variance, schoutens2003levy}.
+
+\section{Risk-neutral option pricing}
+\label{appendix: Risk-neutral option pricing theory}
+A \emph{European option} is a financial contract that gives its holder the right, but not the obligation, to buy or sell an underlying asset at a predetermined price on a fixed maturity date. A \emph{call option} gives the right to buy the asset, while a \emph{put option} gives the right to sell it. The predetermined price is called the strike price, denoted by $K$, and the fixed maturity date is denoted by $T$. European options can only be exercised at maturity. 
+
+Since European call and put prices are linked through the put-call parity, see \cite[p.85]{jarrow2018continuous}, it is sufficient for our purposes to consider European call options, which can be priced using the FFT approach of Carr and Madan \cite{carr1999option}. In the following, we refer to European call options simply as call options. The underlying asset is assumed to be a company's stock.
+
+The standard approach to option pricing is based on risk-neutral pricing. Under this approach, the derivative price is obtained by discounting its expected payoff under a risk-neutral pricing measure. For a call option with strike $K$, maturity $T$, constant risk-free rate $\delta $, and underlying stock price $S(T)$ at maturity, the time-$t$ price is given by
+\begin{equation*}
+    C_T(s,K)  = e^{-\delta T} \E_\mathbb{Q} [(S(T)-K)_+ \mid S(0)=s],
+\end{equation*}
+where $(x)_+ := \max (x,0)$ is the hockey stick function, and $\mathbb Q$ denotes the risk-neutral probability measure. For simplification, we set $t=0$. Then, the call option is priced via
+\begin{equation}
+    C_T(s,K)  = e^{-\delta T} \E_\mathbb{Q} [(S(T)-K)_+ | S(0) = s].
+    \label{E: call option pricing formula}
+\end{equation}
+In the calibration procedure below, stocks are modeled under the risk-neutral probability measure. 
+
+\section{Option pricing via Fourier Transforms}
+\label{appendix: Option pricing via Fourier Transforms}
+Let $k$ denote the logarithm of the strike price $K$ and $C_T(s,k)$ the price of a European call option with maturity T. Let the risk-neutral density of the logarithm price $s_T$ be $q_T(s)$. Then the call option pricing formula \eqref{E: call option pricing formula} reads as
+\begin{align}
+    C_T(s,K) &= e^{-\delta T}\E_\Q [(S(T)-K)_+ | S(0) = s] \nonumber \\
+    &= e^{-\delta T} \int_k^\infty (e^s-e^k) q_T(s) \diff s. 
+    \label{E: call option pricing formula integral form}
+\end{align}
+Note that the function $C_T$ is not square-integrable because $C_T \rightarrow 0$ as $K \rightarrow -\infty$. Moreover, let $u$ be the Fourier frequency of $k$. Then, it can be shown that the Fourier transform of $C_T$ is singular at $u=0$. Therefore, \textcite{carr1999option} introduce the damping term $e^{\alpha k}$, where $\alpha > 0$ is a real number. Specifically, define
+\begin{equation}
+    c_T(s,k) = e^{\alpha k} C_T(s,k). 
+\end{equation}
+Let $\hat c_T$ denote the Fourier transform of $c_T$. The Fourier transform is given by
+\begin{equation*}
+    \hat{c}_T(s,u) = \int_{-\infty}^\infty e^{iuk} c_T(s,k) \diff k,
+\end{equation*}
+with $i^2=-1$ an imaginary number. Furthermore, define the characteristic function of $q_T$ by
+\begin{equation}
+    \phi_T(u) = \int_{-\infty}^{\infty} e^{ius} q_T(s) \diff s. 
+    \label{E: CF}
+\end{equation}
+Then, applying Fourier transforms on $c_T$ and $q_T$, it can shown that \eqref{E: call option pricing formula integral form} can be written as
+\begin{equation}
+    C_T(s,k) = \frac{1}{\pi} e^{-\alpha k} \int_{0}^\infty e^{-iuk} \hat c_T(s,u) \diff u,
+    \label{E: C_T FT}
+\end{equation}
+where 
+\begin{align}
+    \hat c_T(s,u) &= \int_{-\infty}^\infty e^{iuk} \int_k^\infty e^{\alpha k} (e^s-e^k) q_T(s) \diff s \diff k = \frac{e^{-\delta T}\phi_T(u-(\alpha+1)i)}{\alpha^2 + \alpha - u^2 + i(2\alpha +1)u}.
+    \label{E: c-hat}
+\end{align}
+Rigorous details on the derivation of \eqref{E: C_T FT} and \eqref{E: c-hat} can be found in \cite{carr1999option}. 
+
+\section{From Fourier transforms to the Fast Fourier Transform}
+\label{appendix: From Fourier transforms to the Fast Fourier Transform}
+The Fast Fourier Transform (FFT) is an efficient algorithm to compute the sum
+\begin{equation}
+    w(n) = \sum_{j=1}^N e^{-i \frac{2\pi}{N}(j-1)(n-1)} f(j), \quad \text{for } n=0,1,\ldots, N,
+    \label{E: function w}
+\end{equation}
+where $N$ is typically a power of 2. The algorithm was first introduced by Cooley and Tuckey in 1965, see \cite{CooleyTukey1965}. Since the FFT algorithm has a runtime complexity of magnitude $\mathcal{O}(N \log N)$, it is more efficient than a naive discrete Fourier transform, which typically has a runtime complexity $\mathcal{O}(N^2)$. In light of this, we now aim to apply the FFT algorithm to compute a discrete version of \eqref{E: C_T FT}. 
+
+Using the trapezoid rule, \eqref{E: C_T FT} can be written as
+\begin{equation}
+    C_T(s,k) \approx \frac{1}{\pi} e^{-\alpha k} \sum_{j=1}^N e^{-iu_jn} \hat c_T(s,u_j) \eta,
+    \label{E: FFT first step}
+\end{equation}
+where $u_j = \eta (j-1)$. The upper limit of the integration is now 
+\begin{equation*}
+    a = N\eta. 
+\end{equation*}
+Choosing a regular spacing $\lambda$ and setting a bound on the logarithm of the strike $k$ to range between $-$ and $b$, we obtain the grid
+\begin{equation*}
+    k_n = \varepsilon + \lambda (n-1), \quad \text{for } n = 1, \ldots, N,
+\end{equation*}
+where
+\begin{equation*}
+    \varepsilon = \frac{1}{2} N \lambda. 
+\end{equation*}
+The formula \eqref{E: FFT first step} can now be written as
+\begin{equation}
+    C_T(s,k_n) \approx \frac{1}{\pi} e^{-\alpha k_n} \sum_{j=1}^N e^{-i \lambda \eta (j-1)(n-1)}e^{i \varepsilon u_j} \hat c_T(s,u_j) \eta.
+    \label{E: FFT second step}
+\end{equation}
+To obtain a formula similar to \eqref{E: function w} (on which we can apply the FFT), we set $\lambda \eta = \frac{2\pi}{N}$. Furthermore, to obtain a more accurate integration for large $\eta$, Carr and Madan \cite{carr1999option} suggest applying Simpson's weighting rule. Applying these changes to \eqref{E: FFT second step}, we obtain
+\begin{equation}
+    C_T(s,k_n) \approx \frac{1}{\pi} e^{-\alpha k_n} \sum_{j=1}^N e^{-i\frac{2\pi}{N}(j-1)(n-1)}e^{i \varepsilon u_j} \hat c_T(s,u_j) \frac{\eta}{3} \big[ 3 + (-1)^j - \delta_{j-1} \big],
+    \label{E: C_T FFT}
+\end{equation}
+where $\delta_{j-1}$ is the Kronecker delta function that is unit for $j-1=0$ and zero otherwise. The function $\hat c_T$ remains unchanged and is given by \eqref{E: c-hat}. 
+
+\section{Model calibration}
+\label{appendix: Model calibration}
+With an efficient way to price call options, we now turn our attention to the estimation of parameters $\sigma$, $\theta$, and $\nu$ in the Variance-Gamma (VG) model. The VG option pricing model is described in detail in \cite{madan1998variance}. As such, derivations and proofs are omitted in this appendix. 
+
+Let $L(t;\sigma,\theta,\nu)$ denote a VG-process with parameters $\sigma$, $\theta$, and $\nu$. Moreover, assume that the stock pays dividends. We denote by $q$ the annualised log-dividend, estimated using historic dividends. Under the risk-neutral measure $\mathbb{Q}$, the stock price is given by 
+\begin{equation}
+    S(t) = s e^{(\delta+\omega-q)t + L(t;\sigma,\theta,\nu)}, \quad t\geq0,
+    \label{E: VG Stock price process}
+\end{equation}
+where $S(0)=s$ is known and $\omega = (1/\nu) \log (1-\theta \nu - \frac{1}{2}\sigma^2\nu)$. The characteristic function of the logarithm of $S(T)$ is then
+\begin{equation*}
+    \phi_T(u) = \exp\left(iu\left(\log s + (\delta+\omega-q)T\right)\right) \left(1-i\theta\nu u + \frac{1}{2}\sigma^2\nu u^2 \right)^{-T/\nu}.
+    %\label{E: VG characteristic function log stock}
+\end{equation*}
+
+The option prices for $N$ strike prices are obtained by inserting $\phi_T(u)$ into the expression of $\hat c_T$ \eqref{E: c-hat} and then using the FFT algorithm on \eqref{E: C_T FFT}. The calibration then essentially becomes the work of ``reverse engineering'' the parameters $\sigma$, $\theta$, and $\nu$ using market data. Specifically, for options data with $M$ maturities and $N$ strikes, we minimise the squared relative error
+\begin{equation}
+    \Theta^* = \argmin_{\Theta} \sum_{m=1}^M \sum_{n=1}^N \left( \frac{C^{\text{model}}_{T_m}(s,K_n) - C^{\text{market}}_{m,n}}{C^{\text{market}}_{m,n}} \right)^2,
+    \label{E: minimisation problem}
+\end{equation}
+where $\Theta := (\sigma, \theta, \nu)$ and $C^{\text{market}}_{m,n}$ denotes the market price of a call option with maturity $T_m$ and strike $K_n$. The optimisation constraints are
+\begin{equation*}
+    0 < 1-\theta \nu - \frac{1}{2} \sigma^2 \nu \quad \text{and} \quad \alpha < \sqrt{\frac{\theta^2}{\sigma^4} + \frac{2}{\sigma^2 \nu}} - \frac{\theta}{\sigma^2} - 1.
+\end{equation*}
+The first constraint is to keep the logarithm in $\omega$ well-defined. The second constraint is to keep the quantity 
+\begin{equation*}
+    \phi_T(-(\alpha+1)i) = e^{\log s + (\delta+\omega)T} \left( 1-\theta \nu (\alpha+1) - \frac{1}{2}\sigma^2 (\alpha + 1)^2 \nu \right)^{-T/\nu}
+\end{equation*}
+finite, see \cite[Section 5]{carr1999option}. 
+
+The minimisation problem \eqref{E: minimisation problem} is possibly ill-posed and the gradient of $C_T^{\text{model}}$ is unknown. In light of this, we use the \emph{Differential Evolution} (DE) algorithm, which is a population-based stochastic optimization algorithm that does not require gradients. The DE algorithm was first introduced by \textcite{storn1997differential}. It is implemented using $\texttt{scipy.optimize.differential\_evolution}$ in Python.
+
+\section{Estimating the drift}
+\label{appendix: Estimating the drift}
+The drift term $\mu$ is computed by replacing $\delta -q$ in \eqref{E: VG Stock price process} with $\mu$ and then estimating the resulting mean log-return from historical stock prices. The historical stock prices are sampled over a year on a daily basis. Under this specification, the stock price dynamics can be written as 
+\begin{equation*}
+    S(t) = se^{(\mu+\omega)t + L(t; \sigma, \theta, \nu)} .
+\end{equation*}
+Let the observed stock prices be $s, S_{t_1}, \ldots, S_{t_{N_t}}$ with equidistant time step $\Delta t$. The log-return over the interval $[j-1,j]$ is 
+\begin{equation*}
+    R_j := \log \left(\frac{S_{t_j}}{S_{t_{j-1}}}\right) = (\mu + \omega) \Delta t + \Delta L_j, \quad \text{for } j=1, \ldots, N_t,
+\end{equation*}
+where $\Delta L_j := L(t_j; \sigma, \theta, \nu) - L(t_{j-1}; \sigma, \theta, \nu)$. Since the VG process has stationary independent increments and 
+\begin{equation*}
+    \E \left[\Delta L_j\right] = \theta \Delta t,
+\end{equation*}
+it follows that 
+\begin{equation*}
+    \E [R_j] = (\mu + \omega + \theta) \Delta t.
+\end{equation*}
+Consequently, if 
+\begin{equation*}
+    \bar R := \frac{1}{n} \sum_{j=1}^{N_t} R_j
+\end{equation*}
+denotes the empirical mean log-return, we estimate the drift parameter by
+\begin{equation*}
+    \hat \mu = \frac{\bar R}{\Delta t} - \omega - \theta.
+\end{equation*}

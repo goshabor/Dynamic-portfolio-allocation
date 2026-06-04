@@ -1,0 +1,33 @@
+%\section{Auxiliary Results for the Proof of the Existence of the Viscosity Solution}
+\label{Appendix: Auxiliary Results for the Proof of the Existence of the Viscosity Solution}
+
+\begin{lemma}[{\cite[Lemma 7.1]{seydel2010generalexistenceuniquenessviscosity}}]
+\label{lemma: Lemma 7.1 in Seydel}
+    Consider a process $X^{(t_n,x_n)}$ starting at $(t_n,x_n)$ and following the jump-diffusion process \eqref{eqn: jump-diffusion SDE}. Denote the first exit time for $\rho >0$ by $\tau_n^\rho := \in \{t \geq t_n : |X^{t_n,x_n} - x_n| \geq \rho\}$. Suppose that all conditions for existence and uniqueness are satisfied for $X$ and $(t_n,x_n) \rightarrow (t_0,x_0)$. Then for all $\delta > 0$, there is a $\hat \varepsilon > 0$ such that 
+    \begin{equation*}
+        \limsup_{n \rightarrow \infty} \Prob (|\tau_n^\rho - t| < \hat \varepsilon) < \delta.
+    \end{equation*}
+\end{lemma}
+\begin{proof}
+    We refer to {\cite[Lemma 7.1]{seydel2010generalexistenceuniquenessviscosity}}.
+\end{proof}
+
+\begin{lemma}[{\cite[Lemma 7.2]{seydel2010generalexistenceuniquenessviscosity}}]
+\label{lemma: Lemma 7.2 in Seydel}
+    Let $\{X(t)\}_{t \geq 0}$ be a sequence of random variables, and let $X(t)$ converge to $X(0) = x \in \R^d$ in probability for $t \downarrow 0$. Then:
+    \begin{enumerate}[label=(\roman*)]
+        \item For all $\varepsilon>0$ and for all sequences $t_n \rightarrow 0$, 
+        \begin{equation*}
+            \Prob \left( \sup_{0 \leq s \leq t_n} |X(s)-x| > \varepsilon \right) \rightarrow 0 \quad \text{as } n \rightarrow \infty.
+        \end{equation*}
+        \item $(i)$ holds true also for a sequence of positive random variables $\{\tau_n\}_{n \in \mathbb N}$ converging to $0$ in probability (not necessarily independent of $X$). 
+        \item $(ii)$ holds true also in the setting and under the assumptions of Lemma \ref{lemma: Lemma 7.1 in Seydel}, i.e.
+        \begin{equation*}
+            \Prob \left( \sup_{t_n \leq s \leq \tau_n} |X^{t_n,x_n}(s) - x_n| > \varepsilon \right) \rightarrow 0
+        \end{equation*}
+        for $(t_n,x_n) \rightarrow (t_0,x_0)$, random variables $\tau_n \geq t_n$, and $\tau_n \rightarrow t_0$ in probability. 
+    \end{enumerate}
+\end{lemma}
+\begin{proof}
+    We refer to {\cite[Lemma 7.2]{seydel2010generalexistenceuniquenessviscosity}}.
+\end{proof}

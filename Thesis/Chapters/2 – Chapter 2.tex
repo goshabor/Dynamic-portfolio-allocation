@@ -1,0 +1,227 @@
+%\section{Preliminaries}
+\label{section: Preliminaries}
+This chapter introduces the preliminary concepts from stochastic analysis that are required to formulate and analyse finite-horizon impulse control problems, including filtereed probability spaces, jump-diffusions, and stopping times. Much of the theory presented in this chapter can be found in \cite{applebaum2009levy, jarrow2018continuous, oksendal2007applied}.
+
+\section{Stochastic setup}
+\label{section: stochastic setup}
+Throughout this thesis, we denote by $0\leq T<\infty$ a finite time horizon and work with a filtered probability space $(\Omega, \F, \{\F\}_{0 \leq t \leq T}, \Prob)$. Here, $\Omega$ denotes the sample space, $\F$ the $\sigma$-algebra of events, $\Prob$ the real-world probability measure, and $\{\F_t\}_{0 \leq t \leq T}$ the filtration. The interpretation of the filtration is that $\F_t$ contains the information available up to time $t\geq 0$. In many financial problems, decisions should depend only on past and present information, but not on future information. Thus, filtrations provide a way to capture this restriction on the flow of information.
+
+The filtration is assumed to satisfy the usual hypotheses. That is, $\F_0$ contains all $\Prob$-null sets of $\F$, and the filtration is right-continuous, i.e.
+\begin{equation*}
+    \F_t = \bigcap_{u>t}\F_u.
+\end{equation*}
+In addition to the filtered probability space, we commonly use terminologies such as random variables, stochastic processes, and sample paths on $(\Omega, \F, \{\F\}_{0 \leq t \leq T}, \Prob)$. These are defined as follows:
+\begin{definition}[Random variable]
+    For $\Omega$ a sample space, a random variable is a measurable map $X: \Omega \rightarrow \R^d$. 
+\end{definition}
+\begin{definition}[Stochastic process]
+    A stochastic process is a family of random variables $X=\{X(t)\}_{0 \leq t \leq T}$, where each $X(t)$ is a random variable. Equivalently, a stochastic process is a map $X: [0,T]\times\Omega \rightarrow \R^d$, where $\Omega$ is the sample space.
+\end{definition}
+\begin{definition}[Sample paths]
+    Let $X$ be a stochastic process. For a fixed atom $\omega \in \Omega$, the function $t \mapsto X(t,\omega)$ is called a sample path of $X$. 
+\end{definition}
+
+In this thesis, we adopt the short-hand notation $X(t):=X(t,\omega)$, for $\omega \in \Omega$, to denote a time-$t$ sample path of $X$. Furthermore, we will assume that every stochastic process mentioned in this paper is adapted to the filtration $\{\F_t\}_{0 \leq t \leq T}$ and is càdlàg\footnote{The abbreviation càdlàg stands for \emph{continu à droite, limite à gauche}, i.e. \emph{right-continuous with left limits}.}. In the following, if $X$ is a jump process, we denote by $X(t^-)$ a sample of $X$ before a potential jump occurs at time $t$. We use the short-hand notation $\E$ to denote the expectation taken under the probability measure $\Prob$, i.e. $\E[\cdot] := \E_\Prob [\cdot]$.
+
+\section{Brownian motions, Poisson random measures, and Lévy processes}
+\label{section: Brownian motions, Poisson random measures, and Lévy processes}
+We assume that stochastic processes are driven by continuous and discontinuous jump noises. Specifically, the continuous noise is modelled by Brownian motions, while the discontinuous jump part is a Lévy process. 
+
+\begin{definition}[Brownian motion]
+    An $m$-dimensional Brownian motion is an adapted, continuous stochastic process $W=\{W\}_{0 \leq t \leq T}$ with values in $\R^m$, satisfying
+    \begin{enumerate}[label=(\roman*)]
+        \item $W(0) = 0$ a.s.\footnote{The acronym \textit{a.s.} stands for \textit{almost surely}.},
+        \item $W(t)-W(s)$ is $\F_s$-independent for $0\leq s < t \leq T$, and
+        \item $W(t)-W(s) \sim \mathcal{N}(0, (t-s)I_m)$, where $\mathcal N$ denotes the normal cumulative distribution function and $I_m$ is an $m$-dimensional identity matrix. 
+    \end{enumerate}
+\end{definition}
+\begin{definition}[Lévy process]
+\label{def: Lévy process}
+    A càdlàg adapted process $L=\{L(t)\}_{0 \leq t \leq T}$ is a Lévy process if 
+    \begin{enumerate}[label=(\roman*)]
+        \item $L(0^-)=0$ a.s.,
+        \item $L$ has independent and stationary increments,
+        \item $X$ is stochastically continuous in the sense that for all $a>0$ and for all $s\geq 0$,
+        \begin{equation*}
+            \lim_{s \rightarrow t} \Prob \big( |X(t)-X(s)|>a \big) = 0.
+        \end{equation*}
+    \end{enumerate}
+\end{definition}
+Comparing the Brownian motion definition with Lévy processes, it can be shown that the Brownian motion is a Lévy process, see \cite[Example 1.3.8]{applebaum2009levy}.
+
+The Lévy measure $\nu$ satisfies
+\begin{equation}
+    \int_{\R^\ell \backslash \{0\}} \big( |z| \wedge 1 \big) \nu(\diff z) < \infty. 
+    \label{eqn: Lévy measure condition}
+\end{equation}
+Furthermore, we assume that for a given $\nu$, there exist real numbers $p^*>0$ and $q^*\geq 0$ such that 
+\begin{equation}
+    \int_{|z|\geq 1} |z|^{p^*} \nu(\diff z) < \infty \quad \text{and} \quad \int_{|z|<1}|z|^{q^*}\nu(\diff z) < \infty
+    \label{eqn: assumption for chapter 4}
+\end{equation}
+holds. This assumption is needed for the existence proof of viscosity solutions in Chapter \ref{section: Viscosity Solution for Impulse Control: Existence}. 
+\begin{example}[The Variance-Gamma Lévy measure]
+\label{ex: VG measure}
+    A recurring Lévy measure used throughout this thesis is the Variance-Gamma Lévy measure, defined by
+    \begin{equation}
+        \nu(\diff z) = \frac{C}{|z|} \left(e^{Gz} \ind{z<0} + e^{-Mz} \ind{z>0} \right)\diff z,
+        \label{eqn: VG Levy measure}
+    \end{equation}
+    where $C,G,M>0$ are constant parameters and $z \in \R$.
+\end{example}
+\begin{remark}
+\label{remark: properties of VG measure}
+    Note that the Variance-Gamma Lévy measure has infinite activity, i.e. $\nu(\R) = \infty$, due to the singularity at $z=0$. Moreover, it has finite variation, that is, $\int_\R z^2 \nu(\diff z) < \infty$.
+\end{remark}
+The discontinuous jumps in $X$ are caused by a Poisson random measure $N(\diff t, \diff z)$ on $[0,T]\times \R^\ell$, with intensity measure $\nu(\diff z) \diff t$. For a Borel set $A \subset \R^\ell \backslash \{0\}$ with $\nu(A)<\infty$, the process
+\begin{equation*}
+    N(t,A) := N((0,t]\times A)
+\end{equation*}
+counts the number of jumps with marks in $A$ up to time $t$. It is a Poisson process with intensity $\nu(A)$. As is often the case in financial applications, we use the compensated Poisson random measure
+\begin{equation*}
+    \tilde N(\diff t, \diff z) = N(\diff t, \diff z) - \ind{|z|<1}\nu(\diff z) \diff t,
+\end{equation*}
+instead of $N$. 
+
+\section{Jump-diffusion processes}
+\label{section: Jump-diffusion processes}
+Let $X$ be a $d$-dimensional, stochastic process in the filtered probability space \newline $(\Omega, \F, \{\F\}_{0 \leq t \leq T}, \Prob)$ with $X(t^-)=x \in \R^d$. We call $X$ a jump-diffusion process if, for $0 \leq t \leq T$, it satisfies
+\begin{align}
+    X(s) &= x + \int_t^s \mu\left(u,X(u^-)\right) \diff u + \int_t^s \sigma\left(u,X(u^-)\right) \diff W(u) \nonumber \\
+    & \qquad + \int_t^s \int_{\R^\ell} \gamma\left(u,X(u^-),z)\right) \tilde N(\diff u, \diff z),
+    \label{eqn: jump-diffusion}
+\end{align}
+where $\mu: [0,T]\times \R^d \rightarrow \R^d$ is the drift function, $\sigma: [0,T] \times \R^d \rightarrow \R^{d\times m}$ the diffusion matrix, and $\gamma: [0,T]\times \R^d \times \R^\ell \rightarrow \R^d$ the jump-amplitude function. We note that the instantaneous covariance matrix $\sigma\sigma^\top$ is positive semidefinite. 
+
+Throughout the thesis, we refer to \eqref{eqn: jump-diffusion} in its differential form, i.e.
+\begin{align}
+    &\diff X(s) = \mu\left(s, X(s^-)\right) \diff t + \sigma\left(s,X(s^-) \right) \diff W(s) + \int_{\R^\ell} \gamma \left(s,X(s^-),z \right) \tilde N (\diff s, \diff z),\nonumber\\
+    &X(t^-)=x.
+    \label{eqn: jump-diffusion SDE chapter 2}
+\end{align}
+
+To guarantee the well-posedness of the SDE \eqref{eqn: jump-diffusion SDE chapter 2}, i.e the SDE has a unique and stable solution, we assume that there exist $C>0$ such that
+\begin{equation}
+    \int_{\R^\ell}|\gamma(t,x,z)|^2 \nu(\diff z) \leq C < \infty,
+    \label{eqn: gamma condition}
+\end{equation}
+and that the Lipschitz and linear growth bound-like conditions 
+\begin{align}
+    |\mu(t,x) - \mu(&t,y)|^2 + |\sigma(t,x) - \sigma(t,y)|^2 \nonumber\\
+    & + \int_{\R^\ell} |\gamma(t,x,z) - \gamma(t,y,z)|^2 \nu(\diff z) \leq C |x-y|^2.
+    \label{eqn: Lipschitz condition} \\
+    |\mu(t+h,x) &- \mu(t,x)|^2 + |\sigma(t+h,x) - \sigma(t,x)|^2 \nonumber\\
+    &+ \int_{\R^\ell}|\gamma(t+h,x,z) - \gamma(t,x,z)|^2 \leq C (1+|x|^2) b(h)
+    \label{eqn: lgb condition}
+\end{align}
+hold for $x,y \in \R^d$, $t \in [0,T]$, and a positive function $b(h) \downarrow 0$ for $h \rightarrow 0$. Note that conditions \eqref{eqn: gamma condition}--\eqref{eqn: lgb condition} need not hold globally for all $x,y \in \R^d$, and may be relaxed to hold locally on a compact set $U \subset \R^d$.
+
+Let $u \in C^{1,2}([0,T] \times \R^d)$ be a function once differentiable in time and twice differentiable in space. The infinitesimal generator of the jump-diffusion process $X$ is given by
+\begin{align}
+    \InfinitesimalGenerator u(t,x) &= \langle \mu(t,x), \nabla_x u(t,x) \rangle + \frac{1}{2} \Tr (\sigma(t,x)\sigma^\top(t,x)H_x u(t,x)) \nonumber\\
+    &+ \int_{\R^\ell} \{u(t,x+\gamma(t,x,z)) - u(t,x) - \langle \nabla u(t,x), \gamma(t,x,z) \rangle \ind{|z|<1}\} \nu(\diff z),
+    \label{eqn: infinitesimal generator ch.2}
+\end{align}
+where $H_x$ denotes the Hessian operator in $x$ and is defined as
+\begin{equation*}
+    H_x u(t,x) = \big(\partial_{x_i x_j}u(t,x)\big)_{i,j=1}^d \in \R^{d \times d}.
+\end{equation*}
+The corresponding parabolic operator is $\partial_t + \InfinitesimalGenerator$. We note that the integral term in \eqref{eqn: infinitesimal generator ch.2} is nonlocal as it depends on the value of $u$ at the shifted point $x+\gamma(t,x,z)$. The subtraction of the first-order term inside the integral is the compensation term associated with small jumps.
+
+Stochastic processes following common SDEs can be found in Examples \ref{ex: GBM} and \ref{ex: VG process}. These will be used in the numerical experiments presented in Chapters \ref{section: Numerical Experiment I: Impulse Control of the Foreign Exchange Rate} and \ref{section: Multi-dimensional Dynamic Portfolio Allocation}.
+\begin{example}[Geometric Brownian motion]
+\label{ex: GBM}
+    The possibly most famous SDE in finance is the geometric Brownian motion (without jumps). Let $S$ denote a one-dimensional stock price process with initial condition $S(0)=s$, and define, by abuse of notation, $\mu(t,s) := \mu s$ and $\sigma(t,s):=\sigma s$, where $\mu \in \R$ and $\sigma>0$ are one-dimensional constants.
+    
+    Then, the geometric Brownian motion SDE is given by 
+    \begin{equation*}
+        \diff S(t) = \mu S(t) + \sigma S(t) \diff W(t), \qquad S(0)=s,
+    \end{equation*}
+    and the unique solution to the SDE is
+    \begin{equation*}
+        S(t) = s \exp\left\{\left(\mu - \frac{1}{2}\sigma^2 \right) \diff t + \sigma W(t)\right\}. 
+    \end{equation*}
+
+    If $u\in C^{1,2}([0,T] \times \R)$ is a function of $t$ and $s$, the infinitesimal generator of $S$ is given by
+    \begin{equation*}
+        \InfinitesimalGenerator u(t,s) = \mu s \partial_su(t,s) + \frac{1}{2} \sigma^2 s^2 \partial_{ss} u(t,s),
+    \end{equation*}
+    which is local due to the lack of the jump term.  
+\end{example}
+\begin{example}[Variance Gamma]
+\label{ex: VG process}
+    A common example of pure-jump processes is the Variance-Gamma process. Recall that the Lévy measure of a Variance-Gamma process is given by \eqref{eqn: VG Levy measure}. If $X$ denotes a one-dimensional Variance-Gamma process, its solution is given by
+    \begin{equation*}
+        X(t) = \sigma W(G(t)) + \theta G(t), \qquad X(0^-) = x
+    \end{equation*}
+    where $\sigma, \nu > 0$ and $\theta \in \R$ relate to the parameters $C$, $G$, and $M$ through
+    \begin{align*}
+        & C = \frac{1}{\nu} > 0,\\
+        & G = \frac{1}{\sqrt{\frac{1}{4} \theta^2 \nu^2 + \frac{1}{2}\sigma^2\nu} - \frac{1}{2}\theta\nu} > 0, \\
+        & M = \frac{1}{\sqrt{\frac{1}{4} \theta^2 \nu^2 + \frac{1}{2}\sigma^2\nu} + \frac{1}{2}\theta\nu} > 0,
+    \end{align*}
+    and the one-dimensional process $G$ Gamma distributed with shape $1/\nu$ and scale $1/\nu$. $G$ is often referred to as the subordinator. 
+\end{example}
+
+\section{Stopping times}
+\label{section: Stopping times}
+Stopping times formalise random times at which decisions may be taken without looking into the future, and as such are important to impulse control problems. Stopping times are defined as follows:
+\begin{definition}[Stopping time]
+    A random time $\tau: \Omega \rightarrow [0,\infty]$ is an $\F_t$-stopping time if \newline $\{\tau \leq t\} \in \F_t$ for every $t \geq 0$. 
+\end{definition}
+For an adapted process $X$ and a stopping time $\tau$, $X(t \wedge \tau)$ is a stopped process. The $\sigma$-algebra at the stopping time $\tau$ is $\F_\tau = \{A \in \F: A \cap \{\tau \leq t\} \in \F_t \; \forall t \geq 0\}$. 
+\begin{example}[First exit time]
+    A recurring example of stopping times used throughout this thesis is the so-called first exit time. Let $G \subset \R^d$ be an open set and $X$ be a càdlàg adapted process with initial condition $X(0^-)=x \in D$. Then, the first exit time from $G$ is given by 
+    \begin{equation*}
+        \tau_G = \inf\{t \geq 0: X(t) \notin G\}. 
+    \end{equation*}
+    Under the usual assumption on the filtration, $\tau_G$ is a stopping time. 
+\end{example}
+
+An important result involving the stopping time, infinitesimal generator, and jump-diffusion is the Dynkin formula. 
+\begin{theorem}[{\cite[Theorem 1.24]{oksendal2007applied}}, Dynkin formula]
+\label{trm: Dynkin formula}
+    Let $X(s) \in \R^d$ be a jump diffusion with initial condition $X(t^-)=x$, $G \subset \R^d$ be an open set and let $u \in C^{1,2}([0,T] \times \R^d)$. Let $\tau < \infty$ be a stopping time. Suppose that 
+    \begin{align*}
+        \tau \leq \tau_G := \inf \{t\geq 0: X(t) \notin G\}
+    \end{align*}
+    \begin{align}
+        \E^{(t,x)} \left[ |u(\tau, X(\tau))| + \int_0^\tau |\partial_t u(t,X(t)) + \InfinitesimalGenerator u(t,X(t))| \diff t\right] < \infty. 
+        \label{eqn: Dynkin condition II}
+    \end{align}
+    Then we have
+    \begin{equation*}
+        \Etx \left[ u(\tau,X(\tau)) \right] = u(t,x) + \Etx \left[\int_t^\tau \partial_s u(s,X(s)) + \InfinitesimalGenerator u(s,X(s)) \diff s \right].
+    \end{equation*}
+\end{theorem}
+\begin{remark}
+    The notation $\Etx$ denotes expectation conditional on $X(t^-)=x$, that is,  $\Etx[\cdot] = \E[\cdot | X(t^-) = x]$. 
+\end{remark}
+Throughout this thesis, we assume that the second Dynkin condition \eqref{eqn: Dynkin condition II} holds. 
+
+\section{Martingales}
+\label{section: Margtingales}
+Finally, we consider martingales and supermartingales, which are used in dynamic programming and verification arguments in the chapters to come. 
+\begin{definition}[Martingales]
+\label{def: martingales}
+    Let $M=\{M(t)\}_{0 \leq t \leq T}$ be a real-valued càdlàg process with $\E[|M(t)|] < \infty$ for all $t \in [0,T]$. Then $M$ is an $\F_t$-martingale if for all $0 \leq s  \leq t \leq T$, 
+    \begin{equation*}
+        \E[M(t) | \F_s] = M(s).
+    \end{equation*}
+\end{definition}
+\begin{definition}
+    The process $M$ defined in Definition \ref{def: martingales} is a supermartingale if $\E[|M(t)|] < \infty$ and $\E[M(t) | \F_t] \leq M(s)$ for all $0 \leq s \leq t \leq T$. 
+\end{definition}
+% As shown in the following theorem, martingales can be represented via stochastic integrals with respect to a Brownian motion and compensated Possion random measures. While we only focus on real-valued integrals in Theorem \ref{def: Martingale representation theorem}, the result can also be extended to complex-valued martingales, see \cite[Theorem 5.3.6]{applebaum2009levy}. 
+% \begin{theorem}[Martingale representation theorem]
+% \label{def: Martingale representation theorem}
+%     Let $W$ be an $m$-dimensional Brownian motion and let $\tilde N$ be a compensated Poisson random measure. Let $G$ and $H$ be predictable processes satisfying 
+%     \begin{equation*}
+%         \E\left[\int_0^T |G(t)|^2 \diff t \right] < \infty \quad \text{and} \quad \E\left[ \int_0^T \int_{\R^\ell} |H(t,z)|^2 \diff t \right] < \infty. 
+%     \end{equation*}
+%     Then, the process 
+%     \begin{equation*}
+%         M(t) = \int_0^t G(s) \diff W(s) + \int_0^t \int_{\R^\ell} H(s,z) \tilde N(\diff t, \diff z)
+%     \end{equation*}
+%     is a square-integrable martingale. 
+% \end{theorem}

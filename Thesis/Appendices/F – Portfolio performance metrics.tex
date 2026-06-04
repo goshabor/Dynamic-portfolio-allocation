@@ -1,0 +1,39 @@
+%\section{Portfolio Performance Metrics}
+\label{appendix: portfolio performance metrics}
+In Chapter \ref{section: Multi-dimensional Dynamic Portfolio Allocation}, the portfolios are evaluated based on their returns, their risks, and their overall performance. Based on \cite{wang2025risk, mcneil2015quantitative}, we define the metrics used as follows:
+\begin{enumerate}
+    \item \textbf{Cumulative Return:} Measures total portfolio growth over time and is defined as
+    \begin{equation*}
+        R_\text{cumul} = \left(\prod_{n=1}^{N_t}(1+R_n) \right) - 1,
+    \end{equation*}
+    where $R_n$ is the portfolio return at time step $n$, and $N_t$ is the time grid size. Higher values indicate effective trading strategies.
+    \item \textbf{Annualised Return:} Measures standardised growth in portfolio value over time, making it comparable across different durations. It is defined as:
+    \begin{equation*}
+        R_\text{annual} = \left(\frac{\Pi(T)}{\pi_0} \right)^{\frac{252}{N_t}} - 1,
+    \end{equation*}
+    where $\Pi(0^-)=\pi_0$ is the initial portfolio value and $\Pi(T)$ is the portfolio value on the investment horizon $T<\infty$. 
+    \item \textbf{Sharpe ratio:} Evaluates risk-adjusted returns by dividing the mean annualised return by the annualised return volatility, i.e.
+    \begin{equation*}
+        \text{Sharpe Ratio} = \frac{\Bar{R}_\text{annual} - \delta}{\sigma_r},
+    \end{equation*}
+    where $\delta$ is the risk-free rate and $\sigma_r$ is the return standard deviation. 
+    \item \textbf{Maximum Drawdown:} Measures the largest peak-to-through decline in portfolio value:
+    \begin{equation*}
+        \text{MDD} = \max_n \left(\frac{\text{Peak}_n - \Pi(t_n)}{\text{Peak}_n} \right),
+    \end{equation*}
+    where $\Pi(t_n)$ denotes the portfolio value at time step $n$ and $\text{Peak}_n = \max_{j \leq n} \Pi(t_j)$ is the running maximum up to time $t_n$. 
+    \item \textbf{Calmar Ratio}: Assesses return relative to maximum drawdown, i.e.
+    \begin{equation*}
+        \text{Calmar Ratio} = \frac{R_\text{annual}}{\text{MDD}}.
+    \end{equation*}
+    \item \textbf{Empirical Value-at-Risk:} Let $\{L_i\}_{i = 1, \ldots, N_\text{MC}}$ be a sequence of $N_\text{MC}$ Monte Carlo simulated portfolio losses at time $T$. Here, a loss is defined as $L_i = \Pi^{(i)}-\pi_0$. Then, an empirical estimator of the Value-at-risk at the significance level $\alpha$ is given by 
+    \begin{equation*}
+        \widehat{\text{VaR}}_\alpha \approx L_{\lfloor N_\text{MC}(1-\alpha) \rfloor+1,N_\text{MC}},
+    \end{equation*}
+    where $L_{1,n} \geq \cdots \geq L_{n,n}$ are the upper-order statistics of $L_1, \ldots, L_n$ and $\lfloor \cdot \rfloor$ is the ceiling operator. 
+    \item \textbf{Empirical Expected Shortfall:} Let $\{L_i\}_{i = 1, \ldots, N_\text{MC}}$ be a sequence of $N_\text{MC}$ Monte Carlo simulated portfolio losses at time $T$. Here, a loss is defined as $L_i = \Pi^{(i)}-\pi_0$. Then, an empirical estimator of the expected shortfall at significance level $\alpha$ is given by
+    \begin{equation*}
+        \widehat{\text{ES}}_\alpha \approx \frac{1}{N_\text{MC}(1-\alpha)} \sum_{i=1}^{\lfloor N_\text{MC}(1-\alpha) \rfloor} L_{i,N_\text{MC}},
+    \end{equation*}
+    where $L_{1,N_\text{MC}} \geq \cdots \geq L_{N_\text{MC},N_\text{MC}}$ are the upper-order statistics of $L_1, \ldots, L_{N_\text{MC}}$ and $\lfloor \cdot \rfloor$ is the ceiling operator. 
+\end{enumerate}

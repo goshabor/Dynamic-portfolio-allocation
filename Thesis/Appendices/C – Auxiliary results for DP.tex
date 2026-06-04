@@ -1,0 +1,276 @@
+%\section{Auxiliary Results for Dynamic Programming}
+\label{appendix: Auxiliary Results for Dynamic Programming}
+The results provided in this chapter are needed for the derivation of the dynamic programming formula used by the DDQN algorithm in Chapter \ref{section: Value-based Approximation of the Impulse-Control Problem}. %We begin by reviewing the QVI in Appendix \ref{appendix: Brief review of the QVI} and discussing some additional assumptions in Appendix \ref{appendix: Assumptions}. Results are provided in Appendix \ref{appendix: results C}. 
+
+\section{Brief review of the QVI}
+\label{appendix: Brief review of the QVI}
+Recall the QVI \eqref{eqn: QVI}, that is, 
+\begin{align}
+    \min\big\{ - (\partial_t v + \InfinitesimalGenerator v + f), v - \InterveneOper v \big\} = 0& \quad \text{ in } [0,T) \times \Solvency \label{eqn: QVI RL I Appendix} \\
+    \min \{v - g, v - \InterveneOper v \} = 0 & \quad \text{ in } [0,T) \times (\R^d \backslash \Solvency) \label{eqn: QVI RL II Appendix} \\
+    v = \{g, \InterveneOper v\} & \quad \text{ on } \{T\} \times \R^d \label{eqn: QVI RL III Appendix},
+\end{align}
+where the intervention operator is defined as
+\begin{equation*}
+    \InterveneOper v(t,x) := \sup_{\zeta \in \mathcal{Z}(t,x)} \{v(t,\Gamma(x,\zeta)) + K(t,x,\zeta)\},
+\end{equation*}
+and the infinitesimal generator $\InfinitesimalGenerator$ is given by
+\begin{align}
+    \InfinitesimalGenerator \varphi(t,x) &= \langle \mu(t,x), \nabla_x \varphi(t,x) \rangle + \frac{1}{2} \Tr (\sigma(t,x)\sigma^\top(t,x)H_x \varphi(y)) \nonumber\\
+    &+ \int_{\R^\ell} \{\varphi(t,x+\gamma(t,x,z)) - \varphi(t,x) - \langle \nabla \varphi(t,x), \gamma(t,x,z) \rangle \ind{|z|<1}\} \nu(\diff z)
+    \label{C: infinitesimal generator}
+\end{align}
+for some test function $\varphi \in C^{1,2}([0,T]\times \R^d) \cap \PB([0,T]\times \R^d)$. Here, $\PB$ denotes the family of polynomially bounded functions. For brevity, we write $\PB:=\PB([0,T]\times \R^d)$ in what follows. 
+
+In this appendix, the main focus lies on the continuation region $D$, defined as 
+\begin{equation}
+    D := \big\{ (t,x) \in [0,T) \times \Solvency: v(t,x) > \InterveneOper v(t,x) \big\}.
+    \label{eqn: continuation region}
+\end{equation}
+In $D$, an intervention is suboptimal and the process evolves freely without any intervention. Therefore, there are no obstacles inside $D$ and the PIDE
+\begin{equation*}
+    \partial_t v + \InfinitesimalGenerator v + f = 0 \quad \text{in } D
+\end{equation*}
+is the governing equation. 
+
+The jump-diffusion process $X$ follows the SDE
+\begin{equation}
+    \diff X(s) = \mu(s,X(s^-)) \diff s + \sigma(s,X(s^-)) \diff W(s) + \int_{\R^\ell} \gamma(t,X(s^-),z) \tilde N(\diff z, \diff s), \quad X(t^-)=x. 
+    \label{C: SDE}
+\end{equation}
+Assuming that $X$ starts in $D$, i.e. $(t,x) \in D$, we define the exit time from $D$ as
+\begin{equation}
+    \tau_D := \inf \big\{ s \geq 0: \big(t+s, X(t+s)\big) \notin D \big\}.
+    \label{eqn: tau_D}
+\end{equation}
+
+\section{Assumptions}
+\label{appendix: Assumptions}
+We assume that the jump-diffusion $X$ is a càdlàg and $\F_t$-adapted Lévy process. The Lévy measure $\nu$ satisfies 
+\begin{equation*}
+    \int_{\R^\ell} (1 \wedge |z|^2) \nu(\diff z) < \infty
+\end{equation*}
+and, for some $p^*>0$ and $q^*\geq 0$,
+\begin{equation}
+    \int_{|z|\geq 1}|z|^{p^*} \nu(\diff z) < \infty \quad \text{and} \quad \int_{|z|<1} |z|^{q^*} \nu(\diff z) < \infty.
+    \label{C: p and q assumption}
+\end{equation}
+
+To ensure that the SDE \eqref{C: SDE} admits a unique and stable solution, we assume that the standard (local) Lipschitz continuity and linear growth conditions hold. Furthermore, we note that the Hamiltonian $\partial_t u + \InfinitesimalGenerator u + f$ is well-defined if 
+\begin{enumerate}
+    \item $u \in C^{1,2}([0,T) \times \R^d)$, and
+    \item One of the following inequalities hold locally in $(t,x) \in [0,T) \times \Solvency$ for a constant $C_{t,x}$ dependent on $t$ and $x$:
+    \begin{enumerate}[label=(\alph*), ref=(\alph*)]
+        \item $|\gamma(t,x,z)| \leq C_{t,x}$ if $\nu(\R^d) < \infty$ \label{C: (a)}
+        \item $|\gamma(t,x,z)| \leq C_{t,x}|z|$ and $|u(t,z)| \leq C(1+|z|^{p^*})$, where $C$ is independent of $t$ \label{C: (b)}
+        \item Or more generally, for $a,b>0$ such that $ab \leq p^*$: $|\gamma(t,x,z)| \leq C_{t,x}(1+|z|^a)$, $|u(t,z)| \leq C(1+|z|^b)$ on $|z|\geq1$. Furthermore, $|\gamma(t,x,z)| \leq C_{t,x} |z|^{q^*/2}$ on $|z|<1$. \label{C: (c)}
+    \end{enumerate}
+\end{enumerate}
+If the conditions above hold, the integral term $\InfinitesimalGenerator$ is finite, i.e.
+\begin{equation*}
+    \left| \int_{\R^\ell} \big[ u(t,x+\gamma(t,x,z)) - u(t,x) - \langle \nabla_x u(t,x), \gamma(t,x,z) \rangle \ind{|z|<1} \big] \nu(\diff z) \right| < \infty.
+\end{equation*}
+
+For the results derived in this chapter, the assumptions shown below are needed. 
+\begin{assumption}[Assumptions about the stochastic process $X$]
+    \label{C: Assumption S}
+    \begin{enumerate}[label=(\textup{S}\arabic*), ref=(\textup{S}\arabic*)]
+        \item \label{C: S1} $\mu$, $\sigma$, and $\gamma$ are continuous.
+        \item \label{C: S2} $\gamma$ satisfies one of conditions \assitemref{C: (a)}--\assitemref{C: (c)} 
+        \item \label{C: S3} For $t \in [0,T)$ and $x,y \in \R^d$, the following inequality holds 
+            \begin{align*}
+                \int_{\mathbb R^\ell} |\gamma (t,x,z) - \gamma (t,y,z)|^2 \nu(\diff z) < C|x-y|^2
+                %\int_{|z|\geq 1} |\gamma (t,x,z) - \gamma (t,y,z)| \nu(\diff z) < C|x-y|.
+            \end{align*}
+        \item \label{C: S4} For a fixed time step $h \in (t,T-t)$ sufficiently small the $m$-th moment of $X$ exists, i.e.
+        \begin{equation*}
+            \Etx \left[\sup_{t \leq s \leq t+h} |X(s)|^m \right] < \infty.
+        \end{equation*}
+    \end{enumerate}
+\end{assumption}
+\begin{assumption}[Assumptions about the intervention operator $\InterveneOper$]
+    \label{C: Assumption I}
+    \begin{enumerate}[label=(\textup{I}\arabic*), ref=(\textup{I}\arabic*)]
+        \item \label{C: I1} The functions $\Gamma$ and $K$ are continuous.
+        \item \label{C: I2} The set of admissible impulses $\mathcal{Z}(t,x)$ is non-empty and compact for each $(t,x) \in [0,T] \times \R^d$. For a converging sequence $(t_n,x_n) \rightarrow (t,x)$ in $[0,T] \times \R^d$ (with $\mathcal{Z}(t_n,x_n)$ non-empty), $\mathcal{Z}(t_n,x_n)$ converges to $\mathcal{Z}(t,x)$ in the Hausdorff metric.
+        \item \label{C: I3} For the value function $v$, assume that $v \in C^{1,2}([0,T)\times \R^d)$. 
+    \end{enumerate}
+\end{assumption}
+\begin{assumption}[Assumptions about the Hamiltonian]
+    \label{C: Assumption H}
+    \begin{enumerate}[label=(\textup{H}\arabic*), ref=(\textup{H}\arabic*)]
+        \item \label{C: H1} The function $f$ is continuous and in $\PB$.
+        \item \label{C: H2} The Hamiltonian is polynomially bounded, i.e.
+        \begin{equation*}
+            \big|\partial_t v(t,x) + \InfinitesimalGenerator v(t,x) + f(t,x) \big| \leq C_H\big(1+|x|^p\big), \quad p\geq 0.
+        \end{equation*}
+    \end{enumerate}
+\end{assumption}
+We note that with \assitemref{C: I1}--\assitemref{C: I3}, the continuation region $D$ essentially becomes an open set, which we rely on in the proof of Proposition \ref{prop: small-h approximation}. The assumptions \assitemref{C: S2} and \assitemref{C: I3} ensure that integral operator in $\InfinitesimalGenerator$ is finite, while \assitemref{C: S4} ensures that $X$ has finite moments. Moreover, \assitemref{C: H1}, \assitemref{C: H2}, and \assitemref{C: S4} together ensure that the Dynkin condition \eqref{eqn: Dynkin condition II} is satisfied.
+
+\section{Results}
+\label{appendix: results C}
+\begin{proposition}
+\label{prop: dynamic programming with h}
+    Let Assumptions \assitemref{C: H1}, \assitemref{C: H2}, and \assitemref{C: S4} be satisfied. Furthermore, let $X:=X^{t,x}$ be an uncontrolled process started at $X(t^-)=x$ and suppose $(t,x) \in D$, where $D$ is the continuation region \eqref{eqn: continuation region}. Then, for any time increment $0<h<T-t$, 
+    \begin{equation*}
+        v(t,x) = \Etx \left[ \int_t^{\tau} f\big(s,X(s)\big) \diff s + v\big(\tau, X(\tau)\big) \right],
+    \end{equation*}
+    where $\tau:=t + h \wedge \tau_D$ and $\tau_D$ is the first exit time out of $D$. 
+\end{proposition}
+\begin{proof}
+    Fix $(t,x) \in D$ as well as $h>0$, and note that $\tau_D$ is a finite stopping time bounded by $T<\infty$. Since both $t$ and $h$ are finite, $\tau \leq \tau_D$ by construction. Moreover, by assumptions \assitemref{C: H1}, \assitemref{C: H2}, and \assitemref{C: S4}, the Dynkin condition \eqref{eqn: Dynkin condition II} is satisfied. Hence, applying the Dynkin formula, see Theorem \ref{trm: Dynkin formula}, gives 
+    \begin{equation}
+        v(t,x) = \Etx \left[ - \int_t^\tau \Big(  \partial_s v\big(s,X(s)\big) + \InfinitesimalGenerator v\big(s,X(s)\big) \Big) \diff s + v\big(\tau,X(\tau)\big) \right],
+        \label{eqn: own prop temp result}
+    \end{equation}
+    Combining the identity $\partial_t v + \InfinitesimalGenerator v = -f$ on $D$ with \eqref{eqn: own prop temp result}, we obtain
+    \begin{equation*}
+        v(t,x) = \Etx \left[ \int_t^\tau f\big(s,X(s)\big)\diff s + v\big( \tau,X(\tau)\big) \right].
+        \qedhere
+    \end{equation*}
+\end{proof}
+
+\begin{proposition}
+\label{prop: small-h approximation}
+    Let Assumptions \ref{C: Assumption S}--\ref{C: Assumption H} be satisfied. Furthermore, let $X:=X^{t,x}$ be an uncontrolled process started at $X(t^-)=x$ and suppose $(t,x) \in D$, where $D$ is the continuation region \eqref{eqn: continuation region}. Then, for $h>0$ sufficiently small, 
+    \begin{equation*}
+        v(t,x) = \Etx \left[ \int_t^{t+h} f\big(s,X(s)\big) \diff s + v\big(t+h,X(t+h)\big) \right] + \mathcal{O}(h^{3/2}).
+    \end{equation*}
+\end{proposition}
+\begin{proof}
+    Fix $(t,x)\in D$. From Proposition \ref{prop: dynamic programming with h}, we obtain
+    \begin{align*}
+        & v(t,x) = \Etx \left[ \int_t^{\tau} f\big(s,X(s)\big)\diff s + v\big(\tau,X(\tau)\big) \right] \\
+        &\;= \Etx \left[\int_t^{t+h} f(t,X(t)) + v(t+h, X(t+h)) \right] \\
+        & \; -\Etx \left[ \ind{\tau_d \leq h} \left(\int_{t+\tau_D}^{t+h}f(s,X(s)) \diff s - v(t+\tau_D,X(t+\tau_D)) + v(t+h,X(t+h)) \right)\right].
+    \end{align*} 
+    Let the residual term in the above equation be denoted by $R$ and be defined as
+    \begin{equation}
+        R:=-\Etx \left[ \ind{\tau_d \leq h} \left(\int_{t+\tau_D}^{t+h}f(s,X(s)) \diff s - v(t+\tau_D,X(t+\tau_D)) + v(t+h,X(t+h)) \right)\right].
+        \label{C: residual term}
+    \end{equation}
+    Thus, our main objective is to show that $|R| \leq Ch^{3/2}$. For that, we distinguish two events: $\{\tau_D \leq h\}$ and $\{\tau_D > h\}$. However, note that on the event $\{\tau_D > h\}$, the residual term $R$ is zero, so the upper bound holds trivially. Therefore, consider only the event $\{\tau_D \leq h\}$. 
+
+    Consider \eqref{C: residual term} and recall that the Dynkin condition \eqref{eqn: Dynkin condition II} is satisfied due to \assitemref{C: H1}, \assitemref{C: H2}, and \assitemref{C: S4}. Moreover, as $h<T-t$ is a finite time increment, we obtain by the Markov property, the tower rule, and the Dynkin formula, see Theorem \ref{trm: Dynkin formula}, 
+    \begin{align}
+        R &= -\Etx \Bigg[\ind{\tau_D \leq h} \E^{(t+\tau_D,X(t+\tau_D))} \Bigg[ \int_{t+\tau_D}^{t+h} f(s,X(s)) \diff s - v(t+\tau_D, X(t+\tau_D)) \nonumber \\
+        & \qquad \qquad \qquad \qquad  \qquad \qquad  \qquad \qquad  \qquad \qquad  \qquad \qquad  \qquad + v(t+h,X(t+h)) \Bigg] \Bigg] \nonumber\\
+        &= -\Etx \left[\ind{\tau_D \leq h} \E^{(t+\tau_D,X(t+\tau_D))} \left[ \int_{t+\tau_D}^{t+h} \Big(\partial_sv(s,X(s)) +\InfinitesimalGenerator v(s,X(s)) + f(s,X(s)) \Big) \diff s\right] \right] \nonumber\\
+        &= -\Etx \left[\ind{\tau_D \leq h} \int_{t+\tau_D}^{t+h} \Big(\partial_sv(s,X(s)) +\InfinitesimalGenerator v(s,X(s)) + f(s,X(s)) \Big) \diff s \right].
+        \label{C: R after Dynkin}
+    \end{align}
+    Then the Cauchy-Schwarz inequality is applied on expectation in \eqref{C: R after Dynkin} to separate the indicator term from the  integral term. This gives,
+    \begin{align}
+        R &\leq \Bigg(\Etx [\ind{\tau_D \leq h}]\Bigg)^{1/2} \left(\Etx \left[ \left| \int_{t+\tau_D}^{t+h} \partial_s v(s, X(s)) + \InfinitesimalGenerator v(s,X(s)) + f(s,X(s)) \diff s \right|^2 \right]\right)^{1/2}
+        \nonumber \\
+        &\leq \Prob (\tau_D \leq h)^{1/2} \left(\Etx \left[ \left| \int_{t+\tau_D}^{t+h} \partial_s v(s, X(s)) + \InfinitesimalGenerator v(s,X(s)) + f(s,X(s)) \diff s \right|^2 \right]\right)^{1/2}, \label{eqn: R inequality}
+    \end{align}
+    where the probability is conditional on $X(t^-)=x$, i.e, $\Prob(\cdot):= \Prob (\cdot | X(t^-)=x)$. 
+
+    Now, define 
+    \begin{align*}
+        A_1 &:= \left(\Etx \left[ \left| \int_{t+\tau_D}^{t+h} \partial_s v(s, X(s)) + \InfinitesimalGenerator v(s,X(s)) + f(s,X(s)) \diff s \right|^2 \right]\right)^{1/2}, 
+    \end{align*}
+    and
+    \begin{align*}
+        A_2 &:= \Prob (\tau_D \leq h)^{1/2}.
+    \end{align*}
+    To determine an upper bound for the residual term, we consider the terms $A_1$ and $A_2$ separately. 
+
+    Let us begin with the term $A_1$. Recall that by \assitemref{C: S1}, \assitemref{C: S2}, and \assitemref{C: I3}, the Hamiltonian is well-defined. Furthermore, the Hamiltonian is polynomially bounded by \assitemref{C: H2}, while \assitemref{C: S4} ensures that $X$ has a bounded $p$-th moment. Applying these assumptions on $A_1$ therefore yields
+    \begin{align*}
+        A_1 &= \left(\Etx \left[ \left| \int_{t+\tau_D}^{t+h} \partial_s v(s, X(s)) + \InfinitesimalGenerator v(s,X(s)) + f(s,X(s)) \diff s \right|^2 \right]\right)^{1/2} \\
+        & \leq h \left(\Etx \left[  \sup_{t \leq s \leq t+h}\big|\partial_s v(s, X(s)) + \InfinitesimalGenerator v(s,X(s)) + f(s,X(s))\big|^2 \right]\right)^{1/2} \\
+        & \leq C h \left(1+ \Etx \left[\sup_{t \leq s \leq t+h} \big|X(s)\big|^{2m} \right] \right) 
+    \end{align*}
+    where $C>0$. Because $X$ has bounded moments of order $p:=2m$ for some $h$ sufficiently small, we obtain that the upper bound for $A_1$ is finite. Hence, for $C_1>0$, we have
+    \begin{equation}
+        |A_1| \leq C_1 h.
+        \label{C: A1 upper bound}
+    \end{equation}
+
+    Finally, consider the term $A_2$. Our objective is to show that $|A_2| \leq C_2 h^{1/2}$. Therefore, define the stopping time
+    \begin{equation*}
+        \tau_\rho := \inf\{s\geq 0: |X(t+x)-x|> \rho\},
+    \end{equation*}
+    for some fixed constant $\rho>0$. The stopping time $\tau_\rho$ is understood to be the first exit time of $X$ from the open ball $B(x,\rho)$ with radius $\rho$ around $x$. Since $D$ is an open set under \assitemref{C: I1}--\assitemref{C: I3}, there exist $\rho, h'>0$ sufficiently small such that 
+    \begin{equation*}
+        [t,t+h'] \times \overline{B(x,\rho)} \subset D.
+    \end{equation*}
+    Here, we have $0\leq h < h'$, where $h'$ is fixed. As a result, one has
+    \begin{equation}
+        \{\tau_D \leq h\} \subseteq \{\tau_\rho \leq h\} \subseteq \left\{\sup_{0 \leq s \leq h} |X(t+ s \wedge \tau_\rho ) - x| \geq \rho \right\}.
+        \label{C: event inclusions}
+    \end{equation}
+    The first inclusion in \eqref{C: event inclusions} is because whenever $X$ exits $D$ before time $h$, then $X$ must have exited the ball $B(x,\rho)$ either prior to $\tau_D$ or at $\tau_\rho$. However, the converse is not necessarily true since, if $X$ exits $B(x,\rho)$ at $\tau_\rho$, it has not necessarily exited $D$. The second inclusion is due to the inclusion of the boundary at $\rho$. 
+
+    Then, with \eqref{C: event inclusions}, we get that
+    \begin{align}
+        \Prob(\tau_D \leq h) &\leq \Prob \left(\sup_{0 \leq s \leq h} |X(t+ s \wedge \tau_\rho ) - x| \geq \rho \right) \nonumber \\
+        & \leq \frac{1}{\rho^2} \Etx \left[ \sup_{0 \leq s \leq h} |X(t+ s \wedge \tau_\rho ) - x|^2 \right],
+        \label{eqn: Prob ineq}
+    \end{align}
+    where the last inequality is due to Markov's inequality (see Appendix \ref{Appendix: Markov's Inequality}). To show the boundedness of the expectation in \eqref{eqn: Prob ineq}, recall that $X$ is a jump-diffusion satisfying
+    \begin{align}
+        X(t+s) - x &= \int_t^{t+s} \mu(u,X(u^-)) \diff u + \int_t^{t+s} \sigma(u,X(u^-)) \diff W(u) \nonumber\\
+        & \qquad + \int_t^{t+s} \gamma(u,X(u^-),z) \tilde N(\diff u, \diff z),
+        \label{eqn: X in integral form}
+    \end{align}
+    for $s>0$. Furthermore, consider the inequality 
+    \begin{equation}
+        (a+b+c)^2 \leq 3 (a^2+b^2+c^2).
+        \label{eqn: inequality identity}
+    \end{equation}
+    Combining \eqref{eqn: Prob ineq} and \eqref{eqn: X in integral form}, and applying \eqref{eqn: inequality identity} gives
+    \begin{align}
+        \Prob(\tau_D \leq h) \leq &\frac{3}{\rho^2} \Bigg\{ \Etx \left[\sup_{0 \leq s \leq h} \left|\int_t^{t+ s \wedge \tau_\rho } \mu(u,X(u^-)) \diff u \right|^2 \right] \nonumber \\
+        & + \Etx \left[\sup_{0 \leq s \leq h} \left|\int_t^{t+ s \wedge \tau_\rho } \sigma(u,X(u^-)) \diff W(u) \right|^2 \right] \nonumber \\
+        & + \Etx \left[\sup_{0 \leq s \leq h} \left|\int_t^{t+ s \wedge \tau_\rho } \gamma(u,X(u^-),z) \tilde N(\diff u, \diff z) \right|^2 \right] \Bigg\}. \label{eqn: Prob ineq 2}
+    \end{align}
+    As we are working with the compact set $[t,t+h']\times \overline{B(x,\rho)} \subset D$, the functions $\mu$, $\sigma$, and $\gamma$ are bounded in that compact set because they are continuous by \assitemref{C: S1}. Therefore, there exists $C_\mu > 0$ such that
+    \begin{align}
+        & \Etx \left[\sup_{0 \leq s \leq h} \left| \int_t^{t+ s \wedge \tau_\rho} \mu(u,X(u^-)) \diff u \right|^2 \right] \nonumber \\
+        & \qquad \leq \Etx \left[\sup_{0 \leq s \leq h} (s \wedge \tau_\rho) \int_t^{t+\tau_\rho\wedge s} \big|\mu(u,X(u^-)) \big|^2 \diff u \right] \nonumber \\
+        & \qquad \leq h \Etx \left[\int_t^{t+ h \wedge \tau_\rho} \big|\mu(u,X(u^-)) \big|^2 \diff u \right] \nonumber \\
+        & \qquad \leq C_\mu h^2.
+        \label{eqn: mu-term inequality}
+    \end{align}
+
+    For the Brownian part in \eqref{eqn: Prob ineq 2}, first applying Doob's $L^2$-maximal inequality \cite[Theorem 3.8 (iv)]{Karatzas1991} followed by the Itô isometry \cite[Theorem 1.17]{oksendal2007applied}, we obtain 
+    \begin{align}
+        & \Etx \left[\sup_{0 \leq s \leq h} \left| \int_t^{t+s \wedge \tau_\rho } \sigma(u, X(u^-)) \diff W(u) \right|^2 \right] \\
+        & \qquad \leq 4 \Etx \left[\left| \int_t^{t+ \tau_\rho \wedge h} \sigma(u,X(u^-)) \diff W(u) \right|^2 \right] \nonumber \\
+        & \qquad \leq 4 \Etx \left[ \int_t^{t+\tau_{\rho} \wedge h} \left|\sigma(u,X(u^-))\right|^2 \diff u \right] \nonumber \\
+        & \qquad \leq C_\sigma h. 
+        \label{eqn: sigma-term inequality}
+    \end{align}
+    Similarly for the jump part,
+    \begin{align}
+        & \Etx \left[\sup_{0 \leq s \leq h} \left| \int_t^{t+s \wedge \tau_\rho } \int_{\R^k} \gamma(u,X(u^-),z)) \tilde N(\diff u, \diff z) \right|^2 \right] \nonumber \\
+        & \qquad \leq 4 \Etx \left[\int_t^{t+s \wedge \tau_\rho }  \int_{\R^k} \left|\gamma(u,X(u^-),z))\right|^2 \nu(\diff z) \diff u \right] \nonumber \\
+        & \qquad \leq C_\nu h,
+        \label{eqn: nu-term inequality}
+    \end{align}
+    where the last inequality was obtained by applying \assitemref{C: S3}, that is, 
+    \begin{align*}
+        & \int_{\R^k} \left| \gamma(s,X(s^-),z) \right|^2 \nu(\diff z) \\
+        & \qquad \leq 2 \int_{\R^k} \left| \gamma(s,X(s^-),z) - \gamma(s,x,z) \right|^2 \nu(\diff z) + 2 \int_{\R^k}\left|\gamma(s,x,z) \right|^2 \nu(\diff z)  \\
+        & \qquad \leq C |X(s^-)-x|^2 + C'|x|^2 \\
+        & \qquad \leq C'' \rho^2.
+    \end{align*}
+    Combining \eqref{eqn: Prob ineq 2}-\eqref{eqn: nu-term inequality}, we obtain 
+    \begin{equation}
+        A_2 = \Prob (\tau_D \leq h)^{1/2} \leq C_1 h^{1/2}.
+        \label{C: A2}
+    \end{equation}
+    Hence, with \eqref{C: A1 upper bound} and \eqref{C: A2}, the residual term \eqref{eqn: R inequality} is bounded by
+    \begin{equation*}
+        |R| \leq C h^{3/2},
+    \end{equation*}
+    for $C>0$. We therefore conclude that for $h$ sufficiently small,
+    \begin{equation*}
+        v(t,x) = \Etx \left[ \int_0^h f(t+s,X(t+s)) \diff s + v(t+h,X(t+h)) \right] + \mathcal{O}(h^{3/2}).
+        \qedhere
+    \end{equation*} 
+\end{proof}

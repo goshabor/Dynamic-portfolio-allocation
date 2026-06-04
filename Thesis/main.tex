@@ -1,0 +1,406 @@
+\documentclass[a4paper, 12pt, openany, twoside]{book}
+%\raggedbottom
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+
+\usepackage[lmargin=1.25in, rmargin=1in, tmargin=1in, bmargin=1in]{geometry}
+
+\usepackage[Bjarne]{fncychap}
+\usepackage{fancyhdr}
+
+\setlength{\headheight}{14.5pt}
+
+% Normal thesis pages:
+% even page number top left, odd page number top right.
+\fancypagestyle{thesis}{%
+    \fancyhf{}%
+    \fancyhead[LE]{\thepage}%
+    \fancyhead[RO]{\thepage}%
+    \fancyhead[RE]{\leftmark}%
+    \fancyhead[LO]{\leftmark}%
+    \renewcommand{\headrulewidth}{0pt}%
+    \renewcommand{\footrulewidth}{0pt}%
+}
+
+% Chapter-opening pages:
+% page number bottom centre.
+\fancypagestyle{plain}{%
+    \fancyhf{}%
+    \fancyfoot[C]{\thepage}%
+    \renewcommand{\headrulewidth}{0pt}%
+    \renewcommand{\footrulewidth}{0pt}%
+}
+
+\setcounter{tocdepth}{2}
+\setcounter{secnumdepth}{4}
+
+\usepackage[dvipsnames]{xcolor}
+\usepackage{graphicx}
+\usepackage{float}
+\usepackage[export]{adjustbox}
+\usepackage[bf]{caption}
+\usepackage{subcaption} 
+
+\usepackage{minted}
+
+\usepackage{array, booktabs}
+\usepackage{url}
+\usepackage{listings}
+
+\usepackage{bm}
+\usepackage{amsmath}
+\usepackage{amssymb}
+\usepackage{amsthm}
+\usepackage{gensymb}
+\allowdisplaybreaks
+
+\usepackage{textcomp}
+\usepackage{siunitx}
+
+\usepackage{afterpage}
+
+\usepackage{chngcntr}
+
+\counterwithout{figure}{chapter}
+\counterwithout{table}{chapter}
+
+\renewcommand{\thefigure}{\arabic{figure}}
+\renewcommand{\thetable}{\arabic{table}}
+
+\usepackage{comment}
+\usepackage{enumerate}
+\usepackage{dsfont}
+\usepackage{enumitem}
+\usepackage{mathtools}
+
+\usepackage[main=british,norsk,french,nswissgerman]{babel}
+\usepackage{csquotes}
+
+\usepackage[
+    backend=biber,
+    style=numeric,
+    date=long,
+    sorting=nyt,
+    maxbibnames=999,   
+    maxcitenames=3,
+    mincitenames=1     
+]{biblatex}
+\addbibresource{references.bib}
+
+\usepackage[
+    colorlinks=true,
+    linktoc=all,
+    linkcolor=NavyBlue,
+    citecolor=NavyBlue,
+    urlcolor=NavyBlue,
+    filecolor=black,
+    pdftitle={Stochastic Impulse Control Problems: Dynamic Programming, Viscosity Solutions, and Deep Reinforcement Learning},
+    pdfauthor={Gonchigsuren Bor},
+    pdfsubject={Master's thesis in Industrial Mathematics},
+    pdfkeywords={stochastic impulse control, viscosity solutions, dynamic programming, deep reinforcement learning},
+    pdfpagemode=UseOutlines,
+    pdfdisplaydoctitle=true
+]{hyperref}
+
+\makeatletter
+
+\newcommand{\blacktitlesbluepages}[1]{%
+    \begingroup
+    \let\oldcontentsline\contentsline
+    \def\contentsline##1##2##3##4{%
+        \oldcontentsline{##1}{{\color{black}##2}}{{\color{NavyBlue}##3}}{##4}%
+    }%
+    #1%
+    \endgroup
+}
+
+% Completely empty inserted blank pages.
+% These pages still count, but show no page number, no header, and no footer.
+\newcommand{\clearemptydoublepage}{%
+    \clearpage
+    \if@twoside
+        \ifodd\c@page
+        \else
+            \hbox{}%
+            \thispagestyle{empty}%
+            \newpage
+            \if@twocolumn
+                \hbox{}%
+                \thispagestyle{empty}%
+                \newpage
+            \fi
+        \fi
+    \fi
+}
+
+% Make ordinary \cleardoublepage insert empty, unnumbered blank pages.
+\renewcommand{\cleardoublepage}{\clearemptydoublepage}
+
+% Front matter with one unnumbered blank page after the title page.
+\newcommand{\thesisfrontmatter}{%
+    \clearemptydoublepage
+    \@mainmatterfalse
+    \pagenumbering{roman}
+}
+
+\makeatother
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\usepackage{import}
+% \usepackage[autostyle]{csquotes}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%algorithms
+\usepackage{algorithm}
+\usepackage{algorithmic}
+\renewcommand{\algorithmicrequire}{\textbf{Input:}}
+\renewcommand{\algorithmicensure}{\textbf{Output:}}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%Tables
+\usepackage{tabularx}
+\usepackage{longtable}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%Charts --> not needed
+\usepackage{tikz}
+\usepackage{adjustbox}
+\usetikzlibrary{shapes,arrows,arrows.meta,decorations.pathmorphing,positioning,calc,fit,shapes.geometric,backgrounds}
+
+\tikzstyle{decision} = [diamond, draw, fill=blue!20, 
+    text width=4.5em, text badly centered, node distance=3cm, inner sep=0pt]
+\tikzstyle{block} = [rectangle, draw, fill=blue!20, 
+    text width=5em, text centered, rounded corners, minimum height=4em]
+\tikzstyle{line} = [draw, -latex']
+\tikzstyle{cloud} = [draw, ellipse,fill=red!20, node distance=3cm,
+    minimum height=2em]
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% Theorems, etc.
+\theoremstyle{plain}
+\newtheorem{theorem}{Theorem}[chapter]
+\newtheorem{lemma}[theorem]{Lemma}
+\newtheorem{proposition}[theorem]{Proposition}
+\newtheorem{corollary}[theorem]{Corollary}
+\newtheorem{claim}[theorem]{Claim}
+
+\theoremstyle{definition}
+\newtheorem{definition}[theorem]{Definition}
+\newtheorem{assumption}{Assumption}[chapter]
+\newtheorem{example}{Example}[chapter]
+
+\theoremstyle{remark}
+\newtheorem{remark}[theorem]{Remark}
+
+\numberwithin{equation}{section}
+% \numberwithin{table}{section}
+% \numberwithin{figure}{section}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% Own math commands
+
+\newcommand{\F}{\mathcal{F}}
+\newcommand{\R}{\mathbb{R}}
+\newcommand{\E}{\mathbb{E}}
+\newcommand{\Etx}{\mathbb{E}^{(t,x)}}
+\newcommand{\Prob}{\mathbb{P}}
+\newcommand{\Q}{\mathbb{Q}}
+
+\DeclareMathOperator{\V}{Var}
+\DeclareMathOperator{\Cov}{Cov}
+
+\newcommand{\diff}{\,\mathrm{d}}
+
+% Related to impulse controls
+\newcommand{\Xa}{X^{(\alpha)}}
+\newcommand{\tauS}{\tau_{\mathcal{S}}}
+\newcommand{\Solvency}{\mathcal{S}}
+\newcommand{\InterveneOper}{\mathcal{M}}
+\newcommand{\AdmissibleSet}{\mathcal{V}}
+\newcommand{\InfinitesimalGenerator}{\mathcal{L}}
+\newcommand{\PB}{\mathcal{PB}}
+
+\DeclareMathOperator{\LSC}{LSC}
+\DeclareMathOperator{\USC}{USC}
+
+% Other operators
+\DeclareMathOperator*{\argmax}{arg\,max}
+\DeclareMathOperator*{\argmin}{arg\,min}
+\DeclareMathOperator*{\esssup}{ess\,sup}
+\DeclareMathOperator{\Tr}{Tr}
+
+\newcommand{\ind}[1]{1_{\left\{#1\right\}}}
+
+% Reference assumptions
+\newcommand{\assitemref}[1]{\hyperref[#1]{\ref*{#1}}}
+\newcommand{\assitemrange}[2]{\assitemref{#1}--\assitemref{#2}}
+
+% Paragraph spacing
+\setlength{\parindent}{1.5em} % keep paragraph indentation
+\setlength{\parskip}{6pt plus 2pt minus 1pt} % add space between paragraphs
+
+%\setlist{itemsep=0pt, topsep=4pt}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{document}
+
+\begin{titlepage}
+\newgeometry{left=1.5in, right=1.5in}
+\vspace*{1.5cm}
+
+\noindent  \textcolor{gray}{\large Gonchigsuren Bor} \\
+\vspace{0.5cm}
+
+\noindent \textbf{\Large Stochastic Impulse Control Problems: Dynamic Programming, Viscosity Solutions, and Deep Reinforcement Learning} \\
+\vspace{0.2cm}
+
+\noindent {\large With Applications to Optimal Foreign Exchange Intervention and Dynamic Portfolio Allocation} \\
+
+\vspace{5.5cm}
+\noindent Master's thesis in Applied Physics and Mathematics \\
+Supervisor: Prof. Espen Robstad Jakobsen \\
+June 2026 \\
+
+\vspace{0.2cm}
+\noindent Norwegian University of Science and Technology \\
+Faculty of Information Technology and Electrical Engineering \\
+Department of Mathematical Sciences \\
+
+\vspace{0.2cm}
+\begin{figure}[H]
+    \includegraphics[width=0.4\textwidth]{Figures/Norwegian University of Science and Technology - farger - hoyde.png}
+\end{figure}
+
+\end{titlepage}
+\restoregeometry
+
+\thesisfrontmatter
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\pagestyle{thesis}
+
+
+\chapter*{Abstract}
+\phantomsection
+\addcontentsline{toc}{chapter}{\protect\numberline{}Abstract}
+\input{Chapters/0 – Abstract}
+\cleardoublepage
+
+\begin{otherlanguage}{norsk}
+\chapter*{Sammendrag}
+\phantomsection
+\addcontentsline{toc}{chapter}{\protect\numberline{}Sammendrag}
+\input{Chapters/0 - Sammendrag}
+\end{otherlanguage}
+\cleardoublepage
+
+\chapter*{Preface}
+\phantomsection
+\addcontentsline{toc}{chapter}{\protect\numberline{}Preface}
+\input{Chapters/0 – Preface}
+\cleardoublepage
+
+\phantomsection
+\addcontentsline{toc}{chapter}{\protect\numberline{}Contents}
+\blacktitlesbluepages{\tableofcontents}
+
+\cleardoublepage
+\phantomsection
+\addcontentsline{toc}{chapter}{\protect\numberline{}\listfigurename}
+\blacktitlesbluepages{\listoffigures}
+
+\cleardoublepage
+\phantomsection
+\addcontentsline{toc}{chapter}{\protect\numberline{}\listtablename}
+\blacktitlesbluepages{\listoftables}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\pagestyle{fancy} %set customized page style for header
+\fancyhf{} %clear header and footer fields
+\renewcommand{\headrulewidth}{0pt} %set to no rule
+\fancyhead[LE, RO]{\thepage} %set the page number at left for even, right for odd pages
+\fancyhead[RE, LO]{\leftmark} %set the chapter name at right for even, left for odd pages
+%is is possible to design the header with the chapter as you wish, e.q. only the chapter or only the name, all lowercase instead etc.
+%you could also design the footer if you wish, for example:
+%\fancyfoot[LE, RO]{\thepage}
+\setlength{\headheight}{14.49998pt} %set the header height
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%main content 
+\mainmatter
+
+\chapter{Introduction}
+\input{Chapters/1 – Chapter 1}
+\cleardoublepage
+
+\chapter{Preliminaries}
+\input{Chapters/2 – Chapter 2}
+\cleardoublepage
+
+\chapter{Impulse Control of Jump-Diffusion Processes}
+\input{Chapters/3 – Chapter 3}
+\cleardoublepage
+
+\chapter{Existence of Viscosity Solutions for the Impulse-Control QVI}
+\input{Chapters/4 – Chapter 4}
+\cleardoublepage
+
+\chapter{Comparison and Uniqueness for the Impulse-Control QVI}
+\input{Chapters/5 – Chapter 5}
+\cleardoublepage
+
+\chapter{Numerical Solution of the QVI}
+\input{Chapters/6 – Chapter 6}
+\cleardoublepage
+
+\chapter{Deep Reinforcement Learning for Impulse Control Problems}
+\input{Chapters/7 – Chapter 7}
+\cleardoublepage
+
+\chapter{Numerical Experiment I: Impulse Control of the Foreign Exchange Rate}
+\input{Chapters/8 – Chapter 8}
+\cleardoublepage
+
+\chapter{Numerical Experiment II: Dynamic Portfolio Allocation}
+\input{Chapters/9 – Chapter 9}
+\cleardoublepage
+
+\chapter{Concluding Remarks}
+\input{Chapters/10 - Chapter 10}
+\cleardoublepage
+
+\printbibliography[heading=bibintoc, title={References}]
+\cleardoublepage
+
+\appendix
+\phantomsection
+\addcontentsline{toc}{chapter}{Appendices}
+
+\chapter{Some useful theorems}
+\input{"Appendices/A – Stochastic Processes"}
+\cleardoublepage
+
+\chapter{Auxiliary Results for the Proof of the Existence of the
+Viscosity Solution}
+\input{"Appendices/B – Results needed for Proof of Existence"}
+\cleardoublepage
+
+\chapter{Auxiliary Results for Dynamic Programming}
+\input{"Appendices/C – Auxiliary results for DP"}
+\cleardoublepage
+
+\chapter{Economic Scenario Generator}
+\input{"Appendices/D – Stock scenario generator"}
+\cleardoublepage
+
+\chapter{Asset Price Calibration using European Call Options}
+\input{"Appendices/E – Calibration Procedure"}
+\cleardoublepage
+
+\chapter{Portfolio Performance Metrics}
+\input{"Appendices/F – Portfolio performance metrics"}
+\cleardoublepage
+
+\chapter{Data and Calibration Results}
+\input{"Appendices/G - Calibration Results"}
+\end{document}

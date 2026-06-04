@@ -1,0 +1,688 @@
+%\section{Impulse Control of Jump-Diffusion Processes}
+\label{section: Impulse Control of Jump-Diffusion Processes}
+This chapter formulates the finite-horizon impulse control problem for jump-diffusion processes, where the uncontrolled jump-diffusion $X$ introduced in Chapter \ref{section: Preliminaries} is turned into a controlled process through impulse controls. The theory presented in this chapter is taken from \cite[Chapters 9 and 10]{oksendal2007applied}. However, some proofs and intermediate arguments have been expanded in order to provide more clarity to the reader. In Chapter \ref{section: A Primer on Deep Reinforcement Learning}, we present the impulse control problem and state a verification theorem. Chapter \ref{section: Dynamic Programming Principle and Related Results} then reformulates the impulse control problem as an iterated optimal stopping time problem using the dynamic programming principle.
+
+\section{A primer on impulse control}
+\label{section: A Primer on Impulse Control Problems}
+Recall the jump-diffusion process $X$ defined in Chapter \ref{section: Jump-diffusion processes}, that is, 
+\begin{align}
+    &\diff X(s) = \mu(s,X(s^-)) \diff s + \sigma(s, X(s^-)) \diff W(s) + \int_{\mathbb R^\ell} \gamma (s,X(s^-),z) \tilde N (\diff s, \diff z), \nonumber \\
+    &X(t^-) = x \in \R^d.
+    \label{eqn: jump-diffusion SDE}
+\end{align}
+The generator $\mathcal L$ of $X$ is given by \eqref{eqn: infinitesimal generator ch.2}, which we rewrite for the reader's convenience:
+\begin{align}
+    \InfinitesimalGenerator u (t,x) &= \langle \mu(t,x), \nabla_x u (t,x) \rangle + \frac{1}{2} \Tr (\sigma(t,x)\sigma^\top(t,x)H_x u(t,x)) \nonumber\\
+    &+ \int_{\R^\ell} \{u(t,x+\gamma(t,x,z)) - u (t,x) - \langle \nabla u (t,x), \gamma(t,x,z) \rangle \ind{|z|<1}\} \nu(\diff z),
+    \label{eqn: infinitesimal generator}
+\end{align}
+where $u \in C^{1,2}([0,T) \times \Solvency)$. 
+
+In a finite-horizon impulse control problem, the process $X$ is controlled with the impulse control $\alpha$ on a finite time horizon $T<\infty$. The controlled process is therefore denoted by $X^{(\alpha)}$. The main goal of the controller is to maximise a given performance criterion, while keeping the controlled process within the \textit{solvency region} $\Solvency \subset \R^d$. The solvency region is assumed to be an open set in order to omit boundary cases. Furthermore, we denote by $\mathcal Z$ the set of admissible impulses and assume it is non-empty at any time $t$ and state $x$. We define notions such as \emph{impulse control}, \emph{post-jump, pre-intervention state}, and \emph{post-intervention map} in what follows.
+ 
+\begin{definition}[Impulse Control]
+\label{def: Impulse Control}
+    We say that an impulse control is a double (possibly finite) sequence 
+    \begin{equation*}
+        \alpha= \{(\tau_i, \zeta_j)\}_{j=1}^M, \quad M \leq \infty,
+    \end{equation*}
+    where the intervention times $t \leq \tau_1 \leq \tau_2 \leq \cdots$ are $\F_t$-stopping times and $\zeta_1, \zeta_2, \ldots$ are the corresponding impulses at these times. We assume that $\zeta_j$ is $\F_{\tau_j}$-measurable for all $j$ and that $\zeta \in \mathcal{Z}(t,x) \subset \R^d$.
+\end{definition}
+
+\begin{definition}[Post-Jump, Pre-Intervention State]
+% Må kanskje skrive om at jeg antar at jeg kan ta impulser etter hopp?
+\label{def: Post-Jump, Pre-Intervention State}
+    Let $\alpha=\{(\tau_j, \zeta_j)\}_{j=1}^M$, where $M \leq \infty$, be as in Definition \ref{def: Impulse Control}. We denote by $\check{X}^{(\alpha)}$ the state immediately after any exogenous Poisson jump at time $\tau_j$, but before the possible impulse at $\tau_j$, and define it as
+    \begin{equation*}
+        \check{X}^{(\alpha)}(\tau_j^-) = \Xa (\tau_j^-) + \Delta_N X(\tau_j),
+    \end{equation*}
+    Here, $\Delta_N X(\tau_j)$ denotes the jump of $X$ caused by the jump of $N$ only and is defined by
+    \begin{equation*}
+        \Delta_N X(\tau_j) = \int_{\R^d} \gamma(t,X(\tau_j^-),z) \tilde N(\{\tau_j\}, \diff z),
+    \end{equation*}
+    where 
+    \begin{equation*}
+        \tilde N(\{\tau_j\}, \diff z) = \tilde N(\tau_j, \diff z) - \tilde N(\tau_j^-, \diff z). 
+    \end{equation*}
+\end{definition}
+\begin{remark}
+    In essence, this definition imposes that the controller may only apply impulses after exogenous Poisson jumps. For example, in the context of dynamic portfolio allocation, we assume that the asset manager is only allowed to rebalance her portfolio by means of impulses only after an exogenous market jump occurs.
+\end{remark}
+
+\begin{definition}[Post-intervention Function]
+\label{def: Post-intervention Function}
+    Let $(t,x) \in [0,T] \times \Solvency$ be fixed, $\Solvency \subseteq \R^d$ be the state space and $\mathcal Z$ the set of admissible impulses. The post-intervention function
+    \begin{equation*}
+        \Gamma: [0,T) \times \Solvency \times \mathcal Z(t,x) \rightarrow \Solvency
+    \end{equation*}
+    applies the impulse $\zeta$ to the state $x$. Hence, if an impulse $\zeta_j \in \mathcal Z$ is chosen at the intervention time $\tau_j$, the controlled state process $\Xa$ restarts at
+    \begin{equation*}
+        \Xa (\tau_j) = \Gamma (\tau_j, \check{X}^{(\alpha)}(\tau_j), \zeta_j).
+    \end{equation*}
+\end{definition}
+\begin{remark}
+    We note that in \cite{oksendal2007applied}, the function $\Gamma$ is assumed to be a Borel-measurable function. In \cite{seydel2010generalexistenceuniquenessviscosity}, however, a stronger assumption\footnote{Note that any continuous function is Borel-measurable, but the converse implication does not always hold.} of continuity is needed to prove the existence and uniqueness of a viscosity solution. We therefore adopt the stronger continuity assumption on $\Gamma$.
+\end{remark}
+
+With Definitions \ref{def: Impulse Control}, \ref{def: Post-Jump, Pre-Intervention State}, and \ref{def: Post-intervention Function} in mind, suppose now that at any time $t$ and any state $x$, we are free to intervene and give the system an impulse $\zeta \in \mathcal Z \subset \R^d$. Here $\mathcal Z$ denotes the set of admissible impulse values, and is assumed to be non-empty and given at any time $t$ and any state $x$. Let $\alpha$ denote an impulse control. Furthermore, suppose that sending an impulse of size $\zeta$ to the state $X(\tau^-)$ immediately moves the state from $X(\tau^-)$ to $\Gamma(\tau,\check{X}^{(\alpha)}(\tau^-),\zeta) \in \Solvency$. Then, for some initial time $0 \leq t \leq T$, we define the corresponding controlled process $\Xa$ by
+\begin{align}
+    & \Xa (t^-) = x \quad \text{and } \quad \Xa(s) = X(s), \quad \text{for } t \leq s \leq \tau_1, \label{eqn: (9.1.2) in ØS} \\
+    & \Xa (\tau_j) = \Gamma(\tau_j, \check{X}^{(\alpha)}(\tau_j^-), \zeta_j), \quad j=1,2, \ldots \label{eqn: (9.1.3) in ØS} \\
+    & (\text{If } \tau_1=t, \text{we put } \Xa(\tau_1) = \Gamma(t,\Xa(t^-), \zeta_1) = \Gamma(t,x,\zeta_1).) \nonumber \\
+    & \diff \Xa(s) = \mu(s,\Xa(s^-)) \diff s + \sigma(s,\Xa(s^-)) \diff W(s) \nonumber \\
+    & \qquad \qquad \quad + \int_{\R^l} \gamma(s,\Xa(s^-),z) \tilde N(\diff s, \diff z) \quad \text{for } \tau_j < s < \tau_{j+1}. \label{eqn: (9.1.4) in ØS}
+\end{align}
+We note that if $\tau_{j+1} = \tau_j$, that is when two intervention times coincide, the controlled process jumps from $\check{X}^{(\alpha)}(\tau_j^-)$ to $\Gamma \big(\tau_j,\Gamma(\tau_j,\check{X}^{(\alpha)}(\tau_j^-),\zeta_j),\zeta_{j+1}\big)$. However, throughout this thesis it is assumed that executing two rebalancing steps at the same time does not add any economic value relative to a single equivalent intervention. Hence, assume from now on that $\tau_j < \tau_{j+1} < \cdots$ for $j=1,2, \ldots$. Moreover, the drift, diffusion, and jump-amplitude functions in \eqref{eqn: (9.1.4) in ØS} satisfy the Lipschitz and linear-growth bound conditions \eqref{eqn: Lipschitz condition} and \eqref{eqn: lgb condition} respectively.
+
+\begin{definition}[Time of Insolvency]
+\label{def: Time of Insolvency}
+    We define the time of insolvency as the smallest stopping time for which the controlled process $\Xa$ becomes insolvent, that is,
+    \begin{equation*}
+        \tau_\mathcal{S} = \inf \{s \in (t,\infty): \Xa(s) \notin \mathcal{S}\}.
+    \end{equation*}
+\end{definition}
+
+We now proceed to specify the performance criterion and the resulting impulse control problem. Suppose that we are given a continuous \emph{profit function} $f: [0,T] \times \mathcal{S} \rightarrow \mathbb R$ and a continuous \emph{bequest} function $g: [0,T] \times \mathbb R^d \rightarrow \mathbb R$. Let $K: [0,T] \times \Solvency \times \mathcal Z \rightarrow \R$ be the cost-of-intervention function (or simply cost function) and assume $K$ is a continuous, non-positive function. Furthermore, denote by $\AdmissibleSet$ the set of admissible controls $\alpha$. In the case if $\alpha$ is an infinite sequence, we assume that
+\begin{equation}
+    \lim_{j \rightarrow \infty} \tau_j = \tau_\Solvency,
+    \label{eqn: lim of tau_j}
+\end{equation}
+where $\tau_\Solvency$ is the time of insolvency in Definition \ref{def: Time of Insolvency}. Finally, assume the following holds
+\begin{align}
+    & \Etx\left[\int_t^{\tauS \wedge T} \big| f(s,\Xa(s))\big| \diff s \right] < \infty && \text{for all } t \in [0,T], \, x \in \R^d,\, \alpha \in \AdmissibleSet,
+    \label{eqn: well-behavedness of f} \\
+    & \Etx\left[ g^-\big(\tauS \wedge T, \Xa (\tauS \wedge T)\big) \right] < \infty && \text{for all } x \in \R^d, \, \alpha \in \AdmissibleSet, 
+    \label{eqn: well-behavedness of g} \\
+    & \Etx \left[ \sum_{t \leq \tau_j < \tauS \wedge T} K^-\big(\tau_j,\check{X}^{(\alpha)}(\tau_j^-), \zeta_j\big) \right] < \infty, && \text{for all } x \in \R^d, \, \alpha \in \AdmissibleSet,
+    \label{eqn: well-behavedness of K}
+\end{align}
+where $g^-(t,x) := \max\{-g(t,x), 0\}$ and $K^-(t,x,\zeta) := \max\{-K(t,x, \zeta), 0\}$. Then, with $\tau' := \tauS \wedge T$, the performance criterion is read as follows:
+\begin{equation}
+    J^{(\alpha)}(t,x) = \Etx \left[ \int_t^{\tau'} f\big(s,\Xa(s)\big) \diff s + g\big(\tau', \Xa(\tau')\big) + \sum_{t \leq \tau_j < \tau'} K\big(\tau_j, \check{X}^{(\alpha)}(\tau_j^-), \zeta_j\big) \right].
+    \label{eqn: performance criterion}
+\end{equation}
+The impulse control problem over a finite time horizon reads as:
+\begin{quote}
+    Find $v(t,x)$ and $\alpha^* \in \mathcal V$ such that 
+    \begin{equation}
+        v(t,x) = \sup_{a \in \AdmissibleSet}J^{(\alpha)}(t,x) = J^{(\alpha^*)}(t,x).
+        \label{eqn: optimal value function}
+    \end{equation}
+\end{quote}
+We refer to $v$ as the \emph{value function}. 
+
+With the definition of the impulse control problem, we first introduce the intervention operator in Definition \ref{def: Intervention Operator} and then turn to the verification theorem (Theorem \ref{trm: Verification for Impulse Control}), the latter of which lets us verify if a potential solution to the impulse control problem indeed solves \ref{eqn: optimal value function}.
+
+\begin{definition}[{\cite[Definition~9.1]{oksendal2007applied}} Intervention Operator]
+\label{def: Intervention Operator}
+    Let $\mathcal{H}$ be the space of all measurable function $h: \Solvency \rightarrow \R$. The intervention operator, $\mathcal{M}^{(t,x)}: \mathcal{H} \rightarrow \mathcal{H}$ is defined by
+    \begin{equation*}
+        \mathcal{M}^{(t,x)}h(t,x) = \sup_{\substack{\zeta \in \mathcal{Z}(t,x)}} \{h(\Gamma(t,x,\zeta)) + K(t,x,\zeta)\}.
+    \end{equation*}
+    In the case when $\mathcal{Z}(t,x) = \emptyset$, then we set $\mathcal{M}h(t,x) = - \infty$\footnote{This case will however be excluded in later chapters.}. 
+\end{definition}
+\begin{remark}
+    For brevity, we denote the intervention operator in Definition \ref{def: Intervention Operator} by $\InterveneOper = \mathcal{M}^{(t,x)}$.
+\end{remark}
+
+\begin{theorem}[{\cite[Theorem 9.2]{oksendal2007applied}} Quasi-Variational Inequalities for Impulse Control]
+\label{trm: Verification for Impulse Control}
+Let $T > 0$ be a fixed, finite time horizon, recall $\tauS$ from Definition \ref{def: Time of Insolvency}, and let $v(t,x)$ denote the value function for the impulse problem \eqref{eqn: optimal value function} on $[0,T] \times \Solvency$. Furthermore, let the infinitesimal generator for the random process $X$ be given by \eqref{eqn: infinitesimal generator}, recall the intervention operator from Definition \ref{def: Intervention Operator}, and define 
+\begin{equation*}
+    \mathcal{T}_t = \{ \tau: \tau \text{ stopping time}, t \leq \tau \leq \tauS \wedge T \text{ a.s.}\}.
+\end{equation*}
+    \begin{enumerate}[label=(\alph*)]
+        \item Suppose we can find $\varphi: \Bar{\Solvency} \rightarrow \R$ such that
+        \begin{enumerate}[label=(\roman*)]
+            \item $\varphi \in C^1([0,T) \times \Solvency) \cap C(\{T\} \times \Bar{\Solvency})$.
+            \item $\varphi \geq \InterveneOper \varphi$ on $[0,T) \times \Solvency$. 
+        \end{enumerate}
+        
+        Define the continuation region, i.e. the region inside which no impulses occur, as
+        \begin{equation*}
+            D = \{(t,x) \in [0,T) \times \Solvency: \varphi(t,x) > \InterveneOper \varphi(t,x)\},
+        \end{equation*}
+        and assume the following:
+        \begin{enumerate}[label=(\roman*), start=3]
+            \item For all $x \in \Solvency$, $t \in [0,T)$, $\alpha \in \AdmissibleSet$,
+            \begin{equation*}
+                \Etx \left[ \int_t^{\tauS \wedge T} \ind{\partial D}\big(s,\Xa(s)\big) \diff s\right], 
+            \end{equation*}
+            \item $\partial D$ is a Lipschitz surface,
+            \item $\varphi \in C^{1,2}\big([0,T)\times (\Solvency \backslash \partial D) \big)$,
+            \item $\partial_t \varphi + \mathcal L \varphi + f \leq 0$ on $[0,T) \times (\Solvency \backslash \partial D)$,
+            \item $\varphi = g$ on the parabolic boundary, that is, 
+            \begin{equation*}
+                \varphi(t,x) = g(t,x), \quad \text{for } t \in [0,T] \text{ and } x \notin \Solvency,
+            \end{equation*}
+            \item The family $\big\{ \varphi^- \big(\tau,\Xa(\tau)\big): \tau \in \mathcal{T}_t \big\}$ is uniformly integrable, for all $x \in \Solvency$, $\alpha \in \AdmissibleSet$,
+            \item And lastly, 
+            \begin{equation*}
+                \Etx \left[ \int_t^{\tauS \wedge T} \Big|\partial_s \varphi(s,\Xa(s)) + \mathcal{L}\varphi(s,\Xa(s)) \Big| \diff s + \big| \varphi(\tau,\Xa(\tau)) \big| \right] < \infty,
+            \end{equation*}
+            for all $\tau \in \mathcal{T}_t$, $\alpha \in \AdmissibleSet$, $x \in \Solvency$.
+        \end{enumerate}
+        Then,
+        \begin{equation}
+            \varphi(t,x) \geq v(t,x) \quad \text{for all } (t,x) \in [0,T] \times \Solvency.
+            \label{eqn: ØS theorem 9.2, first ineq}
+        \end{equation}
+        \item Suppose in addition that:
+        \begin{enumerate}[label=(\roman*), start=10]
+            \item $\partial_t \varphi + \mathcal{L}\varphi + f = 0$ inside the continuation region $D$,
+            \item A maximizer $\hat{\zeta}(t,x)$ exists, in the sense that
+            \begin{equation*}
+                \hat{\zeta}(t,x) = \argmax \big\{\varphi\big(t, \Gamma(t,x,\cdot)\big) + K(t,x,\cdot) \big\} \in \mathcal{Z}(t,x) 
+            \end{equation*}
+            exists for all $(t,x) \in [0,T) \times \Solvency$ and $\hat{\zeta}(\cdot, \cdot)$ is a Borel measurable selection.
+        \end{enumerate}
+        Put $\hat \tau_0 = s$ and define $\hat \alpha= (\hat \tau_1, \hat \tau_2, \cdots; \hat \zeta_1, \hat \zeta_2, \ldots)$ inductively by \newline $\hat \tau_{j+1} = \inf \{ t > \hat \tau_j: \big( t, X^{(\hat a)} \notin D \big) \} \wedge \tau$ and $\hat \zeta_{j+1} = \hat \zeta(\hat \tau_{j+1}, X^{(\hat a_j)}(\hat \tau_{j+1}^-))$ if $\hat \tau_{j+1} < \tau$, where $X^{\hat a_j}$ is the result of applying $\hat a_j:=(\hat \tau_1, \ldots, \hat \tau_j; \hat \zeta_1, \ldots, \hat \zeta_j)$ to $X$. 
+        
+        Finally, suppose 
+        \begin{enumerate}[label=(\roman*), start=12]
+            \item $\hat a \in \AdmissibleSet$ and $\{\varphi(\tau,X^{(\hat a)}(\tau)): \tau \in \mathcal{T}_t\}$ is uniformly integrable.
+        \end{enumerate}
+        Then,
+        \begin{equation}
+            \varphi(t,x) = v(t,x) \quad \text{and } \hat a \text{ is an optimal impulse control}.
+            \label{eqn: ØS theorem 9.2, second ineq}
+        \end{equation}
+    \end{enumerate}
+\end{theorem}
+\begin{proof}
+    See \cite[pp.242-243]{oksendal2007applied}.
+\end{proof}
+
+
+\section{The Dynamic Programming Principle}
+\label{section: Dynamic Programming Principle and Related Results}
+% Motivere bruk av iterated stopping times, 
+This section is based on the work of \textcite[Chapter 10.1]{oksendal2007applied}. As the authors argue, in general, an impulse control problem cannot be reformulated as a single optimal stopping problem, because the first intervention action, i.e. the initial intervention time $\tau_1$ and the corresponding impulse $\zeta_1$, affects the subsequent state evolution and therefore changes the structure of all future decisions.
+
+Nevertheless, if one focuses on controls with at most $n<\infty$ of interventions, the resulting truncated impulse control can be solved by backward induction through an iterative procedure that reduces the problem into $n$ optimal stopping problems. At each intervention time, the corresponding impulse is chosen to be the maximizer of the intervention operator found in Definition \ref{def: Intervention Operator}. As discussed in this section, the value function of the restricted problem converges to the value function of the unrestricted problem \eqref{eqn: optimal value function}, as $n \rightarrow \infty$. Hence, an impulse problem may be approximated by a sequence of iterated optimal stopping problems. 
+
+We therefore beign by recalling the unrestricted impulse control problem \eqref{eqn: optimal value function}, that is,
+\begin{equation*}
+    v(t,x) = \sup_{a \in \AdmissibleSet}J^{(\alpha)}(t,x) = J^{(\alpha^*)}(t,x),
+\end{equation*}
+where the performance criterion is defined in Equation \eqref{eqn: performance criterion}, the time horizon $T>0$ is finite, and the time of insolvency is as in Definition \ref{def: Time of Insolvency}.  The set $\AdmissibleSet$ contains all admissible (untruncated) impulse controls $\alpha$.
+
+For $n=1, 2, \ldots,$ let $\AdmissibleSet_n$ denote the set of all $\alpha \in \AdmissibleSet$ such that $\alpha_n = \{(\tau_j, \zeta_j)\}_{j=1}^k$ with $k \leq n$. In other words, $\AdmissibleSet_n$ is the set of all admissible controls \emph{with at most $n$ interventions}. By construction,
+\begin{equation*}
+    \AdmissibleSet_n  \subseteq \AdmissibleSet_{n+1} \subseteq \AdmissibleSet,
+\end{equation*}
+for all $n \in \mathbb N$. This is because truncation removes potential optimal impulses that may have been taken after the $n$-th intervention and reduces the cardinality of the truncated set. Denote the value function of at most $n$ interventions by $v_n$ and define it as
+\begin{equation}
+    v_n(t,x) = \sup_{\alpha_n \in \AdmissibleSet_n} J^{(\alpha)}(t,x), \quad n=1,2, \ldots \;.
+    \label{eqn: value function for at most n interventions}
+\end{equation}
+Finally, to distinguish the time of insolvency related to the non-truncated control $\alpha$ from the one related to the truncated control $\alpha_n$, we write denote these stopping times by $\tauS^{(\alpha)}$ and $\tauS^{(\alpha_n)}$ respectively, and define $\tau^{(\alpha_n)} := \tauS^{(\alpha_n)}\wedge T$ and $\tau^{(\alpha)} := \tauS^{(\alpha)} \wedge T$. The lemma below follows.
+
+\begin{lemma}[{\cite[Lemma 10.1]{oksendal2007applied}}]
+\label{lemma: Lemma 10.1 in ØS}
+    For $g \geq 0$, we have
+    \begin{equation*}
+        \lim_{n \rightarrow \infty} v_n(t,x) = v(t,x),
+    \end{equation*}
+    for all $(t,x) \in [0,T] \times \Solvency$.
+\end{lemma}
+\begin{proof}
+    The proof can be found in \cite{oksendal2007applied}, see Lemma 10.1 wherein. We split the proof into two cases:
+    \begin{enumerate}[label=(\alph*)]
+        \item Show that 
+        \begin{equation*}
+            \lim_{n \rightarrow \infty} v_n(t,x) \leq v(t,x),
+        \end{equation*}
+        for all $(t,x) \in [0,T] \times \Solvency$,
+        \item and that 
+        \begin{equation*}
+            \lim_{n \rightarrow \infty} v_n(t,x) \geq v(t,x).
+        \end{equation*}
+    \end{enumerate}
+    
+    (a) Let $\AdmissibleSet_n$ be the set of all admissible controls with at most $n$ interventions, and let $\AdmissibleSet$ denote the set of all admissible controls. Then, as seen earlier,
+    \begin{equation*}
+        \AdmissibleSet_n \subseteq \AdmissibleSet_{n+1} \subseteq \AdmissibleSet,
+    \end{equation*}
+    for any $n \in \mathbb N$. Now consider the the non-truncated and truncated value functions $v$ and $v_n$ defined in \eqref{eqn: value function for at most n interventions} and \eqref{eqn: optimal value function} respectively. Since the optimal control $\alpha^*$ is more likely to be in $\AdmissibleSet$ than in $\AdmissibleSet_n$, we must have 
+    \begin{equation*}
+        v_n(t,x) \leq v_{n+1}(t,x) \leq v(t,x),
+    \end{equation*}
+    for all $(t,x) \in [0,T] \times \Solvency$. Hence, for all $(t,x) \in [0,T] \times \Solvency$,
+    \begin{equation*}
+        \lim_{n \rightarrow \infty} v_n(t,x) \leq v(t,x).
+    \end{equation*}
+
+    (b) To get the opposite inequality, let us first assume $v(t,x) < \infty$. Then for each $\varepsilon > 0$, there exists, for some $M \leq \infty$ a non-truncated control $\alpha= \{(\tau_j, \zeta_j)\}_{j=1}^M \in \AdmissibleSet$ such that 
+    \begin{align}
+        J^{(\alpha)}(t,x) &= \Etx \left[\int_t^{\tau^{(\alpha)}} f(s, \Xa(s)) \diff s + g(\tau^{(\alpha)}, \Xa(\tau^{(\alpha)}))\right] \nonumber \\
+        & \qquad + \Etx \left[\sum_{t \leq \tau_j < \tau^{(\alpha)}} K\big(\tau_j, \check{X}^{(\alpha)}(\tau_j^-), \zeta_j \big)\right] \nonumber \nonumber\\
+        & \geq v(t,x) - \varepsilon,
+        \label{eqn: (10.1.5) in ØS}
+    \end{align}
+    where $J$ is the performance functional, see \eqref{eqn: performance criterion}. 
+
+    For $n=\mathbb N$, define the finite double sequence $\alpha_n = (\tau_1, \ldots, \tau_n, \tauS^{(\alpha)}; \zeta_1, \ldots, \zeta_n)$. Then,
+    \begin{equation}
+        X^{(\alpha_n)}(s) = \Xa(s), \quad \text{for all } s \leq \tau_n.
+        \label{eqn: (10.1.6) in ØS}
+    \end{equation}
+    Since by assumption $\tau_j \rightarrow \tauS$ a.s. when $j \rightarrow \infty$ (see Equation \eqref{eqn: lim of tau_j}), we get \eqref{eqn: well-behavedness of f} and \eqref{eqn: well-behavedness of K} that there exists $n \in \mathbb N$ such that 
+    \begin{align*}
+        0 & \leq \Etx \left[ \int_{\tau_n}^{\tauS^{(\alpha)}} |f(s,X^{(\alpha)}(s)| \diff s + \int_{\tau_n}^{\tauS^{(\alpha_n)}} |f(s,X^{(\alpha_n)}(s)| \diff s \right] \\ 
+        & \leq  \Etx \left[ \int_{t}^{\tauS^{(\alpha)}} |f(s,X^{(\alpha)}(s)| \diff s + \int_{t}^{\tauS^{(\alpha_n)}} |f(s,X^{(\alpha_n)}(s)| \diff s \right] < \infty,
+    \end{align*}
+    and that 
+    \begin{equation*}
+        0 \leq \Etx \Bigg[ \sum_{\substack{j > n \\ t \leq \tau_j < \tau^{(\alpha)}}} K^-\big( \tau_j, \check{X}^{(\alpha)}(\tau_j^-),\zeta_j \big) \Bigg] \leq \Etx \Bigg[ \sum_{t \leq \tau_j < \tau^{(\alpha)}} K^-\big(\tau_j, \check{X}^{(\alpha)}(\tau_j^-),\zeta_j \big) \Bigg] < \infty,
+    \end{equation*}
+    where $K^-(t,x, \zeta) := \max \{-K(t,x,\zeta)\}$. Consequently, there exists an $\varepsilon > 0$ such that 
+    \begin{equation}
+        \E \left[ \int_{\tau_n}^{\tauS^{(\alpha)}} |f(s,X^{(\alpha)}(s)| \diff s + \int_{\tau_n}^{\tauS^{(\alpha_n)}} |f(s,X^{(\alpha_n)}(s)| \diff s \right] < \varepsilon
+        \label{eqn: (10.1.7) in ØS}
+    \end{equation}
+    and
+    \begin{equation}
+        \E \Bigg[ \sum_{\substack{j > n \\ t \leq \tau_j < \tau^{(\alpha)}}} K^-\big(\tau_j, \check{X}^{(\alpha)}(\tau_j^-),\zeta_j \big) \Bigg] < \varepsilon.
+        \label{eqn: (10.1.8) in ØS}
+    \end{equation}
+    
+    Combining \eqref{eqn: (10.1.6) in ØS}--\eqref{eqn: (10.1.8) in ØS}, we obtain
+    \begin{align}
+        & \liminf_{n \rightarrow \infty} J^{(\alpha_n)}(t,x) \nonumber \\
+        & \quad = \liminf_{n \rightarrow \infty} \E^{(t,x)} \left[ \int_t^{\tau^{(\alpha_n)}} f(s,X^{(\alpha_n)}(s)) \diff s + g(\tau^{(\alpha_n)},X^{(\alpha_n)}(\tau^{(\alpha_n)})) + \sum_{j=1}^n K(\tau_j,\check{X}^{(\alpha_n)}(\tau_j^-), \zeta_j) \right] \nonumber \\
+        & \overset{\eqref{eqn: (10.1.6) in ØS}}{=} \liminf_{n \rightarrow \infty} \Bigg\{ \underbrace{\E^{(t,x)} \left[ \int_{t}^{\tau^{(\alpha)}} f(s,X^{(\alpha)}(s)) \diff s + g(\tau^{(\alpha)},\Xa(\tau^{(\alpha)})) + \sum_{t \leq \tau_j < \tau^{(\alpha)}} K(\tau_j,\check{X}^{(\alpha)}(\tau_j^-),\zeta_j) \right]}_{:=\, J^{(\alpha)}(t,x)} \nonumber \\
+        & \qquad + \E^{(t,x)} \left[ \int_{\tau_n}^{\tau^{(\alpha_n)}} f(s,X^{(\alpha_n)}(s)) \diff s - \int_{\tau_n}^{\tau^{(\alpha)}} f(s,X^{(\alpha)}(s)) \diff s \right] \nonumber \\
+        & \qquad + \E^{(t,x)}\Bigg[g(\tau^{(\alpha_n)},X^{(\alpha_n)}(\tau^{(\alpha_n)})) - g(\tau^{(\alpha)},\Xa(\tau^{(\alpha)})) -\sum_{\substack{j > n \\ t \leq \tau_j < \tau^{(\alpha)}}} K\big(\tau_j, \check{X}^{(\alpha)}(\tau_j^-),\zeta_j \big) \Bigg] \Bigg\} \nonumber \\
+        & \qquad + \liminf_{n \rightarrow \infty} \E^{(t,x)}\Bigg[g(\tau^{(\alpha_n)},X^{(\alpha_n)}(\tau^{(\alpha_n)})) - g(\tau^{(\alpha)},\Xa(\tau^{(\alpha)})) -\sum_{\substack{j > n \\ t\leq \tau_j < \tau^{(\alpha)}}} K\big(\tau_j, \check{X}^{(\alpha)}(\tau_j^-),\zeta_j \big) \Bigg]  \nonumber \\
+        & \quad \geq J^{(\alpha)}(t,x) + \liminf_{n \rightarrow \infty}  \E^{(t,x)} \left[ -\int_{\tau_n}^{\tau^{(\alpha_n)}} |f(s,X^{(\alpha_n)}(s))| \diff s - \int_{\tau_n}^{\tau^{(\alpha)}}|f(s,X^{(\alpha)}(s))| \diff s \right] \nonumber \\
+        & \qquad + \liminf_{n \rightarrow \infty} \E^{(t,x)}\left[g(\tau^{(\alpha_n)}),X^{(\alpha_n)}(\tau^{(\alpha_n)})) - g(\tau^{(\alpha)}),\Xa(\tau^{(\alpha)}))\right] \nonumber \\
+        & \qquad - \liminf_{n \rightarrow \infty}  \Etx \left[\sum_{\substack{j > n \\ t \leq \tau_j < \tau^{(\alpha)}}} K^-\big(\tau_j, \check{X}^{(\alpha)}(\tau_j^-),\zeta_j \big)\right]  \nonumber \\
+        & \overset{\eqref{eqn: (10.1.7) in ØS}, \eqref{eqn: (10.1.8) in ØS}}{\geq} J^{(\alpha)}(t,x) - 2 \varepsilon + \liminf_{n \rightarrow \infty} \E^{(t,x)}\Bigg[g(\tau^{(\alpha_n)},X^{(\alpha_n)}(\tau^{(\alpha_n)})) - g(\tau^{(\alpha)},\Xa(\tau^{(\alpha)}))\Bigg] \nonumber \\
+        & \qquad = J^{(\alpha)}(t,x) - 2\varepsilon.
+    \label{eqn: liminf of J}
+    \end{align}
+    Hence, with \eqref{eqn: (10.1.5) in ØS} and \eqref{eqn: liminf of J}, the reverse inequality is obtained
+    \begin{equation*}
+        \liminf_{n \rightarrow \infty} v_n(t,x) \geq \liminf_{n \rightarrow \infty} J^{(\alpha_n)}(t,x) \geq J^{(\alpha)}(t,x) - 2\varepsilon \geq v(t,x) - 3\varepsilon,
+    \end{equation*}
+    and with $\varepsilon > 0$ arbitrary, it follows that 
+    \begin{equation*}
+        \lim_{n \rightarrow \infty} v_n(t,x) \geq v(t,x),
+    \end{equation*}
+    for all $(t,x) \in [0,T] \times \Solvency$ and whenever $v(t,x) < \infty$. For the case when $v(t,x) = \infty$, we refer to \cite[p.257]{oksendal2007applied}
+    
+    Combining cases (a) and (b) then gives us the desired equality.
+\end{proof}
+
+Now that we have established that $v_n$ converges pointwise to $v$ as $n \rightarrow \infty$, let $X(t) = X^{(0)}(t)$ denote the uncontrolled process \eqref{eqn: jump-diffusion SDE}. Consider the following iterative approach
+\begin{equation}
+    \varphi_0(t,x) = \Etx \left[\int_t^{\tauS \wedge T} f\big(s,X(s)\big) \diff s + g\big(\tau,X(\tau)\big) \right],
+    \label{eqn: (10.1.11) in ØS}
+\end{equation}
+and inductively, for $j=1,2,\ldots,n$,
+\begin{equation}
+    \varphi_j(t,x) = \sup_{\tau \in \mathcal{T}_t} \Etx \left[\int_t^{\tau} f\big(s,X(s)\big) \diff s + \InterveneOper \varphi_{j-1}\big(\tau, X(\tau)\big) \right],
+    \label{eqn: (10.1.12) in ØS}
+\end{equation}
+where $\mathcal{T}_t$ denotes the set of stopping times $\tau$ satisfying $\tau \leq \tauS \wedge T$ and $j$ denotes the number of interventions left. Equations \eqref{eqn: (10.1.11) in ØS} and \eqref{eqn: (10.1.12) in ØS} are referred to as the iterated optimal stopping representation. We now show that the truncated impulse control problem may indeed be represented by an iterative optimal stopping representation.
+\begin{definition}[{\cite[Definition 2.1]{seydel2010generalexistenceuniquenessviscosity}} Space of Polynomially Bounded Functions] 
+\label{def: Space of Polynomially Bounded Functions}
+    We denote the space of polynomially bounded functions by $\PB = \PB([0,T) \times \R^d)$ and it is the space of all measurable functions $h: [0,T) \times \R^d \rightarrow \R$ such that 
+    \begin{equation*}
+        |h(t,x)| \leq C_h(1+|x|^m)
+    \end{equation*}
+    for a time-independent constant $C_h>0$ and $m \in \mathbb N$. If $m$ is fixed, we write $\PB_m$. 
+\end{definition}
+\begin{theorem}[Iterated optimal stopping representation, see {\cite[Theorem 10.2]{oksendal2007applied}}]
+    \label{trm: Theorem 10.2 in ØS}
+    Suppose 
+    \begin{equation}
+        f, g \text{ and } \InterveneOper \varphi_{j-1} \in \PB([0,T) \times \R^d), \quad \text{for } j=1,2,\ldots,n.
+        \label{eqn: (10.1.14) in ØS}
+    \end{equation}
+    Then, 
+    \begin{equation*}
+        \varphi_n = v_n.
+    \end{equation*}
+\end{theorem}
+
+Theorem \ref{trm: Theorem 10.2 in ØS} provides a way to formulate the truncated impulse control problem into a sequence of standard optimal stopping problems. In particular, when the controller is restricted to at most $n$ interventions, the value function can be computed via backward recursion. After each intervention, the controller optimally selects when to intervene next and takes the solution from the previous step as the continuation value. This representation lets us replace a single, globally coupled impulse optimisation with an iterated sequence of simpler timing problems. To prove Theorem \ref{trm: Theorem 10.2 in ØS}, a few more auxiliary results are required. We therefore begin by presenting Lemma \ref{lemma: DPP} and Corollary \ref{cor: Corollary 10.5 in ØS}, in which $X$ denotes an uncontrolled stochastic process.
+
+\begin{lemma}[Dynamic Programming Principle (DPP), see {\cite[Lemma 10.3]{oksendal2007applied}}]
+\label{lemma: DPP}
+    Suppose $G \in \PB([0,T)\times \R^d)$. Define 
+    \begin{equation}
+        \psi(t,x) = \sup_{\tau \in \mathcal{T}_t}\E^{(t,x)}\left[ \int_t^\tau f(s,X(s)) \diff s + G(\tau, X(\tau)) \right].
+        \label{eqn: (10.1.15) in ØS}
+    \end{equation}
+    \begin{enumerate}[label=(\alph*)]
+        \item Then, for all finite stopping times $\beta$, we have
+        \begin{equation}
+            \psi(t,x) = \sup_{\tau \in \mathcal{T}_t} \E^{(t,x)}\left[ \int_t^{\tau \wedge\beta} f(s,X(s)) \diff s + G(\tau, X(\tau))\ind{\tau \leq \beta} + \psi(\beta,X(\beta))\ind{\tau > \beta} \right].
+            \label{eqn: (10.1.16) in ØS}
+        \end{equation}
+        \item For $\varepsilon>0$, define the $\varepsilon$-optimal continuation region as
+        \begin{equation*}
+            D^{(\varepsilon)} = \{(t,x) \in [0,T)\times \Solvency: \psi(t,x) > G(t,x) + \varepsilon\},
+        \end{equation*}
+        and define the $\varepsilon$-optimal stopping time 
+        \begin{equation*}
+            \tau^{(\varepsilon)} = \inf\left\{s \geq t: (s,X(s)) \notin D^{(\varepsilon)}\right\}.
+        \end{equation*}
+        Then, if $\beta$ is a finite stopping time such that $\beta \leq \tau^{(\varepsilon)}$ for some $\varepsilon > 0$, we have
+        \begin{equation}
+            \psi(t,x) = \E^{(t,x)} \left[ \int_t^{\beta} f(s,X(s)) \diff s + \psi(\beta, X(\beta)) \right]
+        \end{equation}
+    \end{enumerate}
+\end{lemma}
+\begin{proof}
+    As the proof of Lemma \ref{lemma: DPP} relies on theoretical results that lie beyond the scope of this thesis, we refer the reader to \cite[Section 4]{ishikawa2004optimal} for a complete proof.
+\end{proof}
+
+\begin{corollary}[{\cite[Corollary 10.5]{oksendal2007applied}}]
+\label{cor: Corollary 10.5 in ØS}
+    \begin{enumerate}[label=(\alph*)]
+        \item For each given $\tau \in \mathcal{T}_t$, the process 
+        \begin{equation*}
+            U(s) := u + \int_t^{s \wedge \tau} f(r, X(r)) \diff r + \psi(s \wedge \tau,X(s \wedge \tau)), \quad s \geq t
+        \end{equation*}
+        is a supermartingale. In particular, if $\tau_1$ and $\tau_2$ are finite stopping times such that $t \leq \tau_1 \leq \tau_2 \leq \tauS \wedge T$, then
+        \begin{equation*}
+            \E^{(t,x)} \left[ \psi(\tau_1, X(\tau_1)) \right] \geq \E^{(t,x)}\left[ \int_{\tau_1}^{\tau_2} f(s,X(s)) \diff s + \psi(\tau_2, X(\tau_2)) \right].
+        \end{equation*}
+        \item For $\varepsilon>0$, let $\tau^{(\varepsilon)}$ be as in Lemma \ref{lemma: DPP}a and let $\beta_1$, $\beta_2$ be finite stopping times satisfying $t \leq \beta_1 \leq \beta_2 \leq \tau^{(\varepsilon)}$. Then,
+        \begin{equation*}
+            \E^{(t,x)}\left[ \psi(\beta_1, X(\beta_1)) \right] = \E^{(t,x)} \left[ \int_{\beta_1}^{\beta_2} f(s,X(s)) \diff s + \psi(\beta_2,X(\beta_2))\right].
+        \end{equation*}
+    \end{enumerate}
+\end{corollary}
+\begin{proof}
+    We follow the same approach as in {\cite[see Proof of Corollary 10.5]{oksendal2007applied}} and address points (a) and (b) separately. 
+    
+    (a) Define the random variable 
+    \begin{equation*}
+        R(s) = \left(s \wedge \tau, X(s \wedge \tau), \int_t^{s \wedge \tau} f(r,X(r)) \diff r \right) \in \mathbb R^{d+2}
+    \end{equation*}
+    and put 
+    \begin{equation*}
+        H(t,x,u) = \psi(t,x) + u,
+    \end{equation*}
+    for $(t,x,u) \in [0,T] \times \R^d \times \R$, where $u$ is deterministic. Lastly, recall the definition of the random variable $U(s)$. Then, the Markov property yields
+    \begin{equation*}
+        \E \left[U(s) \mid \F_t \right] = \E\left[ H(R(s)) \mid \F_t \right] = \E^{(s,R(s))} \left[ H(R(s-t)) \right].
+    \end{equation*}
+    Then, by \eqref{eqn: (10.1.16) in ØS}, applied to $\beta:=(s-t)\wedge \tau$ and $(t,x,u) = R(t)$, we obtain
+    \begin{align}
+        \E^{(s,R(s))}[H(R(s-t))] &= \E^{(t,x)} \left[ \psi(\beta, X(\beta)) + u + \int_t^{\beta} f(r,X(r)) \diff r \right] \nonumber \\
+        & = u + \sup_{\tau \geq \beta} \Etx\left[ \psi(X(\beta \wedge\tau)) + \int_t^{\beta \wedge \tau} f(r,X(r)) \diff r \right].
+        \label{eqn: Corollary 10.5a, result in-between 1}
+    \end{align}
+    Now recall \eqref{eqn: (10.1.16) in ØS} in Lemma \ref{lemma: DPP}a. Restricting the supremum in \eqref{eqn: (10.1.16) in ØS} to the event $\{\tau \geq \beta\}$, we get 
+    \begin{equation}
+        \psi(t,x) \geq \sup_{\tau \geq \beta} \Etx \left[ \psi(\beta \wedge \tau, X(\beta \wedge \tau)) + \int_{t}^{\tau \wedge \beta} f(r,X(r)) \diff r \right]. 
+        \label{eqn: Corollary 10.5a, result in-between 2}
+    \end{equation}
+    Combining \eqref{eqn: Corollary 10.5a, result in-between 1} and \eqref{eqn: Corollary 10.5a, result in-between 2}, we obtain
+    \begin{align*}
+        \E^{(s,R(s))}[H(R(s-t))] &= u + \sup_{\tau \geq \beta} \Etx\left[ \psi(X(\beta \wedge\tau)) + \int_t^{\beta \wedge \tau} f(r,X(r)) \diff r \right] \\
+        & \leq u + \psi(t,x) = U(t).
+    \end{align*}
+    Thus, for all $s \geq t$,
+    \begin{equation*}
+        \E[U(s) \mid \F_t] = \E^{(s,R(s))}[H(s-t,R(s-t))] \leq U(t),
+    \end{equation*}
+    which shows that $U(s)$ is a supermartingale. 
+
+    For the proof of the second statement in (a), we may apply Doob's sampling theorem (see Appendix \ref{Appendix: Doob's Sampling Theorem}), because $U$ is a supermartingale and the stopping times $\tau_1$ and $\tau_2$ are finite by assumption. Therefore, for some stopping time $\tau \geq \tau_2$,
+    \begin{align*}
+        \Etx &\left[ \int_{\tau_1}^{\tau_2} f(r,X(r)) \diff r + \psi(\tau_2, X(\tau_2)) \right] \\
+        &= \Etx \left[ \int_{t}^{\tau_2 \wedge \tau} f(r,X(r)) \diff r + \psi(\tau_2 \wedge \tau, X(\tau_2 \wedge \tau)) \right] - \Etx \left[\int_{t}^{\tau_1} f(r,X(r)) \diff r \right] \\
+        &= \Etx \left[ \E \left[\int_{t}^{\tau_2 \wedge \tau} f(r,X(r)) \diff r + \psi(\tau_2 \wedge \tau, X(\tau_2 \wedge \tau)) \bigm| \F_{\tau_1} \right] \right] \\
+        & \qquad - \Etx \left[\int_{t}^{\tau_1} f(r,X(r)) \diff r \right] \\
+        &= \Etx \left[ \E[ U(\tau_2) \bigm| \F_{\tau_1}] \right] - \Etx \left[\int_{t}^{\tau_1} f(r,X(r)) \diff r \right] \\
+        & \leq \Etx [U(\tau_1)] - \Etx \left[\int_{t}^{\tau_1} f(r,X(r)) \diff r \right] \\
+        &= \Etx [\psi(\tau_1, X(\tau_1))]
+    \end{align*}
+    (b) Let $u$ be an arbitrary time variable. We have 
+    \begin{align}
+        \Etx &\left[ \int_{\beta_1}^{\beta_2} f(s,X(s)) \diff s + \psi(\beta_2, X(\beta_2)) \right] \nonumber \\
+        &= \Etx \left[ \int_{t}^{\beta_2} f(s,X(s)) \diff s + \psi(\beta_2, X(\beta_2)) \right] - \Etx \left[ \int_{t}^{\beta_1} f(s,X(s)) \diff s \right] \nonumber \\
+        &= \psi(t,x) - \Etx \left[ \int_{t}^{\beta_1} f(s,X(s)) \diff s \right].
+        \label{eqn: Corollary 10.5b, result in-between 1}
+    \end{align}
+    Since $\beta_1 \leq \tau^{(\varepsilon)}$ is a finite, $\varepsilon$-optimal stopping time, we have, by Lemma \ref{lemma: DPP}b, 
+    \begin{equation*}
+        \psi(t,x) = \Etx \left[ \int_t^{\beta_1} f(s,X(s)) \diff s  + \psi(\beta_1, X(\beta_1))\right].
+    \end{equation*}
+    Therefore, \eqref{eqn: Corollary 10.5b, result in-between 1} becomes
+    \begin{align*}
+        \Etx \left[ \int_{\beta_1}^{\beta_2} f(s,X(s)) \diff s + \psi(\beta_2, X(\beta_2)) \right] = \Etx \left[\psi(\beta_1, X(\beta_1))\right],
+    \end{align*}
+    which concludes the proof.
+\end{proof}
+
+With the help of Lemma \ref{lemma: DPP} and Corollary \ref{cor: Corollary 10.5 in ØS}, we may now prove Theorem \ref{trm: Theorem 10.2 in ØS}.
+
+\begin{proof}[Proof of Theorem \ref{trm: Theorem 10.2 in ØS}]
+    Let the finite time horizon $T>0$ be fixed and choose an impulse control $\alpha_n = (\tau_1, \ldots, \tau_n; \zeta_1, \ldots, \zeta_n)$ with at most $n$ interventions and with $\tau_n \leq \tauS \wedge T$. Set $\tau_{n+1} = \tauS \wedge T$ and note that $X$ is uncontrolled between interventions so that $X^{(\alpha_n)}(s)=X(s)$. Then, by Corollary \ref{cor: Corollary 10.5 in ØS}a, we have
+    \begin{equation}
+        \Etx [\varphi_{n-j}(\tau_j, X(\tau_j))] \geq \Etx \left[ \int_{\tau_j}^{\tau_{j+1}} f(s,X(s)) \diff s + \varphi_{n-j}(\tau_{j+1}, \check{X}(\tau_{j+1})) \right].
+        \label{eqn: (10.1.20) in ØS}
+    \end{equation}
+    Choosing $\tau=t$ in \eqref{eqn: (10.1.12) in ØS} and considering cases where $n-j \geq 1$, we obtain
+    \begin{align}
+        \varphi_{n-j}(t,x) &= \sup_{\tau \in \mathcal{T}_t}\Etx \left[ \int_t^\tau f(s,X(s)) \diff s + \InterveneOper \varphi_{n-j-1} (\tau, X(\tau)) \right] \nonumber \\
+        &\geq \Etx [\InterveneOper \varphi_{n-j-1} (t,x)] = \InterveneOper \varphi_{n-j-1} (t,x).
+        \label{eqn: (10.1.21) in ØS}
+    \end{align}
+    Moreover, from the definition of $\InterveneOper$ (see Definition \ref{def: Intervention Operator}), it follows that
+    \begin{equation}
+        \InterveneOper \varphi_{n-j-1}(\tau_{j+1}, \check{X}(\tau_{j+1}^-)) \geq  \varphi_{n-j-1}(\tau_{j+1},X(\tau_{j+1})) + K(\tau_{j+1},\check{X}(\tau_{j+1}^-), \zeta_{j+1})
+        \label{eqn: (10.1.22) in ØS}
+    \end{equation}
+    Combining \eqref{eqn: (10.1.20) in ØS}--\eqref{eqn: (10.1.22) in ØS},  we obtain
+    \begin{align}
+        \Etx & \left[ \varphi_{n-j}(\tau_j, X(\tau_j)) \right] \geq 
+        \Etx \left[ \int_{\tau_j}^{\tau_{j+1}} f(s,X(s)) \diff s + \varphi_{n-j}(\tau_{j+1}, \check{X}(\tau_{j+1}^-)) \right] \nonumber \\
+        & \geq \Etx \left[ \int_{\tau_j}^{\tau_{j+1}} f(s,X(s)) \diff s + \varphi_{n-j-1}(\tau_{j+1},X(\tau_{j+1})) + K(\tau_{j+1},\check{X}(\tau_{j+1}^-), \zeta_{j+1}) \right],
+    \end{align}
+    for $j=0,1,\ldots,n-1$, where we set $\tau_0:= t$. Summing the inequality above from $j=0$ to $j=n-1$, we find that
+    \begin{align}
+        \sum_{j=0}^{n-1} \Etx & \left[ \varphi_{n-j}(\tau_j, X(\tau_j)) - \varphi_{n-j-1}(\tau_{j+1}, X(\tau_{j+1}))\right] \nonumber \\
+        & \geq \sum_{j=0}^{n-1} \Etx \left[ \int_{\tau_j}^{\tau_{j+1}} f(s,X(s)) \diff s + K(\tau_{j+1},\check{X}(\tau_{j+1}^-), \zeta_{j+1}) \right] \nonumber \\
+        &= \Etx \left[ \int_t^{\tau_n} f(s,X(s)) \diff s \right] + \sum_{j=0}^{n-1} \Etx \left[ K(\tau_{j+1},\check{X}(\tau_{j+1}^-), \zeta_{j+1}) \right]
+        \label{eqn: Theorem 10.2, temporary result 1}
+    \end{align}
+    Noting that the left-hand side in the above inequality simplifies to
+    \begin{equation*}
+        \sum_{j=0}^{n-1} \Etx \left[ \varphi_{n-j}(\tau_j, X(\tau_j)) - \varphi_{n-j-1}(\tau_{j+1}, X(\tau_{j+1}))\right] = \varphi_n(t,x) - \Etx \left[\varphi_0(\tau_n,X(\tau_n))\right],
+    \end{equation*}
+    since $(t,x)$ is deterministic, the inequality \eqref{eqn: Theorem 10.2, temporary result 1} simplifies to
+    \begin{align}
+        \varphi_n(t,x) - &\Etx \left[ \varphi_0(\tau_n, X(\tau_n)) \right] \geq \Etx \left[ \int_t^{\tau_n} f(s,X(s)) \diff s + \sum_{j=0}^{n-1}K(\tau_{j+1},\check{X}(\tau_{j+1}^-), \zeta_{j+1}) \right].
+        \label{eqn: (10.1.24) in ØS}
+    \end{align}
+    By the strong Markov property, note that
+    \begin{align}
+        \Etx [\varphi_0(\tau_n, X(\tau_n))] &= \Etx \left[ \E^{(\tau_n, X(\tau_n))}\left[ \int_t^{\tauS \wedge T} f(s,X(s)) \diff s + g(\tauS \wedge T,X(\tauS \wedge T)) \right] \right] \nonumber \\
+        &= \Etx \left[ \int_{\tau_n}^{\tauS \wedge T} f(s,X(s)) \diff s + g(\tauS \wedge T,X(\tauS \wedge T)) \right].
+        \label{eqn: (10.1.26) in ØS}
+    \end{align}
+    Combining \eqref{eqn: (10.1.24) in ØS} and \eqref{eqn: (10.1.26) in ØS} together with the fact that $\varphi_n(t,x)$ is a deterministic quantity conditional on $(t,x)$, we get
+    \begin{align}
+        \varphi_n(t,x) &\geq  \Etx\left[ \varphi_0(\tau_n, X(\tau_n)) \right] + \Etx\left[ \int_t^{\tau_n} f(s,X(s)) \diff s + \sum_{j=1}^n K(\tau_j,\check{X}(\tau_j^-),\zeta_j) \right] \nonumber \\
+        & = \Etx \left[ \int_t^{\tauS \wedge T} f(s,X(s)) \diff s + g(\tauS \wedge T,X(\tauS \wedge T))+ \sum_{j=1}^n K(\tau_j,\check{X}(\tau_j^-),\zeta_j) \right] \nonumber \\
+        &= J^{(\alpha_n)}(t,x).
+        \label{eqn: (10.1.27) in ØS}
+    \end{align}
+    Since $\alpha_n \in \AdmissibleSet_n$ was arbitrary, we conclude that 
+    \begin{equation}
+        \varphi_n(t,x) \geq v_n(t,x). 
+        \label{eqn: (10.1.28) in ØS}
+    \end{equation}
+
+    It now remains to show that the reverse inequality also holds to complete the proof. To this end, choose an arbitrary $\varepsilon >0$ and define an increasing sequence of stopping times $t=\hat{\tau}_0 < \hat{\tau}_1 < \cdots < \hat{\tau}_0$ in the following manner: For $j=1,\ldots,n$, let the continuation region 
+    \begin{equation}
+        D_j^{(\varepsilon)} = \{ (t,x) \in [0,T) \times \Solvency: \varphi_j(t,x) > \InterveneOper \varphi_{j-1}(t,x) + \varepsilon \},
+        \label{eqn: (10.1.29) in ØS}
+    \end{equation}
+    and define the first $\varepsilon$-optimal stopping time $\hat{\tau}_1$ by
+    \begin{equation}
+        \hat{\tau}_1 = \inf \{ s > t: X^{(0)}(s) \notin D_j^{(\varepsilon)} \},
+        \label{eqn: (10.1.30) in ØS}
+    \end{equation}
+    where $X^{(0)}(s) = X(s)$ is the process without interventions. Then, choose $\hat{\zeta}_1 = \bar{\zeta}_1(\tau_1, X(\tau_1^-))$, where $\bar{\zeta}_1 = \bar{\zeta}_1(t, x) \in \mathcal{Z}(t,x)$ is $\varepsilon$ optimal for $\varphi_{n-1}$ in the sense that 
+    \begin{equation}
+        \InterveneOper \varphi_{n-1}(t,x) \leq \varphi_{n-1}(t, \Gamma(t,x, \bar{\zeta}_{1})) + K(t,x,\bar{\zeta}_{1}) + \varepsilon.
+        \label{eqn: (10.1.31) in ØS}
+    \end{equation}
+    Inductively, if $t = \hat{\tau}_0, \ldots, \hat{\tau}_j; \hat{\zeta}_1, \ldots, \hat{\zeta}_j$ have been chosen, where $j\leq n-1$, we let $X^{(j)}(t)$ be the process obtained by applying the $\varepsilon$-optimal impulse $\hat{a}_j = (\hat{\tau}_1, \ldots, \hat{\tau}_j; \hat{\zeta}_1, \ldots, \hat{\zeta}_j)$ to $X(t)$. Define 
+    \begin{equation}
+        \hat{\tau}_{j+1} = \inf\left\{s \geq \hat{\tau}_j: X^{(j)}(s) \notin D_{n-j}^{(\varepsilon)} \right\}
+        \label{eqn: (10.1.32) in ØS}
+    \end{equation}
+    and $\hat{\zeta}_{j+1} = \bar{\zeta}_{t+1}(\hat{\tau}_{j+1}^-, X^{(j)}(\hat{\tau}_{j+1}^-))$, where $\bar{\zeta}_{j+1} = \bar{\zeta}_{j+1}(t,x) \in \mathcal{Z}(t,x)$ is $\varepsilon$-optimal for $\varphi_{n-j-1}$ in the sense that 
+    \begin{equation}
+        \InterveneOper \varphi_{n-j-1}(t,x) \leq \varphi_{n-j-1}(t,\Gamma(t,x, \bar{\zeta}_{j+1})) + K(t,x,\bar{\zeta}_{j+1}) + \varepsilon
+        \label{eqn: (10.1.33) in ØS}
+    \end{equation}
+    Finally, define the $\varepsilon$-optimal control with at most $n$ interventions
+    \begin{equation*}
+        \hat{a}_n = (\hat{\tau}_1, \ldots, \hat{\tau}_n; \hat{\zeta}_1, \ldots, \hat{\zeta}_n) \in \AdmissibleSet_n. 
+    \end{equation*}
+
+    Now apply the argument presented above in \eqref{eqn: (10.1.20) in ØS}--\eqref{eqn: (10.1.27) in ØS}. By Corollary \ref{cor: Corollary 10.5 in ØS}b, we have
+    \begin{equation}
+        \Etx [\varphi_{n-j}(\hat{\tau}_j, X(\hat{\tau}_j))] \leq \Etx \left[ \int_{\hat{\tau}_j}^{\hat{\tau}_{j+1}}f(s,X(s)) \diff s + \varphi_{n-j}(\hat{\tau}_{j+1}^-, \check{X}(\hat{\tau}_{j+1}^-)) \right]
+        \label{eqn: (10.1.34) in ØS}
+    \end{equation}
+    Since, by the definition of $\hat{\tau}_{j+1}$, $\check{X}(\hat{\tau}_{j+1}^-) \notin D^{(\varepsilon)}_{n-j}$, we have
+    \begin{equation}
+        \varphi_{n-j}(\hat{\tau}_{j+1}^-, \check{X}(\hat{\tau}_{j+1}^-)) \leq \InterveneOper \varphi_{n-j-1}(\hat{\tau}_{j+1}^-, \check{X}(\hat{\tau}_{j+1}^-)) + \varepsilon,
+        \label{eqn: (10.1.35) in ØS}
+    \end{equation}
+    and by \eqref{eqn: (10.1.33) in ØS}, we get, with $X=X^{(\hat{a}_n)}$,
+    \begin{equation}
+        \InterveneOper \varphi_{n-j-1}(\hat{\tau}_{j+1}^-,\check{X}(\hat{\tau}_{j+1}^-)) \leq \varphi_{n-j-1}(\hat{\tau}_{j+1}, X(\hat{\tau}_{j+1})) + K(\hat{\tau}_{j+1},\check{X}(\hat{\tau}_{j+1}^-), \hat{\zeta}_{j+1}) + \varepsilon.
+        \label{eqn: (10.1.36) in ØS}
+    \end{equation}
+    Then, combining \eqref{eqn: (10.1.34) in ØS}--\eqref{eqn: (10.1.36) in ØS}, we obtain
+    \begin{align}
+        &\Etx [\varphi_{n-j}(\hat{\tau}, X(\hat{\tau}))] \nonumber \\
+        & \qquad \leq \Etx \left[ \int_{\hat{\tau}_{j}}^{\hat{\tau}_{j+1}} f(s,X(s)) \diff s + \varphi_{n-j-1}(\hat{\tau}_{j+1}, X(\hat{\tau}_{j})) + K(\hat{\tau}_{j+1},\check{X}(\hat{\tau}_{j+1}^-), \hat{\zeta}_{j+1}) \right] \nonumber\\
+        & \qquad \quad+ 2 \varepsilon. 
+        \label{eqn: (10.1.37) in ØS}
+    \end{align}
+    Summing \eqref{eqn: (10.1.37) in ØS} from $j=0$ to $j=n-1$ gives
+    \begin{align}
+        \sum_{j=0}^{n-1} &\Etx[\varphi_{n-j}(\hat{\tau}_j, X(\hat{\tau}_j))] \nonumber \\
+        &\leq \sum_{j=0}^{n-1} \Etx \left[ \int_{\hat{\tau}_j}^{\hat{\tau}_{j+1}}f(s,X(s)) \diff s + \varphi_{n-j-1}(\hat{\tau}_{j+1}, X(\hat{\tau}_{j+1})) + K(\hat{\tau}_{j+1},\check{X}(\hat{\tau}_{j+1}^-), \hat{\zeta}_{j+1})) \right] \nonumber \\
+        & \quad + 2n\varepsilon \nonumber \\
+        & \leq \Etx \left[ \int_t^{\hat{\tau}_n}f(s,X(s)) \diff s + \sum_{j=0}^{n-1}\varphi_{n-j-1}(\hat{\tau}_{j+1}, X(\hat{\tau}_{j+1})) +  \sum_{j=0}^{n-1} K(\hat{\tau}_{j+1},\check{X}(\hat{\tau}_{j+1}^-), \hat{\zeta}_{j+1}))  \right] \nonumber \\ 
+        & \quad + 2n\varepsilon.
+        \label{eqn: Theorem 10.2, temporary result 2}
+    \end{align}
+    Since 
+    \begin{equation}
+        \sum_{j=0}^{n-1} \Etx[\varphi_{n-j}(\hat{\tau}_j, X(\hat{\tau}_j)) - \varphi_{n-j-1}(\hat{\tau}_{j+1}, X(\hat{\tau}_{j+1}))] = \varphi_n(t,x) - \Etx[\varphi_0(\hat{\tau}_n, X(\hat{\tau}_n))],
+        \label{eqn: Theorem 10.2, temporary result 3}
+    \end{equation}
+    we obtain, by combining \eqref{eqn: Theorem 10.2, temporary result 2} and \eqref{eqn: Theorem 10.2, temporary result 3},
+    \begin{align*}
+        \varphi_n(t,x) &= \Etx \left[ \int_t^{\hat{\tau}_n}f(s,X(s)) \diff s + \varphi_0(\hat{\tau}_n, X(\hat{\tau}_n)) +  \sum_{j=0}^{n-1} K(\hat{\tau}_{j+1},\check{X}(\hat{\tau}_{j+1}^-), \hat{\zeta}_{j+1})) \right] \\
+        & \quad + 2n \varepsilon.
+    \end{align*}
+    Therefore, by \eqref{eqn: (10.1.26) in ØS},
+    \begin{align*}
+        \varphi_n(t,x) &\leq \Etx \left[ \int_t^{\hat{\tau}_\mathcal{S} \wedge T} f(s,X(s)) \diff s + g(\hat{\tau}_\mathcal{S} \wedge T,X(\hat{\tau}_\mathcal{S} \wedge T)) + \sum_{j=1}^n K(\hat{\tau}_j,\check{X}(\hat{\tau}_j^-),\hat{\zeta}_j)\right] \\
+        & \quad + 2n\varepsilon \\
+        & \leq J^{(\hat{a}_n)}(t,x) + 2n\varepsilon.
+    \end{align*}
+    Since $\varepsilon$ was arbitrary, it follows that
+    \begin{equation*}
+        \varphi_n(t,x) \leq \sup_{\alpha_n \in \AdmissibleSet_n} = v_n(y).
+    \end{equation*}
+    Combined with \eqref{eqn: (10.1.28) in ØS}, the result above proves Theorem \ref{trm: Theorem 10.2 in ØS}.
+\end{proof}
+
+Theorem \ref{trm: Theorem 10.2 in ØS} shows that the truncated impulse-control problem with at most $x$ interventions can be represented by the iterated optimal stopping sequence $\{\varphi_j\}_{j=0}^n$. More precisely, the iterative optimal stopping approach produces exactly the value function $v_n$ of the truncated problem \eqref{eqn: value function for at most n interventions}.
+
+It remains to connect the truncated impulse control problem with the unrestricted impulse control problem, which is done through the following two corollaries. Corollary \ref{cor: Corollary 10.7 in ØS} combines Lemma \ref{lemma: Lemma 10.1 in ØS} with Theorem \ref{trm: Theorem 10.2 in ØS} to show that the iterated optimal stopping functions \eqref{eqn: (10.1.11) in ØS}--\eqref{eqn: (10.1.12) in ØS} monotonically converge to the value function $v$. Finally, Corollary \ref{cor: Corollary 10.8 in ØS} translates the impulse control problem \eqref{eqn: impulse control problem} into a non-linear optimal stopping problem.
+\begin{corollary}[{\cite[Corollary 10.7]{oksendal2007applied}}]
+\label{cor: Corollary 10.7 in ØS}
+    Assume $g\geq 0$. Moreover, suppose that $\varphi_n$, defined in \eqref{eqn: (10.1.11) in ØS}--\eqref{eqn: (10.1.12) in ØS}, satisfies condition \eqref{eqn: (10.1.14) in ØS}. Then
+    \begin{equation*}
+        \varphi_n \uparrow v \quad \text{as } n \rightarrow \infty \quad \text{for all } (t,x) \in [0,T) \times \R^d. 
+    \end{equation*}
+\end{corollary}
+\begin{proof}
+    Let $\AdmissibleSet_n$ denote the set of all admissible controls with at most $n$ interventions, where we denote by $\alpha_n$ an impulse control with at most $n$ controls, and let $\AdmissibleSet$ denote the set of all admissible controls $\alpha$. Then, by construction,
+    \begin{equation*}
+        \AdmissibleSet_n \subseteq \AdmissibleSet_{n+1} \subseteq \AdmissibleSet,
+    \end{equation*}
+    as previously seen. Hence, for $(t,x) \in [0,T) \times \Solvency$, the value function
+    \begin{equation*}
+        v_n(t,x) := \sup_{a_n \in \AdmissibleSet_n} J^{(\alpha_n)}(t,x)
+    \end{equation*}
+    satisfies
+    \begin{equation*}
+        v_n(t,x) \leq v_{n+1}(t,x) \leq v(t,x).
+    \end{equation*}
+    Therefore, with Lemma \ref{lemma: Lemma 10.1 in ØS}, 
+    \begin{equation}
+        v_n(t,x) \uparrow \lim_{n \rightarrow \infty} v_n(t,x) = v(t,x).
+        \label{eqn: Corollary 10.7, temporary result 1}
+    \end{equation}
+    Moreover, by Theorem \ref{trm: Theorem 10.2 in ØS}, 
+    \begin{equation}
+        \varphi_n(t,x) = v_n(t,x)
+        \label{eqn: Corollary 10.7, temporary result 2}
+    \end{equation}
+    for all $(t,x) \in [0,T) \times \Solvency$. Combining \eqref{eqn: Corollary 10.7, temporary result 1} and \eqref{eqn: Corollary 10.7, temporary result 2}, we then obtain
+    \begin{equation*}
+        \varphi_n(t,x) \uparrow v(t,x)
+    \end{equation*}
+    as $n \rightarrow \infty$ and for all $(t,x) \in [0,T) \times \R^d$.
+\end{proof}
+\begin{remark}
+    It is worth mentioning that the proof above was not shown in \cite{oksendal2007applied}.
+\end{remark}
+
+\begin{corollary}[{\cite[Corollary 10.8]{oksendal2007applied}}]
+\label{cor: Corollary 10.8 in ØS}
+    Assume $g\geq 0$. Moreover, suppose that $\varphi_n$, defined in \eqref{eqn: (10.1.11) in ØS}--\eqref{eqn: (10.1.12) in ØS}, satisfies condition \eqref{eqn: (10.1.14) in ØS}. Then, $v$ is a solution of the following non-linear optimal stopping problem
+    \begin{equation*}
+        v(t,x) = \sup_{\tau \in \mathcal{T}_t} \Etx \left[ \int_t^\tau f(s,X(s)) \diff s + \InterveneOper v(\tau, X(\tau)) \right].
+    \end{equation*}
+\end{corollary}
+\begin{proof}
+    Let $\{\varphi_n\}_{n=0}^\infty$ be as in \eqref{eqn: (10.1.11) in ØS} and \eqref{eqn: (10.1.12) in ØS}. Then, $\varphi_n \uparrow v_n$ as $n \rightarrow \infty$ by Corollary \ref{cor: Corollary 10.7 in ØS}. Therefore, 
+    \begin{equation*}
+        \varphi_n(t,x) \leq \sup_{\tau \in \mathcal{T}_t} \Etx \left[ \int_t^\tau f(s,X(s)) \diff s + \InterveneOper v(\tau, X(\tau)) \right],
+    \end{equation*}
+    for all $n \in \mathbb N$ and hence
+    \begin{equation*}
+        v(t,x) \leq \sup_{\tau \in \mathcal{T}_t} \Etx \left[ \int_t^\tau f(s,X(s)) \diff s + \InterveneOper v(\tau, X(\tau)) \right].
+    \end{equation*}
+    
+    For the opposite inequality, choose some arbitrary $\varepsilon>0$ and let $\hat{\tau} \in \mathcal{T}_t$ be a stopping time such that
+    \begin{align*}
+        \Etx \left[ \int_t^{\hat{\tau}} f(s,X(s)) \diff s + \InterveneOper v(\hat{\tau}, X(\hat{\tau}))\right] \geq \Etx \left[ \int_t^\tau f(s,X(s)) \diff s + \InterveneOper v(\tau, X(\tau)) \right] - \varepsilon.
+    \end{align*}
+    Then, by monotone convergence, we have
+    \begin{align*}
+        v(t,x) &= \lim_{n \rightarrow \infty} \varphi_n(t,x) \\
+        & \geq \lim_{n \rightarrow \infty} \sup_{\tau \in \mathcal{T}_t} \Etx \left[ \int_t^{\tau} f(s,X(s)) \diff s + \InterveneOper \varphi_{n-1}(\tau,X(\tau))\right] \\
+        & \geq \lim_{n \rightarrow \infty} \Etx \left[ \int_t^{\hat{\tau}} f(s,X(s)) \diff s + \InterveneOper \varphi_{n-1}(\tau, X(\tau)) \right] \\
+        &= \Etx \left[ \int_t^{\hat{\tau}} f(s,X(s)) \diff s + \InterveneOper v(\tau,X(\tau)) \right] \\
+        & \geq \sup_{\tau \in \mathcal{T}_t} \Etx \left[ \int_t^\tau f(s,X(s)) \diff s + \InterveneOper v(\hat{\tau},X(\hat{\tau})) \right] - \varepsilon.
+    \end{align*}
+    Since $\varepsilon>0$ is arbitrary, combining both inequalities, we obtain
+    \begin{equation*}
+        v(t,x) = \sup_{\tau \in \mathcal{T}_t} \Etx \left[\int_t^\tau f(s,X(s)) \diff s + \InterveneOper v(\tau,X(\tau)) \right].
+        \qedhere
+    \end{equation*}
+\end{proof}
+
+We conclude this chapter by noting that, after time discretisation, the dynamic programming principle may be applied to Markov decision process and, consequently, to reinforcement learning (see Chapter \ref{section: Deep Reinforcement Learning for Impulse Control Problems}). As such, the results shown in this section represent the core idea behind large parts of this thesis.

@@ -1,0 +1,914 @@
+%\section{Viscosity Solution for Impulse Control: Uniqueness}
+\label{section: Viscosity Solution for Impulse Control: Uniqueness}
+With the proof of the existence in the previous chapter, we now aim to prove that the previously established viscosity solution is unique. The main result of this chapter is the \textit{Comparison Principle}, which subsequently lets us prove the uniqueness of the viscosity solution. However, the proof of the Comparison Principle requires a few additional assumptions, a transition from the original defintion of the viscosity solution given by Definition \ref{def: Definition 4.1 in Seydel (Viscosity solution)}, and a maximum principle. These topics are treated in Chapters \ref{section: Preliminary Results for the Proof of Uniqueness}, \ref{section: Equivalent Definitions of Viscosity Solutions}, and \ref{section: Maximum Principle} respectively. Chapter \ref{section: Proof of the Uniqueness} then proves the Comparison Principle and the uniqueness result. 
+
+As in Chapter \ref{section: Viscosity Solution for Impulse Control: Existence}, this chapter closely follows the work of \textcite[Section 5]{seydel2010generalexistenceuniquenessviscosity}. In addition, we also use \cite{barles2008second}. It should be noted that although many of the results provided in this chapter are taken directly from \cite{seydel2010generalexistenceuniquenessviscosity}, some proofs were not as detailed as the ones we provide. Moreover, the parabolic, non-local Jensen-Ishii Lemma \ref{lemma: Parabolic, nonlocal Jensen-Ishii Lemma} we apply to prove the Comparison Principle may be seen as a combination of the works of \textcite[Lemma 1]{barles2008second}, \textcite{jakobsen2006maximum}, and \textcite[Theorem 8.3]{crandall1992user}.
+
+\section{Preliminary results and further assumptions}
+\label{section: Preliminary Results for the Proof of Uniqueness}
+Throughout this chapter, $v$ no longer denotes the value function, and some other variables may serve new purposes as well. With this in mind, recall the parabolic QVI \eqref{eqn: QVI} and the infinitesimal generator \eqref{eqn: infinitesimal generator (short form)}. As we study the infinitesimal generator $\InfinitesimalGenerator$ more closely in this chapter, we introduce, for $0<\delta<1$, $t \in [0,T)$, $x,p \in \R^d$, $X \in \R^{d \times d}$, and $r,l \in \R$, the following functionals:
+\begin{align*}
+    F(t,x,p,X,l) &= - \frac{1}{2} \Tr\{ \sigma (t,x) \sigma^\top (t,x) X \} - \langle \mu (t,x), p \rangle - f(t,x) - l \\
+    \mathcal{I}^{1,\delta}[t,x,\varphi] &= \int\limits_{|z|<\delta} \big[ \varphi(t,x+\gamma(t,x,z)) - \varphi(t,x) - \langle \nabla_x \varphi (t,x), \gamma(t,x,z) \rangle \big] \nu(\diff z) \\
+    \mathcal{I}^{2,\delta}[t,x,p,\varphi] &= \int\limits_{|z|\geq \delta} \big[ \varphi(t,x+\gamma(t,x,z)) - \varphi(t,x) - \langle p, \gamma(t,x,z) \rangle \ind{|z|<1} \big] \nu(\diff z) \\
+    \mathcal{I}[t,x,\varphi] &= \mathcal I^{1,\delta}[t,x,\varphi] + \mathcal  I^{2,\delta}[t,x,\nabla_x \varphi(t,x),\varphi]. 
+\end{align*}
+Then, the problem \ref{eqn: QVI} now reads as
+\begin{align}
+    \min \Big \{ F\big(t,x, \nabla_x u(t,x), H_x u(t,x), \mathcal{I}[t,x,u(t,\cdot)]\big), \nonumber \\
+    u(t,x) - \InterveneOper u(t,x) \Big\} &= 0, \quad \text{for } (t,x) \in \Solvency \nonumber \\
+    \min \big\{ u(t,x) - g(t,x), u(t,x) - \InterveneOper u(t,x) \big\} &= 0, \quad \text{for } (t,x) \in \partial^+ \Solvency_T,
+    \label{eqn: QVI with functionals}
+\end{align}
+where the notation $u(t, \cdot)$ in the integral means that nonlocal terms different from $x$ are used on $u$. Note that the functional $F$ does not directly depend on the zeroth order derivative (i.e. the function $u$ itself) in our case. However, results provided in this chapter are still applicable to cases when the zeroth order derivative is present in the functional $F$, see \cite[Section 5]{seydel2010generalexistenceuniquenessviscosity}. Properties of the functionals $F$ and $\mathcal{I}$ can be found below.
+\begin{remark}[{\cite[Remark 5.1]{seydel2010generalexistenceuniquenessviscosity}}]
+\label{remark: Remark 5.1 in Seydel}
+    The following properties hold for the functionals $F$ and $\mathcal I$:
+    \begin{enumerate}[label=(\textup{P}\arabic*), ref=(\textup{P}\arabic*)]
+        \item \label{ass: P1} Ellipticity of $F$: $F(t,x,p,X,l) \leq F(t,x,p,Y,k)$ if $X \geq Y$ and $l \geq k$.
+        \item \label{ass: P2} Translation invariance: For $l \in \R$ constant, we have $u - \InterveneOper u = (u+l)- \InterveneOper (u+l)$ and $\mathcal{I}[t,x,\varphi] = \mathcal{I}[t,x,\varphi + l]$. 
+        \item \label{ass: P3} The map $l \mapsto F(t,x,p,X,l)$ is continuous in the sense that
+        \begin{equation*}
+            \big|F(t,x,p,X,l) - F(t,x,p,X,k)\big| \leq |l-k|. 
+        \end{equation*}
+    \end{enumerate}
+\end{remark}
+
+For $(t,x) \in [0,T) \times \Solvency$ and $\delta > 0$, define the region $U_\delta := U_\delta (t,x) = \{ \gamma (t,x,z): |z| < \delta \}$. We note that the set $U_\delta$ facilitates the splitting of the integral $\mathcal{I}[t,x,\varphi]$ in the sense that changing $\varphi$ on $U_\delta$ affects $\mathcal{I}^{1,\delta}[t,x,\varphi]$ only and vice versa. In addition, we consider the following assumptions for some arbitrary $\delta > 0$:
+
+\begin{assumption}[{\cite[Assumption 2.4]{seydel2010generalexistenceuniquenessviscosity}}]
+    \label{ass: Assumption 2.4 in Seydel}
+    \begin{enumerate}[label=(\textup{B}\arabic*), ref=(\textup{B}\arabic*)]
+        \item \label{ass: B1} For $t \in [0,T)$ and $x,y \in \R^d$, the following inequalities hold: 
+            \begin{align*}
+                \int\limits_{\mathbb R^\ell} |\gamma (t,x,z) - \gamma (t,y,z)|^2 \nu(\diff z) < C|x-y|^2 &, \\
+                \int\limits_{|z|\geq 1} |\gamma (t,x,z) - \gamma (t,y,z)| \nu(\diff z) < C|x-y|.
+            \end{align*}
+        \item \label{ass: B2} Let $f(\cdot, \cdot)$, $\mu(\cdot, \cdot)$, and $\sigma(\cdot, \cdot)$ be locally Lipschitz continuous, i.e. for each point $(t_0,x_0) \in [0,T) \times \Solvency$, there is neighbourhood $U \ni (t_0,x_0)$, where $U$ is open in $[0,T) \times \R^d$, and a constant $C$ such that 
+        \begin{equation*}
+            |f(t,x) - f(t,y)| \leq C|x-y| \quad \text{for all } (t,x), (t,y) \in U,
+        \end{equation*}
+        and likewise for $\mu$ and $\sigma$.
+    \end{enumerate}
+\end{assumption}
+
+Let us briefly discuss conditions \assitemref{ass: B1} and \assitemref{ass: B2}. \assitemref{ass: B1} imposes an ``integrated'' Lipschitz condition on the jump amplitude $\gamma$, which ensures that the nonlocal Lévy integral varies continuously when comparing it to nearby points. \assitemref{ass: B2} is the corresponding local Lipschitz condition for the diffusion, drift, and running payoff functions. Together, these assumptions provide the regularity needed to apply the doubling-of-variables argument in the proof of the comparison principle, both for the local differential terms and for the nonlocal jump term in the infinitesimal generator $\InfinitesimalGenerator$.
+
+make the nonlocal and local parts of the QVI stable under the doubling-of-variables argument used to prove the Comparison Principle.
+
+We now consider the following result, which will be useful for the maximum principle in Chapter \ref{section: Maximum Principle}. 
+
+\begin{proposition}[{\cite[Proposition 5.1]{seydel2010generalexistenceuniquenessviscosity}}]
+\label{prop: Proposition 5.1 in Seydel}
+    Let $\{t_k\}_{k \geq 0} \subset [0,T)$ and $\{x_k\}_{k \geq 0}, \{p_k\}_{k \geq 0} \subset \R^d$, with $t_k \rightarrow t \in [0,T)$, $x_k \rightarrow x \in \R^d$, $p_k \rightarrow p$. 
+
+    \begin{enumerate}[label=(\roman*)]
+        \item If $u \in \PB \cap USC([0,T)\times \R^d)$ and $v \in \PB \cap LSC([0,T)\times \R^d)$, with $u(t_k,x_k) \rightarrow u(t,x)$ and $v(t_k,x_k) \rightarrow v(t,x)$, then
+        \begin{align*}
+            &\limsup_{k \rightarrow \infty} \mathcal{I}^{2,\delta}[t_k,x_k,p_k,u(t_k\cdot)] \leq \mathcal{I}^{2,\delta} [t,x,p,u(t,\cdot)], \\
+            &\liminf_{k \rightarrow \infty} \mathcal{I}^{2,\delta}[t_k, x_k, p_k, v(t_k\cdot)] \geq \mathcal{I}^{2, \delta}[t,x,p,v(t,\cdot)].
+        \end{align*}
+        Moreover, for $\{\varphi\}_{k \geq 0}, \{\psi_k\}_{k \geq 0} \subset \PB \cap C^{1,2,}([0,T) \times \R^d)$ with $\varphi_k \rightarrow u$ and $\psi_k \rightarrow v$ monotonously, $\varphi_k(t_k,x_k) \rightarrow u(t,x)$, and $\psi_k(t_k,x_k) \rightarrow v(t,x)$,
+        \begin{align*}
+            & \limsup_{k \rightarrow \infty} \mathcal{I}^{2,\delta}[t_k,x_k,p_k,\varphi(\cdot)] \leq \mathcal{I}^{2,\delta}[t,x,p,u(t,\cdot)], \\
+            & \liminf_{k \rightarrow \infty} \mathcal{I}^{2,\delta} [t_k,x_k,p_k,\psi_k(\cdot)] \geq \mathcal{I}^{2,\delta}[t,x,p,\varphi(\cdot)].
+        \end{align*}
+        
+        \item If $\varphi \in C^{1,2}([0,T) \times \R^d)$, then $(t,x) \mapsto \mathcal{I}^{1,\delta}[t,x,\varphi(\cdot)]$ is continuous. Moreover, for $\{\varphi\}_{k \geq 0} \subset C^{1,2}([0,T) \times \R^d)$ with $\varphi_k \rightarrow \varphi$ monontously, $\varphi_k = \varphi$ in a neighbourhood of $(t,x)$, then
+        \begin{equation*}
+            \lim_{k \rightarrow \infty} \mathcal{I}^{1,\delta}[t_k,x_k,\varphi_k(\cdot)] = \mathcal{I}^{1,\delta}[t_k,x_k,\varphi(\cdot)]. 
+        \end{equation*}
+        
+        \item If $u \in \PB \cap \USC([0,T) \times \R^d)$ and $v \in \PB \cap \LSC([0,T) \times \R^d)$, $\{\varphi_k\}_{k \geq 0}, \{\psi_k\}_{k \geq 0} \subset \PB \cap C^{1,2}([0,T) \times \R^d)$ with $\varphi_k \rightarrow u$ and $\psi_k \rightarrow v$ monotonously, $\varphi_k = u \in C^{1,2}$ and $\psi_k = v \in C^{1,2}$ in an environment of $(t,x)$, then
+        \begin{equation}
+            \liminf_{k \rightarrow \infty} F \big(t,x,p,X,\mathcal{I}[t_k,x_k,\varphi_k(\cdot)] \big) \geq F\big(t,x,p,X, \mathcal{I}[t,x,u(t,\cdot)] \big)
+            \label{eqn: (33) in Seydel}
+        \end{equation}
+        \begin{equation}
+            \limsup_{k \rightarrow \infty} F \big(t,x,p,X,\mathcal{I}[t_k,x_k,\psi_k(\cdot)]\big)\leq F\big( t,x,p,X,\mathcal{I}[t,x,v(t,\cdot)] \big).
+            \label{eqn: (34) in Seydel}
+        \end{equation}
+    \end{enumerate}
+\end{proposition}
+\begin{proof}
+    We consider cases $(i)$-$(iii)$ separately. 
+    \begin{enumerate}[label=(\roman*)]
+        \item For $u \in \USC$ and $(t_k,x_k)$ fixed for $k$, define the sequence of functions $\{h_k\}_{k \geq 0}$ by
+        \begin{equation*}
+            h_k(z) := u(t_k, x_k + \gamma(t_k,x_k,z)) - u(t_k,x_k) - \langle p_k, \gamma(t_k,x_k,z) \rangle \ind{|z| < 1}. 
+        \end{equation*}
+        Since $u(t_k,x_k) \rightarrow u(t,x)$ and $\gamma$ is assumed to be continuous by \assitemref{ass: V3}, it follows that $h_k(z) \rightarrow h(z)$ for every $z \in \R^d$.  Moreover, as $u \in \PB$, there exists some function $h' \in \PB$ such that $h$ is dominated, i.e.
+        \begin{equation*}
+            h_k(z) \leq h'(z)
+        \end{equation*}
+        for all $k \in \mathbb N$ and all $z \in \R^d$. Then, by Fatou's Lemma, see Appendix \ref{Appendix: Fatou's Lemma}, 
+        \begin{align*}
+            \int\limits_{|z| \geq \delta} \big( h'(z) - h(z) \big) \nu(\diff z) &= \int\limits_{|z| \geq \delta} \liminf_{k \rightarrow \infty}\big( h'(z) - h_k(z) \big) \nu (\diff z) \\
+            & \leq \liminf_{k \rightarrow \infty} \int\limits_{|z| \geq \delta} \big( h'(z) - h_k(z) \big) \nu(\diff z) \\
+            &= \int\limits_{|z| \geq \delta} h'(z) \nu (\diff z) - \limsup_{k \rightarrow \infty} \int\limits_{|z| \geq \delta} h_k(z) \nu (\diff z),
+        \end{align*}
+        or, equivalently, 
+        \begin{equation*}
+            \limsup_{k \rightarrow \infty} \int\limits_{|z| \geq \delta} h_k(z) \nu (\diff z) \leq \int\limits_{|z| \geq \delta} h(z) \nu(\diff z). 
+        \end{equation*}
+        Hence, 
+        \begin{align*}
+            & \limsup_{k \rightarrow \infty}\mathcal{I}^{2,\delta}[t_k,x_k,p_k,u(t_k,\cdot)] \\
+            &\quad = \limsup_{k \rightarrow \infty} \int\limits_{|z| \geq \delta} \big( u(t_k,x_k + \gamma(t_k,x_k,z)) - u(t_k,x_k) - \langle p_k, \gamma(t_k,x_k,z) \rangle \ind{|z| < 1} \big) \nu (\diff z) \\
+            &\quad \leq \int\limits_{|z| \geq \delta} \big( u(t,x+\gamma(x,z)) - u(t,x) - \langle p, \gamma(t,x,z) \rangle \ind{|z| < 1} \big) \nu(\diff z) \\
+            &\quad = \mathcal{I}^{2,\delta} [t,x,p,u(t_k,\cdot)]. 
+        \end{align*}
+
+        For the LSC case, we have
+        \begin{align*}
+            & \liminf_{k \rightarrow \infty} \mathcal{I}^{2,\delta}[t_k,x_k,p_k,v(t_k,\cdot)] \\
+            &\quad =\liminf_{k \rightarrow \infty} \int\limits_{|z| \geq \delta} \big( v(t_k,x_k+\gamma(t_k,x_k,z)) - v(t_k,x_k) - \langle p_k, \gamma(t_k,x_k,z) \rangle \ind{|z| < 1} \big) \nu (\diff z) \\
+            &\quad \geq \int\limits_{|z| \geq \delta} \liminf_{k \rightarrow \infty} \big( v(t_k,x_k+\gamma(t_k,x_k,z)) - v(t_k,x_k) - \langle p_k, \gamma(t_k,x_k,z) \rangle \ind{|z| < 1} \big) \nu(\diff z) \\
+            &\quad = \int\limits_{|z| \geq \delta} \big( v(t,x+\gamma(t,x,z)) - v(t,z) - \langle p, \gamma(t,x,z) \rangle \ind{|z|>1} \big) \nu(\diff z) \\
+            &\quad = \mathcal{I}^{2,\delta} [t,x,p,v(t,\cdot)]. 
+        \end{align*}
+        where the inequality results from the direct application of Fatou's Lemma. 
+
+        For the second assertion, the result for $\varphi_k$ follows from the monotonous property of $\{\varphi_k\}_{k \geq 0}$ and the assumption that $\varphi_k$ converges pointwise to $u$. Applying Dini's Theorem, see {\cite[Theorem 7.3]{dibenedetto2002real}}, one finds that the convergence is uniform, which results in 
+        \begin{equation*}
+            \limsup_{k \rightarrow \infty} \varphi_k(t_k,x_k) \leq u(t,x),
+        \end{equation*}
+        and 
+        \begin{equation*}
+            \limsup_{k \rightarrow \infty} \varphi_k(t_k,x_k + \gamma(t_k,x_k,z)) \leq u(t,x).
+        \end{equation*}
+        Hence \eqref{eqn: (33) in Seydel} holds. A similar logic is applied to obtain \eqref{eqn: (34) in Seydel}. 
+
+    \item Outside of the singularity of  $\nu$, the result follows from the first result $(i)$. In the neighbourhood of $(t,x)$, the Taylor expansion \eqref{eqn: (12) in Seydel} gives the upper bound for the application of DCT. Note that the local boundedness of $U_\delta(t,x)$ holds by \assitemref{ass: V4} which states that for each fixed $\delta > 0$, the set of small jump sizes is uniformly bounded locally in $(t,x)$. 
+
+    \item This is a direct result from (i), (ii), and \assitemref{ass: P1}. 
+    \end{enumerate}
+\end{proof}
+
+\section{Equivalent definitions of viscosity solutions}
+\label{section: Equivalent Definitions of Viscosity Solutions}
+Recall the functionals $F$, $\mathcal{I}^{1,\delta}$, $\mathcal{I}^{2,\delta}$, and $\mathcal{I}$ defined in the previous section. We now restate Definition \ref{def: Definition 4.1 in Seydel (Viscosity solution)} (Viscosity Solution) using the aforementioned functionals. 
+
+\begin{definition}[{\cite[Definition 5.2]{seydel2010generalexistenceuniquenessviscosity}} Viscosity solution 1]
+\label{def: Viscosity solution 1}
+    A function $u \in \PB$ is a (viscosity) subsolution of \eqref{eqn: QVI with functionals} if for all $(t_0,x_0) \in [0,T) \times \R^d$ and $\varphi \in \PB \cap C^{1,2}([0,T) \times \R^d)$ such that $u^* - \varphi$ has a global maximum in $(t_0,x_0)$, 
+    \begin{align*}
+        \min \Big\{ - \partial_t \varphi + F\big(t_0,x_0,\nabla_x \varphi, H_x \varphi, \mathcal{I}[t_0,x_0,\varphi(t_0,\cdot)] \big), \\
+        u^* - \InterveneOper u^* \Big\} &\leq 0 \quad \text{in } (t_0,x_0) \in [0,T) \times \Solvency \\
+        \min \big\{ u^* - g, u^* - \InterveneOper u^* \big\} & \leq 0 \quad \text{in } (t_0,x_0) \in \partial^+ \Solvency_T.
+    \end{align*}
+
+    A function $u \in \PB)$ is a (viscosity) supersolution of \eqref{eqn: QVI with functionals} if for all $(t_0,x_0) \in [0,T) \times \R^d$ and $\varphi \in \PB \cap C^{1,2}([0,T) \times \R^d)$ such that $u_* - \varphi$ has a global minimum in $(t_0,x_0)$, 
+    \begin{align*}
+        \min \Big\{ - \partial_t \varphi + F\big(t_0,x_0, \nabla_x \varphi, H_x \varphi, \mathcal{I}[t_0,x_0,\varphi(t_0,\cdot)] \big), \\
+        u_* - \InterveneOper u_* \Big\} &\geq 0 \quad \text{in } (t_0,x_0) \in [0,T) \times \Solvency \\
+        \min \big\{ u_* - g, u_* - \InterveneOper u_* \big\} & \geq 0 \quad \text{in } (t_0,x_0) \in \partial^+ \Solvency_T.
+    \end{align*}
+
+    A function $u$ is a viscosity solution if it is sub- and supersolution. 
+\end{definition}
+
+We now introduce another definition of the viscosity solution. We motivate this by noting that the Lévy measure is typically singular near the origin, so we split $\mathcal I$ into a small-jump part $\mathcal I^{1,\delta}$, evaluated on a smooth test function $\varphi$ on points $(t,x) \in [0,T] \times U_\delta(t,x)$, and a large-jump part $\mathcal I^{2,\delta}$, evaluated on $u$ and preserving monotonicity and semincontinuity under limits. 
+
+\begin{definition}[{\cite[Definition 5.3]{seydel2010generalexistenceuniquenessviscosity}} Viscosity solution 2]
+\label{def: Viscosity solution 2}
+    A function $u \in \PB$ is a (viscosity) subsolution of \eqref{eqn: QVI with functionals} if for all $(t_0,x_0) \in [0,T) \times \R^d$ and $\varphi \in \PB \cap C^{1,2}([0,T) \times \R^d)$ such that $u^* - \varphi$ has a maximum in $(t_0,x_0)$ on $[0,T) \times U_{\delta}(t_0,x_0)$,
+    \begin{equation*}
+        \begin{aligned}
+            \min \big\{-\partial_t\varphi(t_0,x_0) + F\big( t_0,x_0, \nabla_x \varphi, H_x \varphi, \mathcal{I}^{1,\delta}[t_0,x_0,\varphi(t_0,\cdot)] &+ \mathcal{I}^{2,\delta}[t_0,x_0,\nabla_x \varphi(t_0,\cdot), u^*(\cdot)] \big), \\
+            u^*-\InterveneOper u^* \big\} &\leq 0 \quad \text{in } (t_0,x_0) \in [0,T)\times \Solvency \\
+            \min \big\{ u^* - g, u^* - \InterveneOper u^* \big\} &\leq 0 \quad  \text{in } (t_0,x_0) \in \partial^+ \Solvency_T
+        \end{aligned}
+    \end{equation*}
+    
+    A function $u \in \PB$ is a (viscosity) supersolution of \eqref{eqn: QVI with functionals} if for all $(t_0,x_0) \in [0,T) \times \R^d$ and $\varphi \in \PB \cap C^{1,2}([0,T) \times \R^d)$ such that $u_* - \varphi$ has a minimum in $(t_0,x_0)$ on $[0,T) \times U_{\delta}(t_0,x_0)$,
+    \begin{align*}
+        \min \Big\{ - \partial_t \varphi(t_0,x_0) + F\big( t_0,x_0, \nabla_x \varphi, H_x \varphi, \mathcal{I}^{1,\delta}[t_0,x_0,\varphi(t_0,\cdot)] &+ \mathcal{I}^{2,\delta}[t_0,x_0,\nabla_x \varphi(t_0,\cdot), u_*(\cdot)] \big), \\
+        u_*-\InterveneOper u_* \Big\} &\geq 0 \quad \text{in } (t_0,x_0) \in [0,T)\times \Solvency \\
+        \min \big\{ u_* - g, u_* - \InterveneOper u_* \big\} &\geq 0 \quad \text{in } (t_0,x_0) \in \partial^+ \Solvency_T
+    \end{align*}
+
+    A function $u$ is a viscosity solution if it is sub- and supersolution. 
+\end{definition}
+
+With the second definition of viscosity solutions in place, we aim to find a third way to define viscosity solutions in order to apply the parabolic, nonlocal Jensen-Ishii Lemma presented in the subchapter to follow. We therefore begin by considering parabolic semijets and their limiting counterparts in Definitions \ref{def: Parabolic semijets} and \ref{def: Limiting parabolic semijets}. 
+
+\begin{definition}[Set of Parabolic Semijets]
+\label{def: Parabolic semijets}
+    Let $u: [0,T] \times \R^d \rightarrow \R$ be an USC function and $v:[0,T] \times \R^d \rightarrow \R$ be a LSC function. We define the set of parabolic superjets of $u$ at $(t,x)\in [0,T]\times \R^d$ with
+    \begin{align*}
+        J^+ u(t,x) = \, & \Big\{(a,p,X) \in \R \times \R^d \times \mathbb S^d: u(t+s,x+z) 
+        \leq u(t,x) + a\cdot s + \langle p,z \rangle \\
+        & \quad + \frac 1 2 \langle Xz, z \rangle + o(|s| + |z|^2), \text{ as } s,z \rightarrow 0, (t+s,z) \in [0,T) \times \R^d \Big\},
+    \end{align*}
+    and the set of parabolic subjets of $v$ at $(t,x)\in [0,T]\times \R^d$ with
+    \begin{align*}
+         J^- u(t,x) = \, & \Big\{ (a,p,X) \in \R \times \R^d \times \mathbb S^d: \; u(t+s,x+z) \geq u(t,x) + a\cdot s + \langle p,z \rangle \\
+         & \quad + \frac 1 2 \langle Xz, z \rangle + o(|s| + |z|^2), \text{ as } s,z \rightarrow 0, (t+s,z) \in [0,T) \times \R^d \Big\}.
+    \end{align*}
+\end{definition}
+
+\begin{definition}[Limiting parabolic semijets]
+\label{def: Limiting parabolic semijets}
+    Recall the definition of parabolic super- and subjets (see Definition \ref{def: Parabolic semijets}. Let $u: [0,T] \times \R^d \rightarrow \R$ be an USC function and $v:[0,T] \times \R^d \rightarrow \R$ be a LSC function. We define the set of limiting superjets of $u$ at $(t,x) \in [0,T] \times \R^d$ with
+    \begin{align*}
+        \bar J^+ u(t,x) = \Big\{ (a,p,X) \in \R \times \R^d \times \mathbb S^d: \text{ there exist } (t_k,x_k,a_k,p_k,X_k) \rightarrow (t,x,a,p,X), \\
+        (a_k,p_k,X_k) \in J^+ u(t_k,x_k)  \; \text{ such that } u(t_k,x_k) \rightarrow u(t,x) \Big\},
+    \end{align*}
+    and the set of limiting subjets of $u$ at $(t,x) \in [0,T] \times \R^d$ with
+    \begin{align*}
+        \bar J^- u(t,x) = \Big\{ (a,p,X) \in \R \times \R^d \times \mathbb S^d: \text{ there exist } (t_k,x_k,a_k,p_k,X_k) \rightarrow (t,x,a,p,X), \\
+        (a_k,p_k,X_k) \in J^- u(t_k,x_k)  \; \text{ such that } u(t_k,x_k) \rightarrow u(t,x) \Big\}.
+    \end{align*}
+\end{definition}
+
+The introduction of semijets provides a convenient way to generalise Taylor derivatives and allows us to describe the local behaviour of continuous, but potentially non-differentiable functions by acting as upper or lower parabolic approximations. While semijets decribe local lower and upper approximations at a given point, limiting semijets enlarge this notion by allowing limits of such approximations along convergent sequences, and are therefore useful when it comes to upper and lower semicontinuous envelopes. This brings us to the last definition of the viscosity solution in the form of Definition \ref{def: Viscosity solution 3}, which, as we will see in Proposition \ref{prop: Propositions 5.4 and 5.6 in Seydel}, is equivalent to all previous definitions of the viscosity solution. Moreover, Definition \ref{def: Viscosity solution 3} will play a big part in the proof of uniqueness in Chapter \ref{section: Proof of the Uniqueness}. 
+
+\begin{definition}[{\cite[Definition 5.5]{seydel2010generalexistenceuniquenessviscosity}} Viscosity solution 3]
+\label{def: Viscosity solution 3}
+    A function $u \in \PB$ is a viscosity subsolution of \eqref{eqn: QVI with functionals} if for all $(t_0,x_0) \in [0,T)\times \R^d$ and $\varphi \in C^{1,2}([0,T)\times \R^d)$ such that $u^* - \varphi$ has a maximum in $(t_0,x_0)$ on $[0,T) \times U_\delta(t_0,x_0)$ and for $(a,p,X) \in P^+u(t_0,x_0)$ with $p=\nabla_x \varphi (t_0,x_0)$ and $X \leq H_x \varphi (t_0,x_0)$,
+    \begin{align*}
+        \min \Big\{ - a + F\big(t_0,x_0,p,X,\mathcal{I}^{1,\delta}[t_0,x_0,\varphi(t_0,\cdot)] &+ \mathcal{I}^{2,\delta}[t_0,x_0,p,u^*(t_0,\cdot)] \big), \\ 
+        u^* - \InterveneOper u^* \Big\} & \leq 0  \quad \text{in } (t_0,x_0) \in [0,T) \times  \Solvency \\
+        \min \big\{ u^* - g, u^* - \InterveneOper u^* \big\} &\leq 0 \quad \text{in } (t_0,x_0) \in \partial^+ \Solvency_T
+    \end{align*}
+
+    A function $u \in \PB$ is a (viscosity) supersolution of \eqref{eqn: QVI with functionals} if for all $(t_0,x_0) \in [0,T) \times \R^d$ and $\varphi \in C^{1,2}([0,T)\times \R^d)$ such that $u_* - \varphi$ has a minimum in $(t_0,x_0)$ on $[0,T) \times U_\delta(t_0,x_0)$ and for $(b,q,Y) \in P^- u(t_0,x_0)$ with $q= \nabla_x \varphi(t_0,x_0)$ and $Y \geq H_x \varphi(t_0,x_0)$, 
+    \begin{align*}
+        \min \Big\{ - b + F\big(t_0,x_0,q,Y,\mathcal{I}^{1,\delta}[t_0,x_0,\varphi(t_0,\cdot)] &+ \mathcal{I}^{2,\delta}[t_0,x_0,q,u_*(t_0,\cdot)] \big), \\ 
+        u_* - \InterveneOper u_* \Big\} & \geq 0  \quad \text{in } (t_0,x_0) \in [0,T) \times \Solvency \\
+        \min \big\{ u_* - g, u_* - \InterveneOper u_* \big\} &\geq 0 \quad \text{in } (t_0,x_0) \in \partial^+ \Solvency_T
+    \end{align*}
+
+    A function $u$ is a viscosity solution if it is sub- and supersolution. 
+\end{definition}
+
+\begin{proposition}[{\cite[Propositions 5.4 and 5.6]{seydel2010generalexistenceuniquenessviscosity}}] 
+\label{prop: Propositions 5.4 and 5.6 in Seydel}
+    The Definitions \ref{def: Viscosity solution 1}, \ref{def: Viscosity solution 2}, and \ref{def: Viscosity solution 3} are equivalent. 
+\end{proposition}
+\begin{proof}
+    For the proof of the equivalence of Definitions \ref{def: Viscosity solution 1} and \ref{def: Viscosity solution 2}, we refer to {\cite[Proposition 5.4]{seydel2010generalexistenceuniquenessviscosity}}. For the proof of the equivalence of Definitions \ref{def: Viscosity solution 2} and \ref{def: Viscosity solution 3}, we refer to {\cite[Proposition 5.6]{seydel2010generalexistenceuniquenessviscosity}} and \cite{barles2008second}.
+\end{proof}
+\begin{remark}
+    Note that Definitions \ref{def: Viscosity solution 1}, \ref{def: Viscosity solution 2}, and \ref{def: Viscosity solution 3} in Seydel \cite{seydel2010generalexistenceuniquenessviscosity} are all parabolic versions of Definitions 5.2, 5.3, and 5.5. However, the proof remains somewhat unchanged. Moreover, we note that Barles and Imbert \cite[Chapter 1]{barles2008second} also cover the different definitions of the viscosity solution.
+\end{remark}
+
+\section{The maximum principle}
+\label{section: Maximum Principle}
+We now introduce a concept that plays a central role in the proof of the Comparison Principle, namely the \emph{Maximum Principle}. In the context of local, fully nonlinear degenerate parabolic PDEs, this principle was first developed by \textcite{crandall1990maximum}. The maximum principle was then extended for nonlocal PIDEs by \textcite{jakobsen2006maximum} and later by \textcite{barles2008second}. In what follows, we refer to this result as the parabolic, nonlocal Jensen–Ishii lemma.
+
+We begin by considering a few properties of the intervention operator $\InterveneOper$, which will be needed for the Comparison Principle. 
+\begin{lemma}[{\cite[Lemma 5.7]{seydel2010generalexistenceuniquenessviscosity}}]
+\label{lemma: Lemma 5.7 in Seydel}
+    Recall the intervention operator $\InterveneOper$ in Definition \ref{def: Intervention Operator}. We have that
+    \begin{enumerate}[label=(\roman*)]
+        \item $\InterveneOper$ is convex, i.e. for $\lambda \in [0,1]$ and functions $a,b \in \PB$, 
+        \begin{equation*}
+            \InterveneOper \big( \lambda a(t,x) + (1-\lambda) b(t,x) \big) \leq \lambda \InterveneOper a(t,x) + (1-\lambda) \InterveneOper b(t,x),
+        \end{equation*}
+        for $(t,x) \in [0,T) \times \R^d$.
+
+        \item For $\lambda > 0$ and functions $a,b \in \PB$, 
+        \begin{equation*}
+            \InterveneOper \big(- \lambda (t,x) + (1-\lambda)b(t,x) \big) \leq \lambda \InterveneOper a(t,x) + (1+\lambda) \InterveneOper b(t,x).
+        \end{equation*}
+    \end{enumerate}
+\end{lemma}
+\begin{proof}
+    The proofs for $(i)$ and $(ii)$ are provided separately. 
+    
+    \begin{enumerate}[label=(\roman*)]
+        \item For $(t,x) \in [0,T) \times \R^d$,
+        \begin{align*}
+            \InterveneOper &\big(\lambda a(t,x) + (1-\lambda)b(t,x)\big) \\
+            &= \sup_{\zeta \in \mathcal{Z}(t,x)} \big\{ \lambda \big(a(t,\Gamma(x,\zeta))+ K(t,x,\zeta)\big) + (1-\lambda) \big(b(t,\Gamma(x,\zeta)) + K(t,x,\zeta)\big) \big\} \\
+            & \leq \lambda \sup_{\zeta \in \mathcal{Z}(t,x)} \big\{ \big( a(t,x,\Gamma(x,\zeta)) + K(t,x,\zeta \big) \big\} \\
+            & \qquad + (1-\lambda) \sup_{\zeta \in \mathcal{Z}(t,x)} \big\{ \big( b(t,x,\Gamma(x,\zeta)) + K(t,x,\zeta \big) \big\} \\
+            &= \lambda \InterveneOper a(t,x) + (1-\lambda) \InterveneOper b(t,x).
+        \end{align*}
+
+        \item For $(t,x) \in [0,T) \times \R^d$, 
+        \begin{align*}
+            \InterveneOper & \big( - \lambda a(t,x) + (1+\lambda) b(t,x) \big) \\
+            &= \sup_{\zeta \in \mathcal{Z}(t,x)} \big\{ -\big(\lambda a(t,\Gamma(x,\zeta)) +  K(t,x,\zeta)\big) + (1+\lambda) \big(b(t,\Gamma(x,\zeta)) + K(t,x,\zeta)\big) \big\} \\
+            & \geq - \lambda \sup_{\zeta \in \mathcal{Z}(t,x)} \big\{ a(t,\Gamma(x,\zeta)) + K(t,x,\zeta) \big\}\\
+            & \qquad + (1+\lambda) \sup_{\zeta \in \mathcal Z (t,x)} \big\{ b(t,\Gamma(x,\zeta)) + K(t,x,\zeta) \big\} \\
+            & = - \lambda \, \InterveneOper a(t,x) + (1+\lambda) \InterveneOper b(t,x).
+        \qedhere
+        \end{align*}
+    \end{enumerate}
+\end{proof}
+
+Let us now consider the parabolic, nonlocal Jensen-Ishii Lemma. 
+\begin{lemma}[Parabolic, nonlocal Jensen-Ishii Lemma]
+\label{lemma: Parabolic, nonlocal Jensen-Ishii Lemma}
+    Let $u \in \USC([0,T) \times \R^d)$, $v \in \LSC([0,T) \times \R^d)$, and $\varphi \in C^{1,2}([0,T) \times \R^{2d})$. If $(t_0,x_0,y_0) \in [0,T) \times \R^{2d}$ is a zero global maximum point of $u(t,x) - v(t,y) - \varphi(t,x,y)$ and if $p = \nabla_x \varphi(t_0,x_0,y_0)$, $q = \nabla_y \varphi(t_0,x_0,y_0)$, then, for any $K>0$, there exists $\bar \alpha (K) > 0$ such that for any $0 <\alpha < \bar \alpha (K)$, we have: There exist sequences $t_k \rightarrow t_0$, $x_k \rightarrow x_0$, $y_k \rightarrow y_0$, $p_k \rightarrow p$, $q_k \rightarrow q$, matrices $X_k$ and $Y_k$, and a sequence of functions $\{\varphi_k\}_{k \geq 0}$, converging to the function 
+    \begin{equation*}
+        \varphi_\alpha (t,x,y) := R^\alpha [\varphi] \big(t,(x,y),(p,q)\big)
+    \end{equation*}
+    uniformly in $[0,T) \times \R^{2d}$ and in $C^{1,2}\big([0,T) \times B((x_0,y_0),K)\big)$ such that 
+    \begin{align}
+        u(t_k,x_k) \rightarrow u(t_0,x_0) \quad \text{ and } \quad v(t_k,y_k) \rightarrow v(t_0,y_0) \label{eqn: (36) in Seydel} \\
+        (t_k,x_k,y_k) \text{ is a global maximum point of } u-v-\varphi_k \label{eqn: (37) in Seydel} \\
+        (a_k,p_k,X_k) \in J^+ u(t_k,x_k) \label{eqn: (38) in Seydel} \\
+        (b_k,-q_k,Y_k) \in J^- v(t_k,y_k) \label{eqn: (39) in Seydel} \\
+        a_k - b_k = \partial_t \varphi_k(t_k,x_k,y_k) \label{eqn: (39*) in Seydel} \\
+        - \frac{1}{\alpha} I \leq 
+            \begin{bmatrix}
+            X_k & 0 \\
+            0 & -Y_k 
+            \end{bmatrix}
+            \leq H_{(x,y)} \varphi_k (t_k,x_k,y_k). \label{eqn: (40) in Seydel}
+    \end{align}
+    Here, $p_k = \nabla_x \varphi_k(t_k,x_k,y_k)$, $q_k = \nabla_y \varphi_k (t_k,x_k,y_k)$, and \newline $\nabla_{(x,y)} \varphi_\alpha (t_0,x_0,y_0) = \nabla_{(x,y)} \varphi(t_0,x_0,y_0)$.
+\end{lemma}
+\begin{remark}[{\cite[Remark 5.4]{seydel2010generalexistenceuniquenessviscosity}}]
+    The expression $\varphi_\alpha(t,x,y) = R^\alpha[\varphi]\big((x,y),(p,q)\big)$ is the ``modified sup-convolution'' as used by Barles and Imbert \cite{barles2008second}. For all compacts $C$, $\varphi_\alpha$ converges uniformly to $\varphi$ in $C^{1,2}(C)$ as $\alpha \rightarrow 0$.
+\end{remark}
+\begin{remark}
+    Note that the above lemma is taken in the sense of Barles and Imbert \cite{barles2008second}. More precisely, the nonlocal part, that is the block-matrix estimate with $\begin{psmallmatrix}X&0\\0&-Y\end{psmallmatrix}$, and the sign convention is given by Lemma 1 \cite{barles2008second} $(b,-q,Y)\in J^-v$) is given by \emph{Lemma 1} in \cite{barles2008second}. The corresponding parabolic extension is stated explicitly
+    as \emph{Corollary 2} in \cite{barles2008second}. For the underlying parabolic semijet theory and the local Theorem of Sums used in doubling-of-variables
+    arguments, we refer to Crandall--Ishii--Lions \cite[Theorem 8.3]{crandall1992user}.
+    
+    We also note that as an alternative, one may also apply the Maximum Principle for Semicontinuous Functions for PIDEs, see Jakobsen and Karlsen
+    \cite{jakobsen2006maximum}, which plays an analogous role in comparison proofs for viscosity solutions of fully nonlinear, nonlocal equations.
+\end{remark}
+
+Having established the relevant maximum principle, we now aim to apply it to our QVI problem. The following corollary shows how the preceding result applies to the present QVI.
+
+\begin{corollary}[{\cite[Corollary 5.13]{seydel2010generalexistenceuniquenessviscosity}}, {\cite[Corollary 2]{barles2008second}}]
+\label{cor: Corollary 5.13 in Seydel}
+    Assume conditions \assitemref{ass: V1} and \assitemref{ass: V2} are satisfied. Let $u$ be a viscosity subsolution and $v$ a viscosity supersolution of \eqref{eqn: QVI with functionals}. Furthermore, let $\varphi \in C^{1,2}([0,T) \times \R^{2d})$ be a test function. If $(t_0,x_0,y_0) \in [0,T) \times \R^{2d}$ is a global maximum point of $u^*(t,x) - v_*(t,y) - \varphi(t,x,y)$ on $[0,T) \times \R^{2d}$, then, for any $\delta > 0$, there exists $\bar \alpha$ such that for $0< \alpha < \bar \alpha$, there are $(a,p,X) \in \bar J^+ u^*(t_0,x_0)$ and $(b,q,Y) \in \bar J^- v_*(t_0,y_0)$ with 
+    \begin{align*}
+        \min \Big\{ -a + F\big(t_0, x_0, p, X, \mathcal{I}^{1, \delta} [t_0,x_0,\varphi_\alpha (t_0, \cdot, y_0)] + \mathcal{I}^{2, \delta} [t_0,x_0,p,u^*(t_0,\cdot)] \big), \\
+        u^*(t_0,x_0) - \InterveneOper u^* (t_0,x_0) \Big\} \leq 0,
+    \end{align*}
+    and 
+    \begin{align*}
+        \min \Big\{ -b + F\big(t_0, y_0, q, Y, \mathcal{I}^{1, \delta} [t_0,y_0,-\varphi_\alpha (t_0, x_0, \cdot)] + \mathcal{I}^{2, \delta} [t_0,y_0,q,v_*(t_0,\cdot)] \big), \\
+        v_*(t_0,y_0) - \InterveneOper v_* (t_0,y_0) \Big\} \geq 0,
+    \end{align*}
+    if $x_0 \in \Solvency$ or $y_0 \in \Solvency$ respectively. Here, $a-b = \partial_t \varphi (t_0,x_0,y_0)$, $p = \nabla_x \varphi (t_0,x_0,y_0) = \nabla_x \varphi_\alpha (t_0,x_0,y_0)$, $q=-\nabla_y \varphi(t_0,x_0,y_0) = - \nabla_y \varphi_\alpha (t_0,x_0,y_0)$, and furthermore, 
+    \begin{equation}
+        -\frac{1}{\alpha} I \leq 
+            \begin{bmatrix}
+            X & 0 \\
+            0 & -Y 
+            \end{bmatrix}
+        \leq H_{(x,y)} \varphi_\alpha (t_0,x_0,y_0) = H_{(x,y)} \varphi(t_0,x_0,y_0) + o_\alpha(1) 
+        \label{eqn: (48) in Seydel}
+    \end{equation}
+\end{corollary}
+\begin{proof}
+    We begin by noting that because of the translation invariance, see  $P2$ in Remark \ref{remark: Remark 5.1 in Seydel}, we can assume WLOG that 
+    \begin{equation*}
+        u^*(t_0,x_0) - v_*(t_0,x_0) - \varphi(t_0,x_0,y_0) = 0.
+    \end{equation*}
+    Choose sequences according to Lemma \ref{lemma: Parabolic, nonlocal Jensen-Ishii Lemma} (applied for $u^*$ and $v_*$), and 
+    \begin{equation*}
+        K:= \max \big\{\text{dist}(x_0, U_\delta (x_0)), \text{dist}(y_0, U_\delta (y_0))\big\} + 1 > 0.
+    \end{equation*}
+    Furthermore, fix $\alpha \in (0,\Bar{\alpha}(K))$. With this in mind, we split the proof into two cases: The subsolution and The supersolution cases. 
+
+    \textbf{Subsolution case:} We begin by noting that since $x_k \rightarrow x_0$ as $k \rightarrow \infty$, $x_0 \in \Solvency$, and $\Solvency$ is an open set, then $x_k \in \Solvency$ for $k$ large enough. 
+    
+    Fix the $y$-coordinate to some $y_{k'}$ and note that from \eqref{eqn: (37) in Seydel}, for every $(t,x) \in [0,T) \times \Solvency$, 
+    \begin{equation*}
+        u(t,x) - v(t,y_{k'}) - \varphi_k(x,y_{k'}) \leq u(t_k,x_k) - v(t_k,y_k) - \varphi_k(t_k,x_k,y_k). 
+    \end{equation*}
+    In particular, $(t_k,x_k)$ is a local maximiser on the neighbourhood $U_\delta(t_k,x_k)$. With $(a_k,p_k,X_k) \in J^+ u(t_k,x_k)$, where $J^+$ is the parabolic semijet of $u$ on $(t_k,x_k)$, we obtain
+    \begin{equation*}
+        p_k = \nabla_x \varphi (t_k,x_k,y_{k'}),
+    \end{equation*}
+    and, with \eqref{eqn: (40) in Seydel},
+    \begin{equation*}
+        X_k \leq H_x \varphi_k(t_k,x_k,y_{k'}). 
+    \end{equation*}
+    As $y_{k'}$ was fixed, we may apply Definition \ref{def: Viscosity solution 3}, and, together with the translation invariance (see \assitemref{ass: P2} in Remark \ref{remark: Remark 5.1 in Seydel}), we obtain
+    \begin{align}
+        \min \big\{ - a_k + F\big(t_k,x_k,p_k,X_k,\mathcal{I}^{1,\delta}[t_k,x_k,\varphi(t_k,\cdot,y_k)] + \mathcal{I}^{2,\delta}[t_k,x_k,p_k,u^*(t_k,\cdot)]\big), \nonumber \\
+        u^*(t_k,x_k) - \InterveneOper u^*(t_k,x_k)\big\} \leq 0
+        \label{eqn: (42) in Seydel}
+    \end{align}
+
+    We now aim to prove the convergence of the PIDE part $F$ in \eqref{eqn: (42) in Seydel} as $k \rightarrow \infty$. Recall that by Lemma \ref{lemma: Parabolic, nonlocal Jensen-Ishii Lemma}, $x_k \rightarrow x_0$, $u^*(t_k,x_k) \rightarrow u^*(t_0,x_0)$, $a_k \rightarrow a$, and $p_k \rightarrow p$, as $k \rightarrow \infty$. Also, the matrix sequence $\{X_k\}_{k \geq 0}$ is contained in a compact set in $\R^{d \times d}$ by \eqref{eqn: (40) in Seydel} because $\varphi_k \in C^{1,2}([0,T) \times \R^{2d})$, so it admits a convergent subsequence to an $X$ satisfying \eqref{eqn: (48) in Seydel}. Moreover, by Lemma \ref{lemma: Parabolic, nonlocal Jensen-Ishii Lemma}, $u^*(t_k,x_k) \rightarrow u^*(t_0,x_0)$, so it therefore remains to show that the integral part also converges as $k \rightarrow \infty$. 
+
+    For the convergence of the integral term $\mathcal{I}^{1,\delta}$, by DCT, \assitemref{ass: V3}, and uniform convergence, 
+    \begin{align*}
+        \lim_{k \rightarrow \infty} \mathcal{I}^{1,\delta}[t_k,x_k,\varphi_k] &= \lim_{k \rightarrow \infty} \int\limits \limits_{|z| < \delta} \big( \varphi_k \big( t_k,x_k+\gamma(t_k,x_k,z), y_k \big) - \varphi_k(t_k,x_k,y_k) \\
+        & \qquad \qquad \quad - \langle \nabla_x \varphi(t_k,x_k,y_k), \gamma(t_k,x_k,z) \rangle \big) \nu (\diff z) \\
+        &= \int\limits_{|z|<\delta} \lim_{k \rightarrow \infty} \big( \varphi_k \big( t_k,x_k+\gamma(t_k,x_k,z), y_k \big) - \varphi_k(t_k,x_k,y_k) \\
+        & \qquad \qquad \quad -\langle \nabla_x \varphi(t_k,x_k,y_k), \gamma(t_k,x_k,z) \rangle \big) \nu (\diff z) \\
+        &= \int\limits_{|z|<\delta} \big( \varphi_\alpha\big(t_0,x_0+\gamma(t_0,x_0,z),y_0\big) - \varphi(t_0,x_0,y_0) \\
+        & \qquad \qquad \quad -\langle \nabla_x \varphi_\alpha(t_0,x_0,y_0), \gamma(t_0,x_0,z) \rangle \big) \nu(\diff z).
+    \end{align*}
+    Furthermore, with the application of the Taylor expansion on $\varphi_k \in C^{1,2}([0,T) \times \R^{2d})$ about $(t_k,x_k,y_k)$, we find the the $\nu$-integrable upper estimate 
+    \begin{align*}
+        \varphi_k&\big(t_k,x_k+\gamma(t_k,x_k,z),y_k\big) - \varphi_k(t_k,x_k,y_k) - \langle \nabla_x \varphi_k (t_k,x_k,y_k), \gamma(t_k,x_k,z) \rangle \\
+        & \overset{\text{Taylor}}{=} \varphi_k(t_k,x_k,y_k) + \langle \nabla_x \varphi_k(t_k,x_k,y_k), \gamma(t_k,x_k,y_k) \rangle \\
+        & \qquad \qquad+ \frac 1 2 \gamma(t_k,x_k,z)^\top \, H_x \varphi_k(t_k,x_k,y_k) \, \gamma(t_k,x_k,z) \\
+        & \qquad \qquad  - \varphi_k(t_k,x_k,y_k) - \langle \nabla_x \varphi_k(t_k,x_k,y_k), \gamma(t_k,x_k,y_k) \rangle \\
+        & \quad \leq \frac 1 2 |\gamma(t_k,x_k,z)|^2 |H_x \varphi_k(t_k,x_k,y_k)|,
+    \end{align*}
+    where, for $k$ large enough and some $\kappa_1, \kappa_2 > 0$, 
+    \begin{equation*}
+        \sup_{|(s,\xi)-(t,x)| < \kappa_1} |H_x \varphi_k(t,\xi,y)| \leq \sup_{|(s,\xi)-(t,x)| < \kappa_1} |H_x \varphi_\alpha (s,\xi,y)| + \kappa_2.
+    \end{equation*}
+    Recalling that $\int_C |z|^2 \nu(\diff z)$ for all compact sets $C$, and that $U_\delta (t_0,x_0)) \downarrow 0$ for singular $\nu(z)$, we see that $\mathcal{I}^{1,\delta}$ is bounded uniformly from above. For the second integral term $\mathcal I^{2,\delta}$ the upper limit is provided by Proposition \ref{prop: Proposition 5.1 in Seydel}(i). 
+
+    Lastly, for the impulse part, we know by Lemma \ref{lemma: Lemma 4.3 in Seydel}(ii) that $\InterveneOper u^*$ is USC, so
+    \begin{align*}
+        \liminf_{k \rightarrow \infty} \big\{u^*(t_k,x_k) - \InterveneOper u^*(t_k,x_k) \big\} &= u^*(t_0,x_0) - \limsup_{k \rightarrow \infty} \InterveneOper u^*(t_k,x_k) \\
+        & \geq u^*(t_0,x_0) - \InterveneOper u^*(t_0,x_0).
+    \end{align*}
+    Hence, combining the results thus far under the subsolution case, taking the subsequences iteratively using \eqref{eqn: (33) in Seydel} in Proposition \ref{prop: Proposition 5.1 in Seydel}(iii), and taking into account the property \assitemref{ass: P2} (see Remark \ref{remark: Remark 5.1 in Seydel}), we get
+    \begin{align*}
+    &0\geq \liminf_{k\to\infty} \min
+        \begin{aligned}[t]
+            & \big\{ -a_k + F\big(t_k,x_k,p_k,X_k,\mathcal{I}^{1,\delta}[t_k,x_k,\varphi_k(t_k,\cdot,y_k)] + \mathcal{I}^{2,\delta} [t_k,x_k,p_k,u^*(t_k,\cdot)]\big),\\
+            & \quad  u^*(t_k,x_k)-\InterveneOper u^*(t_k,x_k)\big\}
+        \end{aligned}
+        \\
+        &= \min
+        \begin{aligned}[t]
+            & \Big\{ \liminf_{k\to\infty} \big\{-a_k + F\big(t_k,x_k,p_k,X_k,\mathcal{I}^{1,\delta}[t_k,x_k,\varphi_k(t_k,\cdot,y_k)]
+             +\mathcal{I}^{2,\delta}[t_k,x_k,p_k,u^*(t_k,\cdot)]\big) \big\},\\
+            & \quad \liminf_{k\to\infty}\big\{u^*(t_k,x_k)-\InterveneOper u^*(t_k,x_k)\big\}\Big\}
+        \end{aligned}
+        \\
+        & \ge \min
+        \begin{aligned}[t]
+            \Big\{ & -a + F\big(t_0,x_0,p,X, \mathcal{I}^{1,\delta}[t_0,x_0,\varphi(t_0,\cdot,y_0)] +\mathcal{I}^{2,\delta}[t_0,x_0,p,u^*(t_0,\cdot)]\big),\\
+            & u^*(t_0,x_0)-\InterveneOper u^*(t_0,x_0)\Big\},
+        \end{aligned}   
+    \end{align*}
+    which, by Definition \ref{def: Viscosity solution 3}, is a subsolution. 
+
+    \textbf{Supersolution case:} The supersolution case is shown in an analogous way to the subsolution case, except that in this case we use \eqref{eqn: (34) in Seydel} for the convergence of the PIDE part. For the impulse part, we use the fact that $\InterveneOper v_*$ is LSC by Lemma \ref{lemma: Lemma 4.3 in Seydel} (i) so that
+    \begin{equation*}
+        \limsup_{k \rightarrow \infty} \big\{ v_*(t_k,y_k) - \InterveneOper v_*(t_k,y_k)\big\} = v_*(t_0,y_0) - \liminf_{k \rightarrow \infty} \InterveneOper v_*(t_k,y_k) \leq v_* - \InterveneOper v_*(t_0,y_0).
+    \end{equation*}
+    Hence,
+    \begin{align*}
+        0 \leq \min \Big\{ -b + F\big(t_0, y_0, q, Y, \mathcal{I}^{1, \delta} [t_0,y_0,-\varphi_\alpha (t_0, x_0, \cdot)] + \mathcal{I}^{2, \delta} [t_0,y_0,q,v_*(t_0,\cdot)] \big), \\
+        v_*(t_0,y_0) - \InterveneOper v_* (t_0,y_0) \Big\}.
+    \end{align*}
+\end{proof}
+
+\section{Comparison principle and uniqueness}
+\label{section: Proof of the Uniqueness}
+Before considering the Comparison Principle, consider Lemma \ref{lemma: Lemma 5.10 in Seydel} the following result, which is a perturbation technique needed for the proof of the Comparison Principle.
+\begin{lemma}%[{\cite[Lemma 5.10]{seydel2010generalexistenceuniquenessviscosity}}]
+\label{lemma: Lemma 5.10 in Seydel}
+    Assume that conditions \assitemref{ass: V1} and \assitemref{ass: V2} be satisfied. Let $u$ be a subsolution and $v$ a supersolution of \eqref{eqn: QVI with functionals}. Assume that there is a function $w \in \PB \cap C^{1,2}([0,T)\times \R^d)$ and a positive function $\kappa: [0,T] \times \R^d$ such that
+    \begin{align*}
+        \min \Big \{ - \big(\partial_t w - \InfinitesimalGenerator w - f, w - \InterveneOper w \big) \Big\} \geq \kappa & \quad \text{in } [0,T) \times \Solvency, \\
+        \min \big\{ w - g, w - \InterveneOper w \big\} \geq \kappa & \quad \text{in } \partial^+ \Solvency
+    \end{align*}
+    Then, for $m \in \mathbb N$, 
+    \begin{equation*}
+        v_m := \left( 1 - \frac{1}{m} \right) v_* + \frac{1}{m} w
+    \end{equation*}
+    is a supersolution of 
+    \begin{equation}
+        \begin{aligned}
+            \min \Big\{ -\big(\partial_t \psi - \InfinitesimalGenerator \psi - f \big), \psi - \InterveneOper \psi \Big\} - \frac{\kappa}{m} &= 0 && \quad \text{in } [0,T) \times \Solvency,\\
+            \min \big\{ \psi - g, \psi - \InterveneOper \psi \big\} - \frac{\kappa}{m} &= 0 && \quad \text{in } \partial^+ \Solvency.
+        \end{aligned}
+        \label{eqn: (43) in Seydel}
+    \end{equation}
+    Similarly, 
+    \begin{equation*}
+        u_m := \left( 1 + \frac{1}{m} \right) u^* - \frac{1}{m} w
+    \end{equation*}
+    is a subsolution of 
+    \begin{equation}
+        \begin{aligned}
+            \min \Big\{ -\big(\partial_t \psi + \InfinitesimalGenerator \psi + f \big), \psi - \InterveneOper \psi \Big\} + \frac{\kappa}{m} &= 0 && \quad \text{in } [0,T) \times \Solvency, \\
+            \min \big\{ \psi - g, \psi - \InterveneOper \psi \big\} + \frac{\kappa}{m} &= 0 && \quad \text{in } \partial^+ \Solvency.
+        \end{aligned}
+        \label{eqn: (43*) in Seydel}
+    \end{equation}
+\end{lemma}
+\begin{remark}
+    Note that this is the parabolic extension to {\cite[Lemma 5.10]{seydel2010generalexistenceuniquenessviscosity}}. However, the proof remains the same as in \cite{seydel2010generalexistenceuniquenessviscosity}. 
+\end{remark}
+\begin{proof}[Proof of Lemma \ref{lemma: Lemma 5.10 in Seydel}]
+    The proof is based on the first definition of the viscosity solution, see Definition \ref{def: Definition 4.1 in Seydel (Viscosity solution)}. We split the proof into two parts, corresponding to the supersolution and subsolution cases.
+
+    \textbf{Supersolution case:} Let $\varphi \in \PB \cap C^{1,2}([0,T) \times \R^d)$ such that $\varphi_m(t,x) = u_m(t,x)$, $(t_0,x_0) \in [0,T) \times \Solvency$ such that $\varphi_m(t_0,x_0) = v_m(t_0,x_0)$ and $\varphi_m \geq v_m$ everywhere else on $[0,T) \times \R^d$.  Choose 
+    \begin{equation*}
+        \varphi := \frac{m}{m-1} \left( \varphi_m -  \frac 1 m w \right),
+    \end{equation*}
+    and note that 
+    \begin{equation*}
+        \varphi(t_0,x_0) = v_*(t_0,x_0) \quad \text{and} \quad \varphi \leq v_*.
+    \end{equation*}
+    Since $v$ is assumed to be a supersolution, we know by Definition \ref{def: Definition 4.1 in Seydel (Viscosity solution)} that
+    \begin{equation*}
+        - \big( \partial_t \varphi + \InfinitesimalGenerator \varphi + f\big) \geq 0 \quad \text{on } [0,T) \times \Solvency,
+    \end{equation*}
+    and it is sufficient to show that
+    \begin{equation*}
+        -\big(\partial_t \varphi + \InfinitesimalGenerator \varphi + f \big) \geq \frac{\kappa}{m}
+    \end{equation*}
+    holds on $[0,T) \times \Solvency$. Using the linearity of $\partial_t$ and $\InfinitesimalGenerator$, we obtain
+    \begin{align*}
+        0 &\geq \partial_t \varphi(t,x) + \InfinitesimalGenerator \varphi(t,x) + f \\
+        &= \partial_t \Big( \frac{m-1}{m} \big( \varphi_m(t,x) - \frac 1 m w(t,x) \big) \Big) + \InfinitesimalGenerator \Big( \frac{m-1}{m} \big( \varphi_m(t,x) - \frac 1 m w(t,x) \big) \Big) + f(t,x) \\
+        &= \frac{m-1}{m} \Big( \partial_t \varphi_m(t,x) - \frac 1 m w (t,x) \Big) + \frac{m-1}{m} \Big( \InfinitesimalGenerator \varphi_m(t,x) - \frac{1}{m} \InfinitesimalGenerator w(t,x) \Big) + f(t,x) \\
+    \end{align*}
+    or, equivalently,
+    \begin{align*}
+        0 &\geq \partial_t \varphi(t,x) - \frac 1 m \partial_t w(t,x) + \InfinitesimalGenerator \varphi_m(t,x) - \frac 1 m \InfinitesimalGenerator w(t,x) + \frac{m}{m-1} f(t,x) \\
+        &= \partial_t \varphi_m(t,x) + \InfinitesimalGenerator \varphi_m(t,x) + f(t,x) - \frac{1}{m} \big( \underbrace{\partial_t w(t,x) + \InfinitesimalGenerator w(t,x) + f(t,x)}_{\leq -\kappa(t,x)} \big) \\
+        &\geq \partial_t \varphi_m(t,x) + \InfinitesimalGenerator \varphi_m(t,x) + f(t,x) + \frac{\kappa(t,x)}{m},
+    \end{align*}
+    for $(t,x) \in [0,T)\times \Solvency$. Hence, 
+    \begin{equation}
+        -\big( \partial_t \varphi_m - \InfinitesimalGenerator \varphi_m - f\big) \geq \frac{\kappa}{m} \quad \text{on } (t,x) \in [0,T) \times \Solvency.
+        \label{eqn: Lemma 4.22, temporary result 1}
+    \end{equation}
+    For the intervention part, because $\InterveneOper$ is convex by Lemma \ref{lemma: Lemma 5.7 in Seydel}(i), in any point $(t,x) \in [0,T) \times \R^d$,
+    \begin{align}
+        v_m(t,x) - & \InterveneOper v_m(t,x) = v_m(t,x) - \InterveneOper \left( \frac{m-1}{m} v_*(t,x) + \frac 1 m w(t,x) \right) \nonumber\\
+        &\geq v_m(t,x) - \frac{m-1}{m} \InterveneOper v_*(t,x) - \frac{1}{m} \InterveneOper w(t,x) \nonumber \\
+        &= \frac{m-1}{m} \big( \underbrace{v_*(t,x) - \InterveneOper v_*(t,x)}_{\geq 0} \big) + \frac 1 m \underbrace{\big(w(t,x) - \InterveneOper w(t,x)}_{\geq \kappa(t,x)} \big) \nonumber \\
+        &\geq \frac{\kappa(t,x)}{m}. \label{eqn: Lemma 4.22, temporary result 2}
+    \end{align}
+    Finally, with inequality \eqref{eqn: Lemma 4.22, temporary result 2}, we get
+    \begin{align}
+        v_m(t,x) - g(t,x) &= \frac{m-1}{m} v_*(t,x) + \frac{1}{m} w(t,x) - g(t,x) \nonumber \\
+        &= \frac{m-1}{m} \big( v_*(t,x) - g(t,x) \big) + \frac 1 m \big( w(t,x) - g(t,x) \big) \nonumber  \\
+        & \geq \frac{\kappa(t,x)}{m}
+        \label{eqn: Lemma 4.22, temporary result 3}
+    \end{align}
+    for $(t,x) \in [0,T) \times \R^d$. Combining inequalities \eqref{eqn: Lemma 4.22, temporary result 1}--\eqref{eqn: Lemma 4.22, temporary result 3}, we obtain \eqref{eqn: (43) in Seydel}. 
+    
+    \textbf{Subsolution case:} The proof for the subsolution $u$ is not different from the supersolution case, except that we use Lemma \ref{lemma: Lemma 5.7 in Seydel}(ii) to show the anticonvexity of $\InterveneOper$. To this end, let $\varphi \in \PB \cap C^{1,2}([0,T)\times \R^d)$, such that $\varphi_m(t_0,x_0) = u_m(t_0,x_0)$ and $\varphi_m \geq u_m$ on $[0,T) \times \R^d$. Then, for
+    \begin{equation*}
+        \varphi := \frac{m}{m+1} \left( \varphi_m + \frac{1}{m} w \right),
+    \end{equation*}
+    we have $\varphi(t_0,x_0) = u^*(t_0,x_0)$ and $\varphi \geq u^*$ everywhere else. For any $(t,x) \in [0,T) \times \Solvency$ and by the linearity of $\partial_t$ and $\InfinitesimalGenerator$, 
+    \begin{align*}
+        0 &\leq \frac{m+1}{m} \big( \partial_t \varphi(t,x) + \InfinitesimalGenerator \varphi(t,x) + f(t,x) \big) \\
+        &= \partial_t \varphi_m(t,x) + \InfinitesimalGenerator \varphi_m(t,x) + f(t,x) + \frac 1 m \big( \underbrace{\partial_t w(t,x) + \InfinitesimalGenerator w(t,x) + f(t,x)}_{\leq - \kappa(t,x)} \big) \\
+        &\leq \partial_t \varphi_m(t,x) + \InfinitesimalGenerator \varphi_m(t,x) + f(t,x) - \frac{\kappa(t,x)}{m},
+    \end{align*}
+    which is equivalent to
+    \begin{equation}
+        - \big(\partial_t \varphi_m(t,x) + \InfinitesimalGenerator \varphi_m(t,x) + f(t,x) \big) \leq - \frac{\kappa(t,x)}{m}. 
+        \label{lemma: Lemma 4.22, temporary result 4}
+    \end{equation}
+    Furthermore, and now for $(t,x) \in [0,T) \times \R^d$, 
+    \begin{align}
+        u_m(t,x) - \InterveneOper u_m(t,x) &= u_m(t,x) - \InterveneOper \left( \frac{m+1}{m}u^*(t,x) - \frac{1}{m}w(t,x) \right) \nonumber \\
+        & \leq u_m(t,x) - \frac{m+1}{m}\InterveneOper u^*(t,x) + \frac{1}{m} \InterveneOper w(t,x) \nonumber \\
+        & \leq u_m(t,x) - \frac{m+1}{m} u^*(t,x) + \frac 1 m \InterveneOper w(t,x) \nonumber \\
+        & = -\frac{1}{m} \big(w(t,x) - \InterveneOper w(t,x) \big) \nonumber \\
+        &\leq -\frac{\kappa(t,x)}{m}.
+        \label{lemma: Lemma 4.22, temporary result 5}
+    \end{align}
+    Finally, by a similar argument as in the supersolution case,
+    \begin{equation}
+        u_m(t,x) - g(t,x) \leq - \frac{\kappa(t,x)}{m}.
+        \label{lemma: Lemma 4.22, temporary result 6}
+    \end{equation}
+    Hence, with \eqref{lemma: Lemma 4.22, temporary result 4}--\eqref{lemma: Lemma 4.22, temporary result 6}, we obtain \eqref{eqn: (43*) in Seydel} and have that $u_m$ is a subsolution according to Definition \ref{def: Definition 4.1 in Seydel (Viscosity solution)}.
+\end{proof}
+Lemma \ref{lemma: Lemma 5.10 in Seydel} is used to perturb the sub- and supersolutions in order to ensure that the maximum of $u_m - v_m$ is attained in the Comparison Principle.
+
+Recall that $\PB_m:=\PB_m ([0,T] \times \R^d)$ denotes the set of all function $u \in \PB$ for which there is a time-dependent constant $C_t$ such that
+\begin{equation*}
+    |u(t,x)| \leq C_t (1+|x|^m) \quad \text{for all } (t,x) \in [0,T]\times \R^d.
+\end{equation*}
+The lower and upper semicontinuous envelopes, $v_*$ and $u^*$ respectively, are taken from within $[0,T] \times \R^d$. 
+
+By \assitemref{ass: B2}, the functions $f$, $\mu$, and $\sigma$ are locally Lipschitz continuous. Hence, by classical results, see {\cite[Lemma V.7.1]{fleming2006controlled}}, our functional $F$ has the property:
+\begin{quote}
+    For any $R>0$, there exist a modulus of continuity $\omega_R$ such that, for any $|x|,|y|,|v| \leq R$, $l \in \R$ and for any $X,Y \in \mathbb S^d$ satisfying 
+    \begin{equation*}
+        \begin{bmatrix}
+            X & 0\\
+            0 & -Y
+        \end{bmatrix}
+        \leq 
+        \frac 1 \varepsilon
+        \begin{bmatrix}
+            I & -I\\
+            -I & I
+        \end{bmatrix}
+        + o_\alpha(1)
+    \end{equation*} 
+    for some $\varepsilon > 0$ and $o_\alpha(1)$ independent on $\varepsilon$, then
+    \begin{align*}
+        F(t,x,\varepsilon^{-1} (x-y), X, l&) - F(t,y,\varepsilon^{-1} (x-y), Y, l) \\
+        &\quad \leq \omega_R (|x-y| + \varepsilon^{-1} |x-y|^2) + o_\alpha(1),
+    \end{align*}
+    where $o_\alpha(1)$ is once again independent of $\varepsilon$, and the first term is independent of $\alpha$. 
+\end{quote}
+In the proof of Theorem \ref{trm: 5.14 in Seydel}, $x_\varepsilon$ and $y_\varepsilon$ converge to the same limit $x_0$, so the requirement can be relaxed to local Lipschitz condition, as required by Assumption \ref{ass: Assumption 2.4 in Seydel}, and the property holds only for $x$ and $y$ in a suitable neighbourhood of $x_0$. 
+
+\begin{theorem}[{\cite[Theorem 5.14]{seydel2010generalexistenceuniquenessviscosity}}, Comparison Principle]
+\label{trm: 5.14 in Seydel}
+    Let Assumptions \ref{ass: Assumption 2.1 in Seydel} and \ref{ass: Assumption 2.4 in Seydel} be satisfied. Assume further that, for a constant $\kappa>0$, there is a $w \geq 0$ as in Lemma \ref{lemma: Lemma 5.10 in Seydel} with $|w(t,x)| / |x|^m \rightarrow \infty$ for $|x| \rightarrow \infty$ uniformly in $t$. If $u \in \PB_m([0,T] \times \R^d)$ is a subsolution and $v \in \PB_m([0,T] \times \R^d)$ a supersolution of \eqref{eqn: QVI with functionals}, then $u^* \leq v_*$ on $[0,T] \times \R^d$. 
+\end{theorem}
+\begin{proof}
+    Recall Lemma \ref{lemma: Lemma 5.10 in Seydel}, where we defined the sub-and supersolutions
+    \begin{align*}
+        u_m := \left(1+\frac{1}{m}\right) u^* - \frac{1}{m} w \quad \text{and} \quad v_m := \left(1-\frac{1}{m}\right) v_* + \frac{1}{m} w
+    \end{align*}
+    respectively, for subsolution $u$ and supersolution $v$. Noting that 
+    \begin{equation*}
+        \lim_{m\rightarrow \infty} u_m = u \quad \text{and} \quad \lim_{m\rightarrow \infty} v_m = v,
+    \end{equation*}
+    we observe that if we can show that $u_m \geq v_m$ for m large enough, then we also must have $u^* \leq v^*$. To this end, let $m$ be fixed and define 
+    \begin{equation*}
+        M:= \sup_{t \in [0,T], x \in \R^d} \big\{u_m(t,x) - v_m(t,x) \big\}. 
+    \end{equation*}
+    We prove this theorem by means of contradiction, so assume from now on that $M>0$. We now consider two steps:
+    \begin{enumerate}[label=\textbf{Step \arabic*:}, leftmargin=*, labelsep=.6em]
+        \item In the first step, we show that $M$ cannot be strictly positive on $\partial^+ \Solvency_T$.
+        \item Then, we show that $M$ cannot be strictly positive on $[0,T)\times \Solvency$ by employing the doubling of variables as seen in Corollary \ref{cor: Corollary 5.13 in Seydel}.
+    \end{enumerate}
+    Together, these two steps contradict the assumption where $M>0$, i.e. $u^* \leq v_*$ must hold on $[0,T]\times \R^d$.
+
+    \textbf{Step 1:} We want to show that the supremum in the expression of $M$ cannot be approximated from within $\partial^+\Solvency_T$. Assume that for each $\varepsilon_1 > 0$, we can find an $(\hat t,\hat x) = (\hat t_{\varepsilon_1},x_{\varepsilon_1}) \in \partial^+\Solvency_T$ such that 
+    \begin{equation*}
+        u_m(\hat t,\hat x) - v_m(\hat t,\hat x) + \varepsilon_1 > M
+    \end{equation*}
+    and WLOG 
+    \begin{equation*}
+        u_m(\hat t,\hat x) - v_m(\hat t,\hat x) > 0.
+    \end{equation*}
+    By Lemma \ref{lemma: Lemma 5.10 in Seydel}, we have 
+    \begin{align*}
+        \min \big\{ u_m(\hat t,\hat x) - g(\hat t,\hat x), u_m(\hat t,\hat x) - \InterveneOper u_m(\hat t,\hat x) \big\} \leq 0 \\
+        \min \big\{ v_m(\hat t,\hat x) - g(\hat t,\hat x), v_m(\hat t,\hat x) - \InterveneOper v_m(\hat t,\hat x) \big\} \geq \frac{\kappa}{m}.
+    \end{align*}
+    If $u_m(\hat t,\hat x) - g(\hat t,\hat x) \leq$, then
+    \begin{align*}
+        u_m(\hat t,\hat x) - v_m(\hat t,\hat x) + \frac \kappa m &= u_m(\hat t,\hat x) - \underbrace{v_m(\hat t,\hat x) + g(\hat t,\hat x) + \frac \kappa m}_{\leq 0} - g(\hat t,\hat x) \\
+        & \leq u_m(\hat t,\hat x) - g(\hat t,\hat x) \leq 0,
+    \end{align*}
+    which is a contradiction as we assume that $M>0$. Furthermore, if $u_m(\hat t,\hat x) \leq \InterveneOper u_m(\hat t,\hat x)$, then select for $\varepsilon_2>0$ an impulse $\hat \zeta = \hat \zeta_{\varepsilon_1,\varepsilon_2}$ such that
+    \begin{equation*}
+        u_m\big(\hat t, \Gamma(\hat x, \hat \zeta) \big) + K(\hat x, \hat \zeta) + \varepsilon_2 > \InterveneOper u_m(\hat t, \hat x).
+    \end{equation*}
+    Then, with $-v_m + \InterveneOper v_m \leq -\frac{\kappa}{m}$,
+    \begin{align*}
+        M - \varepsilon_1 &= \sup_{t \in [0,T], x \in \R^d} \big\{u_m(t,x) - v_m(t,x) \big\} - \varepsilon_1 \\
+        &< u_m(\hat t,\hat x) - v_m(\hat t,\hat x) \\
+        &\leq u_m \big(\hat t, \Gamma(\hat x, \hat \zeta)\big) + K(\hat x, \hat \zeta) + \varepsilon_2 - \frac \kappa m - \InterveneOper v_m(\hat t, \hat x) \\
+        & \leq u_m \big(\hat t, \Gamma(\hat x, \hat \zeta)\big) + K(\hat, \hat \zeta) + \varepsilon_2 - \frac{\kappa}{m} - v_m\big(\hat t, \Gamma(\hat, \hat \zeta) \big) - K(\hat x, \hat \zeta) \\
+        & \leq M + \varepsilon_2 - \frac{\kappa}{m},
+    \end{align*}
+    which, for sufficiently small $\varepsilon_1, \varepsilon_2>0$ is a contradiction as $\frac{\kappa}{m}>0$. Therefore, the supremum $M$ cannot be attained in $\partial^+ \Solvency_T$, neither can it be approached from within $\partial^+ \Solvency_T$. 
+
+    \textbf{Step 2:} Now that we are certain that we need not to take into account the boundary conditions, we employ the doubling of variables. We define, for $\varepsilon>0$, 
+    \begin{equation*}
+        M_\varepsilon = \sup_{t \in [0,T], x,y \in \R^d} \big\{u_m(t,x) - v_m(t,y) - \frac{1}{2\varepsilon}|x-y|^2\big\},
+    \end{equation*}
+    with $u_m$ and $v_m$ as defined in Lemma \ref{lemma: Lemma 5.10 in Seydel}. In view of the definiiton of $u_m$, $v_m$, and $w$, we find that
+    \begin{align*}
+        & u_m(t,x) - v_m(t,y) - \frac{1}{2\varepsilon} \\
+        &\quad = \frac{m+1}{m}u(t,x) - \frac{1}{m}w(t,x) - \frac{m-1}{m}v(t,y) - \frac{1}{m}w(t,y) - \frac{1}{2 \varepsilon}|x-y|^2 \\
+        & \quad \leq C_{t,m}(1+|x|^m) + C_{t,m}' (1+|y|^m) - \frac{1}{m}\big( w(t,x) + w(t,y) \big) - \frac{1}{2\varepsilon} |x-y|^2
+    \end{align*}
+    for time-dependent constants $C_{t,m}, C_{t,m}' > 0$. Furthermore, for fixed $t < T < \infty$ and $y \in \R^d$, note that
+    \begin{equation*}
+     \frac{1}{|x|^m} \left( C_{t,m}(1+|x|^m) + C_{t,m}' (1+|y|^m) - \frac{1}{m}\big( w(t,x) + w(t,y) \big) - \frac{1}{2\varepsilon} |x-y|^2 \right) \rightarrow - \infty,
+    \end{equation*}
+    as $|x| \rightarrow \infty$, because $w(t,x)/|x|^m \rightarrow \infty$ as $|x| \rightarrow \infty$ by assumption. Therefore, the maximum of $u_(t,x)-v_m(t,y)-\frac{1}{2 \varepsilon}|x-y|^2$ is attained in a compact set $C$ independent of small $\varepsilon$. 
+
+    Now pick a point $(t_\varepsilon, x_\varepsilon, y_\varepsilon)$, where for small $\varepsilon$, we know from the previous step that $t_\varepsilon < T$ and $x_\varepsilon,y_\varepsilon \in \Solvency$. We assume that the supremum of $M_\varepsilon$ is attained at $(t_\varepsilon,x_\varepsilon,y_\varepsilon)$. Then, by Lemma 3.1 in \cite{barles2008second} and with $u_m \in \USC([0,T) \times \Solvency)$ and $v_m \in \LSC([0,T) \times \Solvency)$, we obtain 
+    \begin{align*}
+        & \frac{1}{2 \varepsilon} |x_\varepsilon - y_\varepsilon|^2 \quad \text{as } \varepsilon \rightarrow 0,
+    \end{align*}
+    and 
+    \begin{align*}
+        M_\varepsilon \rightarrow M = u_m(t_0,x_0) - v_m(t_0,x_0)
+    \end{align*}
+    for all limit points $x_0$ of the sequence $\{x_\varepsilon\}$. We assume from now on that we have chosen a convergent subsequence of $\{x_\varepsilon\}$ and $\{y_\varepsilon\}$ converging to the same limit $x_0 \in C$. Let $\varepsilon$ be small enough such that $x_0,y_0 \in \Solvency$, and that all local estimates in \assitemref{ass: B1} and \assitemref{ass: B2} hold. Moreover, assume that $\{t_\varepsilon\}$ converges to $t_0 < T$. 
+    
+    With the above assumptions in mind, we may apply Corollary \ref{cor: Corollary 5.13 in Seydel} in $(t_\varepsilon,x_\varepsilon,y_\varepsilon)$ for $\varphi(x,y) = \frac{1}{2\varepsilon} |x-y|^2$: For any $\delta > 0$, there is a range of $\alpha>0$ for which there are matrices $X,Y$ satisfying \eqref{eqn: (48) in Seydel}, $(p,-q) = \nabla \varphi(x_\varepsilon,y_\varepsilon)$, so that $p=q=\frac{1}{\varepsilon}(x_\varepsilon - y_\varepsilon)$, and $a+b= \partial_t \varphi(x_0,y_0) = 0$ such that
+    \begin{align*}
+        \min \big\{-a + F\big(t_\varepsilon, x_\varepsilon, p, X, \mathcal{I}^{1,\delta}[t_\varepsilon,x_\varepsilon,\varphi_\alpha(\cdot,y_\varepsilon)] + \mathcal{I}^{2,\delta}[t_\varepsilon,x_\varepsilon,p,u_m(t_\varepsilon,\cdot)]\big), \\
+        u_m(t_\varepsilon, x_\varepsilon) - \InterveneOper u_m(t_\varepsilon,x_\varepsilon) \big\} \leq 0 \\
+        \min \big\{-b + F\big(t_\varepsilon, y_\varepsilon, q, Y, \mathcal{I}^{1,\delta}[t_\varepsilon,y_\varepsilon,-\varphi_\alpha(x_\varepsilon, \cdot)] + \mathcal{I}^{2,\delta}[t_\varepsilon,y_\varepsilon,q,v_m(t_\varepsilon,\cdot)]\big), \\
+        v_m(t_\varepsilon, y_\varepsilon) - \InterveneOper v_m(t_\varepsilon,y_\varepsilon) \big\} \geq \frac{\kappa}{m}.
+    \end{align*}
+    This representation lets us split the proof into 2 cases that we need to consider for the proof: 
+    \begin{enumerate}[label=\textbf{Case 2\alph*:}, leftmargin=*, labelsep=.6em]
+        \item If $u_m(t_\varepsilon,x_\varepsilon) - \InterveneOper u_m(t_\varepsilon,x_\varepsilon) \leq 0$.
+        \item If $u_m(t_\varepsilon,x_\varepsilon) - \InterveneOper u_m(t_\varepsilon,x_\varepsilon) > 0$.
+    \end{enumerate}
+
+    \textbf{Case 2a:} Assume that 
+    \begin{equation*}
+        u_m(t_\varepsilon,x_\varepsilon) - \InterveneOper u_m(t_\varepsilon,x_\varepsilon) \leq 0.
+    \end{equation*}
+    Using 
+    \begin{equation*}
+        v_m(t_\varepsilon,y_\varepsilon) - \InterveneOper v_m(t_\varepsilon,y_\varepsilon) \geq \frac{\kappa}{m}
+    \end{equation*}
+    for $\varepsilon>0$ small enough, we have
+    \begin{align*}
+        M &= \limsup_{\varepsilon \rightarrow 0} \big\{ u_m(t_\varepsilon,x_\varepsilon) - v_m(t_\varepsilon,y_\varepsilon) \big\}\\
+        & \leq \limsup_{\varepsilon \rightarrow 0} \InterveneOper u_m(t_\varepsilon,x_\varepsilon) - \liminf_{\varepsilon \rightarrow 0} \InterveneOper v_m(t_\varepsilon,y_\varepsilon) - \frac{\kappa}{m} \\
+        & \leq \InterveneOper u_m(t_0,x_0) - \InterveneOper v_m(t_0,x_0) - \frac{\kappa}{m}.
+    \end{align*}
+    Applying the same approach as in \textbf{Step 1}, select for $\hat \varepsilon > 0$ a $\hat \zeta = \hat \zeta_{\hat \varepsilon}$ such that 
+    \begin{equation*}
+        u_m\big(t_0, \Gamma(x_0,\hat \zeta) \big) + K(x_0, \hat \zeta) + \hat \varepsilon > \InterveneOper u_m(t_0,x_0).    
+    \end{equation*}
+    Then, 
+    \begin{align*}
+        M &\leq \InterveneOper u_m(t_0,x_0) - \InterveneOper v_m(t_0,x_0) \\
+        &< u_m\big(t_0, \Gamma(x_0,\hat \zeta) \big) + K(x_0,\hat \zeta) + \hat \varepsilon - v_m(t_0,x_0) - K(x_0, \hat \zeta) - \frac{\kappa}{m} \\
+        & \leq M + \hat \varepsilon - \frac{\kappa}{m},
+    \end{align*}
+    which is a contradiction for sufficiently small $\hat \varepsilon$ since $\kappa/m > 0$. This implies that the assumption 
+    \begin{equation*}
+        u_m(t_\varepsilon,x_\varepsilon) - \InterveneOper u_m(t_\varepsilon,x_\varepsilon) \leq 0
+    \end{equation*}
+    cannot hold if we want $M>0$. 
+
+    \textbf{Case 2b:} Assume now that $u_m(t_\varepsilon, x_\varepsilon) - \InterveneOper u_m(t_\varepsilon, x_\varepsilon) > 0$. Then, we must have 
+    \begin{align}
+        F \big( t_\varepsilon, x_\varepsilon, p, X, \mathcal I^{1,\delta}[t_\varepsilon, x_\varepsilon, \varphi_\alpha(\cdot, y_\varepsilon)] + \mathcal I^{2,\delta}[t_\varepsilon, x_\varepsilon, p, u_m(t_\varepsilon, \cdot)] \big) \leq 0 \label{eqn: (44) in Seydel} \\
+        F \big( t_\varepsilon, y_\varepsilon, q, Y, \mathcal I^{1,\delta}[t_\varepsilon, y_\varepsilon, \varphi_\alpha(x_\varepsilon, \cdot)] + \mathcal I^{2,\delta}[t_\varepsilon, y_\varepsilon, q, v_m(t_\varepsilon, \cdot)] \big) \geq \frac{\kappa}{m} \label{eqn: (45) in Seydel}
+    \end{align}
+    Before we can proceed, we have to compare the integral terms in both inequalities. First, note that because
+    \begin{equation*}
+        |x+\gamma(t,x,z)-y|^2 = |x-y|^2 + 2\langle x-y,\gamma(t,x,z)\rangle + |\gamma(t,x,z)|^2,
+    \end{equation*}
+    we have, for the test function $\varphi(x,y) \frac{1}{2\varepsilon}|x-y|^2$ and fixed $t_\varepsilon < T$,
+    \begin{align*}
+        \mathcal{I}^{1,\delta} &[t_\varepsilon, x_\varepsilon, \varphi(\cdot, y_\varepsilon)]\\
+        & = \int\limits_{|z|<\delta} \Big( \varphi \big( x_\varepsilon + \gamma(t_\varepsilon,x_\varepsilon,z) \big) - \varphi(x_\varepsilon,y_\varepsilon) - \langle \nabla_x \varphi(x_\varepsilon,y_\varepsilon), \gamma(t_\varepsilon,x_\varepsilon,z) \rangle \Big) \nu(\diff z) \\
+        &= \int\limits_{|z|<\delta} \left( \frac{1}{2\varepsilon} |x_\varepsilon + \gamma(t_\varepsilon,x_\varepsilon,z) - y_\varepsilon|^2 - \frac{1}{2\varepsilon} |x_\varepsilon - y_\varepsilon|^2 - \left\langle \frac 1 \varepsilon (x_\varepsilon-y_\varepsilon), \gamma(t_\varepsilon,x_\varepsilon,z) \right\rangle \right) \nu(\diff z) \\
+        &= \int\limits_{|z|<\delta} \bigg( \frac{1}{2\varepsilon} |x_\varepsilon - y_\varepsilon|^2 - \frac{1}{\varepsilon}\langle x_\varepsilon - y_\varepsilon,\gamma(t_\varepsilon,x_\varepsilon,z) \rangle + \frac{1}{2\varepsilon}|\gamma(t_\varepsilon,x_\varepsilon,z)|^2 - \frac{1}{2\varepsilon} |x_\varepsilon - y_\varepsilon|^2 \\
+        & \qquad - \frac 1 \varepsilon \left\langle (x_\varepsilon-y_\varepsilon), \gamma(t_\varepsilon,x_\varepsilon,z) \right\rangle \bigg) \nu(\diff z) \\
+        &= \frac{1}{2\varepsilon} \int\limits_{|z|<\delta} |\gamma(t_\varepsilon, x_\varepsilon,z)|^2 \nu(\diff z).
+    \end{align*}
+    Similarly,
+    \begin{equation*}
+        \mathcal{I}^{1,\delta}[t_\varepsilon, y_\varepsilon, -\varphi(\cdot,y_\varepsilon)] = - \frac{1}{2\varepsilon} \int\limits_{|z|<\delta} |\gamma(t_\varepsilon, y_\varepsilon,z)|^2 \nu(\diff z).
+    \end{equation*}
+    We also note that $\mathcal{I}^{1,\delta}[t_\varepsilon, x_\varepsilon, \varphi(\cdot, y_\varepsilon)]< \infty$ and $\mathcal{I}^{1,\delta}[t_\varepsilon, y_\varepsilon, -\varphi(\cdot,y_\varepsilon)] < \infty$ by \assitemref{ass: V4} and by the definition of $\PB$, see Definition \ref{def: Space of Polynomially Bounded Functions}. Define 
+    \begin{equation*}
+        o_\delta(1) := \int\limits_{|z|<\delta} \big( |\gamma(t_\varepsilon,x_\varepsilon,z)|^2 + |\gamma(t_\varepsilon,x_\varepsilon,z)|^2 \big) \nu (\diff z).
+    \end{equation*}
+    Then, we have
+    \begin{align*}
+        \mathcal{I}^{1,\delta} [t_\varepsilon, x_\varepsilon, \varphi(\cdot, y_\varepsilon)] &= \mathcal{I}^{1,\delta}[t_\varepsilon, y_\varepsilon, -\varphi(\cdot,y_\varepsilon)] + \frac{1}{2\varepsilon} o_\delta(1) \\
+        & \leq \mathcal{I}^{1,\delta}[t_\varepsilon, y_\varepsilon, -\varphi(\cdot,y_\varepsilon)] + \frac{1}{\varepsilon} o_\delta(1).
+    \end{align*}
+    Because we know that $\varphi_\alpha$ converges to $\varphi$ unifromly in $C^{1,2}(C)$ for any compact $C$, we have that
+    \begin{equation*}
+        \mathcal{I}^{1,\delta} [t_\varepsilon, x_\varepsilon, \varphi_\alpha(\cdot, y_\varepsilon)] \leq \mathcal{I}^{1,\delta}[t_\varepsilon, y_\varepsilon, -\varphi_\alpha(\cdot,y_\varepsilon)] + \frac{1}{\varepsilon} o_\delta(1) + o_\alpha(1),
+    \end{equation*}
+    where $o_\alpha(1)$ may depend on $\varepsilon$, but is independent of small $\delta$. 
+
+    Now for the other integral term, that is, $\mathcal{I}^{2,\delta}$, we use that $(t_\varepsilon,x_\varepsilon,y_\varepsilon)$ is a maximum point to find that 
+    \begin{equation}
+        u_m(t_\varepsilon,x_\varepsilon+h) - v_m(t_\varepsilon,y_\varepsilon+h')  - \frac{1}{2 \varepsilon} |(x_\varepsilon + h) - (y_\varepsilon + h')|^2 \leq u_m(t_\varepsilon,x_\varepsilon)  - v_m(t_\varepsilon,y_\varepsilon) - \frac{1}{2\varepsilon} |x_\varepsilon-y_\varepsilon|^2
+        \label{eqn: Theorem 4.24, temporary result 1}
+    \end{equation}
+    for arbitrary vectors $h, h' \in \R^d$. Then, with the identity
+    \begin{equation*}
+        |x+y|^2 = |x|^2 + 2 \langle x,y \rangle + |y|^2, 
+    \end{equation*}
+    and rearranging \eqref{eqn: Theorem 4.24, temporary result 1}, we obtain
+    \begin{align}
+        u_m&(t_\varepsilon,x_\varepsilon+d) - u_m(t_\varepsilon,x_\varepsilon)\nonumber \\
+        & \leq v_m(t_\varepsilon,y_\varepsilon+d') - v_m(t_\varepsilon,y_\varepsilon) + \frac{1}{2\varepsilon} |(x_\varepsilon+d) - (y_\varepsilon+d')|^2 - \frac{1}{2\varepsilon}|x_\varepsilon-y_\varepsilon|^2 \nonumber \\
+        &= v_m(t_\varepsilon, y_\varepsilon+d') - v_m(t_\varepsilon,y_\varepsilon) + \frac{1}{2\varepsilon} \big( |x_\varepsilon-y_\varepsilon|^2 + 2 \langle x_\varepsilon-y_\varepsilon,d-d' \rangle + |d-d'|^2 \big)\nonumber \\
+        & \qquad - \frac{1}{2\varepsilon} |x_\varepsilon-y_\varepsilon|^2 \nonumber \\
+        &= v_m(t_\varepsilon,y_\varepsilon+d') - v_m(t_\varepsilon,y_\varepsilon) + \frac{1}{\varepsilon} \langle x_\varepsilon-y_\varepsilon,d-d' \rangle + \frac{1}{2\varepsilon} |d-d'|^2.
+        \label{eqn: Theorem 4.24, temporary result 2}
+    \end{align}
+    Since $x_\varepsilon,y_\varepsilon,d,d' \in \R^d$,
+    \begin{equation*}
+        \langle x_\varepsilon-y_\varepsilon, d-d' \rangle = \langle x_\varepsilon-y_\varepsilon,d \rangle - \langle x_\varepsilon-y_\varepsilon,d' \rangle,
+    \end{equation*}
+    we obtain, by rearranging terms in \eqref{eqn: Theorem 4.24, temporary result 2},
+    \begin{align}
+        & u_m(t_\varepsilon,x_\varepsilon+d) - u_m(t_\varepsilon,x_\varepsilon) - \frac{1}{\varepsilon}\langle x_\varepsilon-y_\varepsilon, d\rangle \nonumber \\
+        & \qquad \leq v_m(t_\varepsilon,y_\varepsilon+d') - v_m(y_\varepsilon) - \frac{1}{\varepsilon} \langle x_\varepsilon-y_\varepsilon,d'\rangle + \frac{1}{2\varepsilon}|d-d'|^2. 
+        \label{eqn: (46) in Seydel}
+    \end{align}
+    Then, with $p=q=\frac{1}{\varepsilon}(x_\varepsilon-y_\varepsilon)$, $d=\gamma(t_\varepsilon,x_\varepsilon,z)$, and $d'=\gamma(t_\varepsilon,y_\varepsilon,z)$, integrating \eqref{eqn: (46) in Seydel} yields
+    \begin{align*}
+        \mathcal{I}^{2,\delta}&[t_\varepsilon,x_\varepsilon,p,u_m(\cdot)] \\
+        &= \int\limits_{|z|\geq \delta} \Big( u_m \big( (t_\varepsilon,x_\varepsilon+\gamma(t_\varepsilon,x_\varepsilon,z) \big) - u_m(t_\varepsilon,x_\varepsilon) - \langle p, \gamma(t_\varepsilon,x_\varepsilon,z) \rangle \ind{|z|<1} \Big) \nu (\diff z) \\
+        & \qquad - \int\limits_{|z| \geq \delta} \langle p, \gamma(t_\varepsilon,x_\varepsilon) \rangle \ind{|z|\geq1} \nu(\diff z) + \int\limits_{|z| \geq \delta} \langle p, \gamma(t_\varepsilon,x_\varepsilon) \rangle \ind{|z|\geq 1} \nu(\diff z) \\
+        &= \int\limits_{|z| \geq \delta} \Big( u_m(t_\varepsilon,x_\varepsilon+\gamma\big(t_\varepsilon,x_\varepsilon,z\big) -u_m(t_\varepsilon,x_\varepsilon) - \langle p, \gamma(t_\varepsilon,x_\varepsilon,z) \rangle \Big) \nu (\diff z) \\
+        & \quad + \int\limits_{|z|\geq 1} \langle p, \gamma(t_\varepsilon,x_\varepsilon,z) \rangle \nu(\diff z) \\
+        & \leq \int\limits_{|z|\geq \delta} \Big(v_m\big(t_\varepsilon,y_\varepsilon+\gamma(t_\varepsilon,y_\varepsilon,z)\big) - v_m(t_\varepsilon,y_\varepsilon) - \langle q, \gamma(t_\varepsilon,y_\varepsilon,z) \rangle \Big) \nu(\diff z) \\
+        & \quad + \frac{1}{2\varepsilon} \int\limits_{|z|\geq \delta} |\gamma(t_\varepsilon,x_\varepsilon,z)-\gamma(t_\varepsilon,y_\varepsilon,z)|^2 \nu (\diff z) + \int\limits_{|z|\geq 1} \langle p, \gamma(t_\varepsilon,x_\varepsilon,z)\rangle \nu(\diff z) \\
+        & = \mathcal{I}^{2,\delta}[t_\varepsilon,y_\varepsilon,q,v_m(t_\varepsilon,\cdot)] + \frac{1}{2\varepsilon} \int\limits_{|z| \geq \delta} |\gamma(t_\varepsilon,x_\varepsilon,z)-\gamma(t_\varepsilon,y_\varepsilon,z)|^2 \nu(\diff z) \\
+        & \quad + \int\limits_{|z|\geq 1} \langle p, \gamma(t_\varepsilon,x_\varepsilon,z)-\gamma(t_\varepsilon,y_\varepsilon,z)\rangle \nu(\diff z).
+    \end{align*}
+    Now denote 
+    \begin{align*}
+        l^1 &= \mathcal{I}^{1,\delta}[t_\varepsilon,x_\varepsilon,\varphi(\cdot, y_\varepsilon)] + \mathcal{I}^{2,\delta}[t_\varepsilon,x_\varepsilon,p,u_m(t_\varepsilon, \cdot)] \\
+        l^2 &=\mathcal{I}[t_\varepsilon,y_\varepsilon,-\varphi(x_\varepsilon,\cdot)] + \mathcal{I}^{2,\delta} [t_\varepsilon,y_\varepsilon,q,v_m(t_\varepsilon,\cdot)].
+    \end{align*}
+    By \assitemref{ass: B1}, we have, for $\varepsilon>0$ small enough,
+    \begin{equation*}
+        l^1 \leq l^2 + \mathcal{O}\left( \frac{1}{\varepsilon} |x_\varepsilon-y_\varepsilon|^2\right) + \frac{1}{\varepsilon}o_\delta(1)+o_\alpha(1),
+    \end{equation*}
+    where the $\mathcal{O}$ term is independent of $\alpha$ and $\delta$. Thus, by \eqref{eqn: (44) in Seydel} and \eqref{eqn: (45) in Seydel}, as well as \assitemref{ass: P1} and \assitemref{ass: P3}, 
+    \begin{align*}
+        \frac{\kappa}{m} &\leq F\big(t_\varepsilon, y_\varepsilon, q, Y, l^2 \big) - F\big(t_\varepsilon, x_\varepsilon, p, X, l^1 \big) \\
+        & \hspace{-1em} \overset{\assitemref{ass: P1},\assitemref{ass: P3}}{\leq} F\big(t_\varepsilon, y_\varepsilon, q, Y, l^1 \big) - F\big(t_\varepsilon, x_\varepsilon, v_m(t_\varepsilon,x_\varepsilon), p, X, l^1 \big) \\
+        & \qquad + \mathcal{O}\left( \frac{1}{\varepsilon} |x_\varepsilon-y_\varepsilon|^2 \right)+ \frac{1}{\varepsilon} o_\delta(1) + o_\alpha(1),
+    \end{align*}
+    Furthermore, with $\varphi(x,y) := \frac{1}{2\varepsilon}|x-y|^2$, the matrix inequality in \eqref{eqn: (48) in Seydel} in Corollary \ref{cor: Corollary 5.13 in Seydel} becomes
+    \begin{align*}
+        -\frac{1}{\alpha} I \leq 
+        \begin{bmatrix}
+            X & 0 \\
+            0 & -Y
+        \end{bmatrix}
+        \leq H_{(x,y)} \varphi(x,y) = \frac{1}{\varepsilon} 
+        \begin{bmatrix}
+            I & -I \\
+            -I & I
+        \end{bmatrix}
+        \leq 
+        \frac{1}{\varepsilon} 
+        \begin{bmatrix}
+            I & -I \\
+            -I & I
+        \end{bmatrix} + o_\alpha(1)
+    \end{align*}
+    By \assitemref{ass: B2}, for $R>0$ large enough and $\varepsilon$ small enough, we have
+    \begin{align*}
+        \frac{\kappa}{m} &\leq  F\big(t_\varepsilon, y_\varepsilon, q, Y, l^2 \big) - F\big(t_\varepsilon, x_\varepsilon, p, X, l^1 \big) \\
+        & \qquad + \mathcal{O}\left( \frac{1}{\varepsilon} |x_\varepsilon-y_\varepsilon|^2 \right)+ \frac{1}{\varepsilon} o_\delta(1) + o_\alpha(1) \\
+        & \leq \omega_R \left( |x_\varepsilon-y_\varepsilon| + \frac{1}{\varepsilon} |x_\varepsilon-y_\varepsilon|^2 \right) \mathcal O \left( \frac 1 \varepsilon |x_\varepsilon-y_\varepsilon|^2 \right) + \frac 1 \varepsilon o_\delta(1) + o_\alpha(1).
+    \end{align*}
+    Letting $\delta \rightarrow 0$, the integral truncation error, $o_\delta(1)$ vanishes and so does $o_\alpha(1)$ as $\alpha \rightarrow 0$. Finally, as $\varepsilon \rightarrow 0$, $\frac{1}{\varepsilon}|x_\varepsilon-y_\varepsilon| \rightarrow 0$ and $|x_\varepsilon-y_\varepsilon| \rightarrow 0$ by assumption. This leaves us with the contradiction
+    \begin{equation*}
+        \frac{\kappa}{m} \leq 0.
+    \end{equation*}
+    Hence, the assumption $M:= \sup_{t \in [0,T], x \in \R^d} \{u_m(x)-v_m(x)\}>0$ does not hold on the interior $[0,T)\times \Solvency$ either. We therefore conclude that we must have $u_m \leq v_m$ and for $m$ large enough, we obtain $u^* \leq v^*$.
+\end{proof}
+\begin{remark}
+    At the end of \textbf{Case 2b} of the above proof, we note that $\alpha$ depends on $\delta$. However, letting $\delta \downarrow 0$ does not affect $\alpha$. As we let $\delta \downarrow 0$, the admissible region for $\alpha$ becomes larger, i.e. $\bar \alpha(K)$ grows, but we still may fix some $\alpha > 0$ and the proof still holds.
+\end{remark}
+\begin{remark}
+    The above proof relies on the same technique used by Seydel for the proof of Theorem 5.11 in \cite{seydel2010generalexistenceuniquenessviscosity}. 
+\end{remark}
+
+Finally, and with the help of Theorem \ref{trm: 5.14 in Seydel}, we may prove the uniqueness of the viscosity solution.
+
+\begin{corollary}[{\cite[Corollary 5.15]{seydel2010generalexistenceuniquenessviscosity}} Viscosity Solution: Uniqueness] 
+\label{cor: Corollary 5.15 in Seydel}
+    Under the same assumptions as in Theorem \ref{trm: 5.14 in Seydel}, there is at most one viscosity solution of \eqref{eqn: QVI with functionals}, and it is continuous on $[0,T] \times \R^d$. 
+\end{corollary}
+\begin{proof}
+    Let $u$ and $v$ be viscosity solutions of \eqref{eqn: QVI with functionals}. By Theorem \ref{trm: 5.14 in Seydel}, we must have
+    \begin{equation}
+        u^* \leq v_* \quad \text{and} \quad v^* \leq u_* \quad \text{on } [0,T] \times \R^d. 
+        \label{eqn: Cor. 4.26, temporary result 1}
+    \end{equation}
+    Also, for any function $h$, we always have $h_* \leq h^*$. Hence,
+    \begin{equation}
+        v_* \leq v^* \quad \text{and} \quad u_* \leq u^* \quad \text{on } [0,T] \times \R^d.
+        \label{eqn: Cor. 4.26, temporary result 2}
+    \end{equation}
+    Combining \eqref{eqn: Cor. 4.26, temporary result 1} and \eqref{eqn: Cor. 4.26, temporary result 2}, we obtain
+    \begin{equation}
+        u^* \leq v_* \leq v^*
+        \label{eqn: Cor. 4.26, temporary result 3}
+    \end{equation}
+    and 
+    \begin{equation}
+        v^* \leq u_* \leq u^*.
+        \label{eqn: Cor. 4.26, temporary result 4}
+    \end{equation}
+    Putting together \eqref{eqn: Cor. 4.26, temporary result 3} and \eqref{eqn: Cor. 4.26, temporary result 4}, we obtain 
+    \begin{equation*}
+        u^* = v_*, \quad u_* = v_*, \quad \text{and} \quad u^* = v_* \quad \text{on } [0,T] \times \R^d. 
+    \end{equation*}
+    The lower and upper envelopes of $u$ and $v$ coincide. Hence, $u=v$ on $[0,T] \times \R^d$, i.e. $u$ is unique. 
+
+    Moreover, because $u$ is a viscosity solution, i.e. it is both sub- and supersolution, applying Theorem \ref{trm: 5.14 in Seydel} yields
+    \begin{equation*}
+        u^* \leq u_* \quad \text{on} [0,T] \times \R^d.
+    \end{equation*}
+    Trivially, we also have $u_* \leq u^*$, so $u_* = u^*$. This means that $u$ is both LSC and USC, which means that $u$ is continuous. Therefore,
+    \begin{equation*}
+        u=u_*=u^* \quad \text{on } [0,T] \times \R^d,
+    \end{equation*}
+    which shows that there exist at most one viscosity solution of \eqref{eqn: QVI with functionals}.
+\end{proof}
+
+Taken together, the existence result in Chapter \ref{section: Viscosity Solution for Impulse Control: Existence} and the uniqueness result in this chapter, we may conclude that the QVI \eqref{eqn: QVI with functionals} admits a unique viscosity solution. Moreover, since the value function \eqref{eqn: impulse control problem} satisfies the QVI in the viscosity sense, it follows that the value function is uniquely determined by the QVI. 
+
+However, as it is often the case with (HJB)QVIs, a closed-form solution may not exist and often depends on the choice of the functions $f$, $g$, and $K$. This motivates us to apply numerical schemes to approximate the solution of \eqref{eqn: QVI with functionals} in the chapters that follow. 

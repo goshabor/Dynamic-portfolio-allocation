@@ -1,0 +1,121 @@
+%\section{Some useful theorems}
+
+\section{Doob's Sampling Theorem}
+\label{Appendix: Doob's Sampling Theorem}
+\begin{theorem}[{\cite[Theorem 3.6c]{BhattacharyaWaymire2007}} Optional Stopping]
+    Let $\{X(t)\}_{t \in [0,T]}$ be a righ-continuous $\{\F_t\}$-martingale, where $T \in [0,\infty)$. Suppose $\tau$ is a stopping time such that 
+    \begin{enumerate}[label=(\roman*)]
+        \item 
+        \begin{equation}
+            \Prob(\tau < \infty) = 1,
+            \label{eqn: Optional Sampling Theorem (cond. i)}
+        \end{equation}
+        and
+        \item 
+        \begin{equation}
+            X(\tau \wedge t) \quad \text{is uniformly integrable for } t \in [0,T].
+            \label{eqn: Optional Sampling Theorem (cond. i)}
+        \end{equation}
+        Then,
+        \begin{equation*}
+            \E[X(\tau)] = \E[X(0)].
+        \end{equation*}
+    \end{enumerate}
+\end{theorem}
+
+% \section{Dynkin's Formula}
+% \label{Appendix: Dynkin's Formula}
+% \begin{lemma}[{\cite[Theorem 1.24]{oksendal2007applied}} The Dynkin Formula]
+%     Let $X(t) \in \R^d$ be a jump diffusion with generator $\InfinitesimalGenerator$, $G \subset \R^d$ be an open set, and let $h \in C^2(\mathbb R^d)$. Let $\tau<\infty$ be a stopping time. Suppose that 
+%     \begin{align*}
+%         & \tau \leq \tau_G:= \inf\{t>0: X(t) \notin G\} \\
+%         & \E^x \left[ |h(X(\tau))| + \int_0^\tau |\InfinitesimalGenerator h(X(\tau))| \diff t \right] < \infty.
+%     \end{align*}
+%     Then we have
+%     \begin{equation*}
+%         \E^x \left[ h(X(\tau)) \right] = h(x) + \E^x \left[ \int_0^\tau (\InfinitesimalGenerator h)(X(t)) \diff t \right].
+%     \end{equation*}
+% \end{lemma}
+
+\section{Chebyshev's Inequality}
+\label{Appendix: Chebyshev's Inequality}
+\begin{theorem}[{\cite[Chapter 2]{wainwright2019high}} Chebyshev's Inequality]
+    Let $X$ be an integrable random variable with finite, nonzero variance $\sigma^2$ and mean $\mu$. Then, for any real number $k>0$, 
+    \begin{equation*}
+        \Prob(|X-\mu| \geq k) \leq \frac{\text{Var}[X]}{k^2}. 
+    \end{equation*}
+\end{theorem}
+
+\section{Markov's Inequality}
+\label{Appendix: Markov's Inequality}
+\begin{theorem}[{\cite[Chapter 2]{wainwright2019high}} Markov's Inequality]
+    Let $X$ be an integrable random variable with finite, nonzero $k$-th order moment. Then, for any real number $k$ and $t>0$,
+    \begin{equation*}
+        \Prob(|X|^k \leq t) \leq \frac{\E[|X|^k]}{t^k}.
+    \end{equation*}
+\end{theorem}
+
+\section{Fatou's Lemma}
+\label{Appendix: Fatou's Lemma}
+\begin{lemma}[{\cite[Fatou's Lemma]{dibenedetto2002real}}] 
+    Let $\{X, \mathcal A, \mu \}$ be a measure space and $E$ a measurable set. Let $\{f_n\}$ be a sequence of measurable functions and a.e. nonnegative function in $E$. Then,
+    \begin{equation*}
+        \int_E \liminf_{n \rightarrow \infty} f_n \diff \mu \leq \liminf_{n \rightarrow \infty} \int_E f_n \diff \mu.
+    \end{equation*}
+\end{lemma}
+
+% \section{Girsanov's Change of Measure Theorem}
+% \label{appendix: Girsanov's Theorem}
+% \begin{theorem}[{\cite[Theorem 5]{jarrow2018continuous}}, Girsanov's Theorem]
+%     \label{trm: Giranov}
+%     Let $W$ be a standard Brownian motion on $(\Omega ,\F, \{\F\}_{t \in [0,T]}, \Prob)$ and let $\theta = \{\theta(t)\}_{t\in [\tau,T]}$ be an adapted process satisfying the Novikov condition
+%     \begin{equation}
+%         \E_\Prob \left[ e^{\frac{1}{2}\int_\tau^T \theta^2(u) \diff u} \right] < \infty,
+%         \label{eqn: Novikov condition}
+%     \end{equation}
+%     Then, the process $L=\{L(t)\}_{t \in [\tau,T]}$, defined by
+%     \begin{equation}
+%         L(t) = e^{-\frac{1}{2} \int_\tau^t \theta^2(u) \diff u -\int_\tau^t \theta_u \diff W(u)},
+%         \label{eqn: Girsanov martingale}
+%     \end{equation}
+%     is a martingale under the $\Prob$-measure. Moreover, under the probability measure $\Q$ equivalent to $\Prob$ on $\F_T$, defined by
+%     \begin{equation*}
+%         \frac{\diff \Q}{\diff \Prob} = L(T) \quad \text{on } \F_T,
+%     \end{equation*}
+%     the process
+%     \begin{equation}
+%         W^{\Q}(t) = W^\Prob (t) + \int^t_\tau \theta(u) \diff u
+%     \end{equation}
+%     is an $\F_t$-Brownian motion under $\Q$.
+% \end{theorem}
+% \begin{remark}
+%     The above result is a slight modification of the theorem given in \cite[Theorem 5]{jarrow2018continuous}. In essence, however, both theorems are equivalent.
+% \end{remark}
+
+% \section{Lévy-Itô Calculus}
+
+% \begin{theorem}[{\cite[Theorem 1.14]{oksendal2007applied}}, Itô's Lemma in One-dimension]
+% \label{trm: Itô's Lemma in One-dimension}
+%     Suppose $X(t) \in \R$ is an Itô-Lévy process of the form 
+%     \begin{equation*}
+%         \diff X(t) = \mu(t,X(t^-)) \diff t + \sigma(t,X(t^-)) \diff W(t) + \int_\R \gamma(t,X(t^-),z) \tilde N (\diff t, \diff z),
+%     \end{equation*}
+%     where 
+%     \begin{equation*}
+%         \tilde N(\diff t, \diff z) = 
+%         \begin{cases} 
+%             N(\diff t, \diff z) - \nu(\diff z) \diff t & \text{if } |z| < 1 \\
+%             N(\diff t, \diff z) & \text{if } |z| \geq 1.
+%         \end{cases}
+%     \end{equation*}
+%     Let $f \in C^2(\R^2)$ and define $Y(t) = f(t,X(t))$. Then $Y(t)$ is again an Itô-Lévy process and 
+%     \begin{align*}
+%         \diff Y(t) =& \; \partial_t f(t,X(t)) \diff t + \partial_x (t,X(t)) \big[\mu(t,X(t)) \diff t + \sigma(t,X(t)) \diff W(t)\big] + \frac{1}{2} \sigma^2(t,X(t)) \partial_{xx} f(t,X(t)) \diff t \\
+%         & + \int_{|z|<1} \Big \{ f\big(t,X(t^-)+\gamma(t,X(t^-),z)\big) - f(t,X(t^-)) - \partial_x f(t,X(t^-))\gamma(t,X(t^-),z) \Big\} \nu(\diff z) \diff t \\
+%         &+ \int_\R \Big\{ f\big(t,X(t^-)+\gamma(t,X(t^-),z)\big) - f(t,X(t^-)) \Big\} \tilde N(\diff t, \diff z).
+%     \end{align*}
+% \end{theorem}
+
+% \begin{Theorem}[Itô Isometry]
+%     ...
+% \end{Theorem}

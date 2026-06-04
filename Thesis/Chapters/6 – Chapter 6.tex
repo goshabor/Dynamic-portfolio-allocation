@@ -1,0 +1,214 @@
+%\section{Numerical Solution of the QVI}
+\label{section: Numerical solution of the QVI}
+This chapter describes the finite-difference scheme used to approximate the QVI introduced in Chapters \ref{section: Viscosity Solution for Impulse Control: Existence} and \ref{section: Viscosity Solution for Impulse Control: Uniqueness}. We closely follow \cite{azimzadeh2018impulsecontrolfinancenumerical} and, under additional assumptions, derive the explicit-impulse scheme, which is a finite-difference scheme, used to solve the QVI in lower dimensions. Because finite-difference schemes for QVIs require convergence arguments slightly different from those found in \textcite{barlessouganidis1991convergence}, we do not prove convergence, monotonicity, stability, and nonlocal consistency of the scheme. We instead refer the interested reader to \cite{azimzadeh2018impulsecontrolfinancenumerical, azimzadeh2018convergence, azimzadeh2016weakly} for a thorough  analysis of the explicit-impulse scheme.
+
+
+\section{Preliminaries}
+\label{section: Preliminaries (Ch.6)}
+Recall the QVI \eqref{eqn: QVI}. For the reader's convenience, we write it again as 
+\begin{align}
+    \min \{-(\partial_t v + \InfinitesimalGenerator v + f), v - \InterveneOper v \} = 0 & \quad \text{in } [0,T) \times \Solvency \nonumber \\
+    \min \{v-g, v - \InterveneOper v \} = 0 & \quad \text{in } [0,T) \times (\R^d \backslash \Solvency ) \tag{QVI} \label{eqn: QVI (Ch.6)} \\
+    v = \max \{g, \InterveneOper g\} & \quad \text{on } \{T\} \times \R^d \nonumber,
+\end{align}
+where $v$ is the value function and the intervention operator is defined as 
+\begin{equation*}
+    \InterveneOper v(t,x) := \sup_{\substack{\zeta \in \mathcal{Z}(t,x)}} \{v(t,\Gamma(t,x,\zeta)) + K(t,x,\zeta)\}.
+\end{equation*}
+Here $\Gamma$ is the post-intervention state (see Definition \ref{def: Post-intervention Function}) and $K(t,x,\zeta)$ is the cost of intervening. 
+
+\subsection{Simplification of the QVI}
+\label{section: Simplification of the QVI}
+To apply the numerical scheme presented in \cite{azimzadeh2018impulsecontrolfinancenumerical}, we reduce \eqref{eqn: QVI (Ch.6)} to a one-dimensional, finite-horizon QVI. The simplification consists of the following points: First, the controlled process $X^{(\alpha)}$ is one-dimensional, so the spatial variable is denoted by $x \in \R$. Secondly, there is no jump term in the diffusion dynamics. Accordingly, the Lévy measure is zero, i.e. $\nu \equiv 0$, and the integral term in the infinitesimal generator $\InfinitesimalGenerator$ disappears. Thirdly, the numerical problem is posed on a fixed and truncated spatial domain. As a consequence, we only consider the QVI on $\Solvency$ (or on a truncated domain inside $\Solvency)$ and apply an artificial Neumann boundary condition. We will revisit this new boundary condition later. Finally, the bequest function is taken to be a function solely depending on the state, that is $g(t,x) \equiv g(x)$. 
+
+With these conventions, the QVI simplifies to
+ \begin{align}
+     \min \{ -(\partial_t v + \InfinitesimalGenerator v + f), v - \InterveneOper v \} = 0 & \quad \text{in } [0,T) \times \Solvency \label{eqn: QVI I (Ch.6)} \\
+     \min \{v - g, v - \InterveneOper v\} = 0 &  \quad \text{in } \{T\} \times \Solvency \label{eqn: QVI II (Ch.6)}.
+ \end{align}
+The infinitesimal generator is now the local second-order operator
+ \begin{equation*}
+     \InfinitesimalGenerator v (t,x) = \mu(t,x) \partial_x v(t,x) + \frac{1}{2} \sigma^2(t,x) \partial_{xx} v(t,x),  
+ \end{equation*}
+ for $(t,x) \in [0,T] \times \Solvency$. 
+
+\subsection{Terminal condition}
+\label{section: Terminal condition}
+The terminal condition \eqref{eqn: QVI II (Ch.6)} can be written as
+\begin{equation}
+    v(T,x) = \max \{ g(T,x), \InterveneOper v(T,x) \}, \quad \text{for } x \in \Solvency,
+    \label{eqn: (2.1) in Azimzadeh}
+\end{equation}
+which is an implicit terminal condition, because $v(T,\cdot)$ appears on both sides. For a numerical scheme that proceeds backward in time (beginning at the terminal condition), it is preferable to start from a known terminal condition rather than solving an additional nonlinear problem at time $T$. A simplification of the terminal condition is therefore needed. 
+
+For a function $g$ depending on the spatial variable only, a time-$T$ intervention reads as
+\begin{equation*}
+    \InterveneOper g(x) =  \sup_{\zeta \in \mathcal{Z}(T,x)} \big\{ g(\Gamma(T,x,\zeta)) + K(T,x,\zeta) \big\}.
+\end{equation*}
+We assume the pointwise inequality 
+\begin{equation}
+    \InterveneOper g(x) \leq g, \quad \text{for } x\in \Solvency.
+    \label{eqn: (2.2) in Azimzadeh}
+\end{equation}
+Then, $v(T,x) = g(x)$ solves \eqref{eqn: (2.1) in Azimzadeh}, and the terminal condition reduces to
+\begin{equation*}
+    v(T,x) = g(x), \quad \text{for } x \in \Solvency.
+\end{equation*}
+Assumption \eqref{eqn: (2.2) in Azimzadeh} means that an intervention at the final time cannot improve the terminal payoff. In financial problems with transaction costs, this assumption can be interpreted as follows: a last-instant transaction pays its cost but leaves no remaining time in which the new position can generate additional value. 
+
+\subsection{Numerical grid}
+\label{section: Numerical grid}
+As the known initial condition in the QVI is the terminal condition at time $T$, it is natural to let the scheme evolve backwards in time, beginning at $t=T$. Let $N_t \geq 2$ be a positive integer and define the uniform grid
+\begin{equation*}
+    \Delta t := \frac{T-t}{N_t}, \quad t_n := T - n \Delta t, \quad \text{for } n = 0, 1, \ldots, N_t,
+\end{equation*}
+so that $t_0=T$ and $t_{N_t}=t$.
+
+Assume first that the computational spatial domain is the bounded interval $\mathcal{S}=(a,b)$\footnote{If the original solvency set is unbounded, this open interval is to be understood as a truncation.}. Let $N_x \geq 2$ be a positive integer and define the uniform spatial grid
+\begin{equation*}
+    \Delta x := \frac{b-a}{N_x}, \quad x_i := a + i \Delta x, \quad \text{for } i = 0, 1, \ldots, N_x. 
+\end{equation*}
+We write 
+\begin{equation*}
+    V_i^n \approx v(t_n,x_i), \quad V^n := (V_0^n, \ldots ,V_{N_x}^n)^\top. 
+\end{equation*}
+For brevity, we also use the notation 
+\begin{equation*}
+    \mu_i^n := \mu(t_n,x_i), \quad \sigma_i^n := \sigma(t_n,x_i), \quad f_i^n := f(t_n,x_i).
+\end{equation*}
+Finally, the terminal condition is imposed by
+\begin{equation*}
+    V_i^0 = g(x_i), \quad \text{for } i = 0, 1, \ldots, N_x.  
+\end{equation*}
+
+\begin{remark}
+    Throughout this chapter, we have kept the numerical grid uniform. It is worth noting, however, that the same construction can be extended to non-uniform grids, provided that the finite-difference stencils and interpolation weights are modified accordingly.
+\end{remark}
+
+\subsection{Stencils used}
+\label{section: Stencils used}
+The time derivative $\partial_t v$ in \eqref{eqn: QVI I (Ch.6)} is discretised by
+\begin{equation}
+    \partial_t v(t_n,x_i) \approx \frac{v(t_n+\Delta t, x_i) - v(t_n,x_i)}{\Delta t} = \frac{v(t_{n-1}, x_i) - v(t_n,x_i)}{\Delta t} \approx \frac{V_i^{n-1}-V_i^n}{\Delta t}.
+    \label{eqn: time stencil}
+\end{equation}
+For the second derivative $\partial_{xx}v$, we write $\partial_{xx}v(t_n,x_i) \approx (\mathcal{D}_2V^n)_i$, where $\mathcal{D}_2$ is the centered three-point approximation. We impose the artificial Neumann boundary condition $\partial_{xx}v(t,x_0) = \partial_{xx}v(t,x_{N_x}) = 0$, so that, for $U=(U_0, \ldots, U_{N_x})^\top$, 
+\begin{equation}
+    (\mathcal{D}_2U)_i =
+    \begin{cases}
+        \dfrac{U_{i+1}-2U_i+U_{i-1}}{(\Delta x)^2}, & \text{if } 0 < i < M, \\[1ex]
+        0, & \text{otherwise}.
+    \end{cases}
+    \label{eqn: second derivative stencil}
+\end{equation}
+
+In many implicit schemes, the discretisation of the first-order spatial derivative $\partial_x v$ is done via an upwind stencil. However, in the explicit-impulse scheme, rather than using an upwind scheme, the first-order spatial derivative $\partial_x v$ and the drift term are handled through a semi-Lagrangian approach. A more detailed derivation of this approach can be found in Chapter \ref{section: The explicit-impulse scheme}.
+
+
+\subsection{Intervention operator}
+\label{section: Intervention operator}
+
+We begin by recalling that the intervention operator is non-local as the the value of $\InterveneOper v(t,x)$ depends on the value of $v$ at the post-intervention point $\Gamma(t,x,\zeta)$, which need not be a grid point. In light of this, we therefore combine a finite approximation of the impulse with spatial interpolation.
+
+For a vector $U=(U_0,\ldots,U_M)^\top$, define the piecewise linear interpolation operator $\mathcal{I}_{\Delta x}$ by
+\begin{equation}
+     (\mathcal{I}_{\Delta x} U)(x)=
+     \begin{cases}
+        U_0, & \text{if } x \leq x_0, \\[1ex]
+        w_k \, U_{k+1} + (1-w_k) U_k, & \text{if } x_k < x < x_{k+1} \quad \text{for } k=0,\ldots,N_x, \\[1ex]
+        U_M, & \text{if } x \geq x_{N_x},
+    \end{cases}
+    \label{eqn: interpolation operator chapter 6}
+\end{equation}
+where $w_k \in (0,1)$ denotes the one-dimensional interpolation weight and is given by
+\begin{equation*}
+    w_k := \frac{x-x_k}{x_{k+1}-x_k}.
+\end{equation*}
+The first and last cases in \eqref{eqn: interpolation operator chapter 6} are included to prevent extrapolation beyond the domain boundary.
+
+Let $\mathcal{Z}_{\Delta x}(t_n,x_i)$ be a finite, non-empty subset of $\mathcal{Z}(t_n,x_i)$ used to approximate the admissible impulse set. The discrete intervention operator is then defined by
+\begin{equation}
+    (\mathcal{M}_n U)_i := \max_{\zeta \in \mathcal{Z}_{\Delta x}(t_n,x_i)}
+    \left\{(\mathcal{I}_{\Delta x}U)\big(\Gamma(t_n,x_i,\zeta)\big) + K(t_n,x_i,\zeta)\right\}.
+    \label{eqn: discrete intervention operator chapter 6}
+\end{equation}
+The maximum is well-defined here because $\mathcal{Z}_{\Delta x}(t_n,x_i)$ is finite by assumption. The admissible-impulse set is usually chosen so that it becomes denser as the grid is refined. If $\Gamma(t_n,x_i,\zeta)$ lies between two grid points, \eqref{eqn: interpolation operator chapter 6} gives the interpolated continuation value. If it lies outside the domain of interest, the value is imposed to be the nearest boundary value.
+
+
+\section{The explicit-impulse scheme}
+\label{section: The explicit-impulse scheme}
+In \cite{azimzadeh2018impulsecontrolfinancenumerical}, the author introduces three schemes for HJBVQI's: the direct control scheme, the penalty scheme, and the explicit-impulse scheme. The first two schemes lead to nonlinear systems and are usually solved by policy iteration, for instance Howard's policy iteration algorithm \cite{bokanowski2009some, howard1960dynamic}, or the $\epsilon$-policy iteration algorithm {\cite[Chapter 3]{azimzadeh2018impulsecontrolfinancenumerical}}. However, for the finite-horizon QVI system in \eqref{eqn: QVI I (Ch.6)} and \eqref{eqn: QVI II (Ch.6)}, applying the explicit-impulse scheme is preferable because each time step reduces to a linear system and because we omitted continuous stochastic controls. 
+
+Recall \eqref{eqn: QVI I (Ch.6)} with terminal condition $v(T,x) = g(x)$. For some smooth function $\varphi \in C^{1,2}([0,T] \times \R^d)$, a Taylor expansion about $(t,x)$ gives
+\begin{align*}
+    \varphi(t + \Delta t, x + \mu(t,x) \Delta t) = \varphi(t,x) + \partial_t \varphi(t,x) \Delta t + \mu(t,x) \partial_x \varphi(t,x) \Delta t + \mathcal{O}\big((\Delta t)^2 \big).
+\end{align*}
+Equivalently, 
+\begin{equation*}
+    \partial_t \varphi(t,x) + \mu(t,x) \partial_x \varphi(t,x) = \frac{\varphi(t + \Delta t, x + \mu(t,x) \Delta t) - \varphi(t,x)}{\Delta t} + \mathcal{O}(\Delta t). 
+\end{equation*}
+On the uniform numerical grid proposed in Chapter \ref{section: Numerical grid}, this motivates the approximation
+\begin{align}
+    \partial_t v(t_n,x_i) + \mu(t_n,x_i) \partial_x v(t_n,x_i) & \approx \frac{v(t_n + \Delta t, x_i + \mu_i^n \Delta t) - v(t_n,x_i)}{\Delta t} \nonumber \\
+    & = \frac{v(t_{n-1}, x_i + \mu_i^n \Delta t) - v(t_n,x_i)}{\Delta t}. \label{eqn: between (2.17) and (2.18) in Azimzadeh}
+\end{align}
+Since the spatial point $x_i + \mu_i^n \Delta t$ is generally not a grid point, we use the interpolant from \eqref{eqn: interpolation operator chapter 6}, so that \eqref{eqn: between (2.17) and (2.18) in Azimzadeh} becomes
+\begin{equation*}
+    \partial_t v(t_n,x_i) + \mu(t_n,x_i) \partial_x v(t_n,x_i) \approx \frac{(\mathcal{I}_{\Delta x}V^{n-1})(x_i+\mu_i^n \Delta t) - V_i^n}{\Delta t}.
+    \label{eqn: (2.18) in Azimzadeh}
+\end{equation*}
+The second derivative in the QVI is approximated by the finite-difference operator $\mathcal D_2$ defined in \eqref{eqn: second derivative stencil}. The impulse term is treated explicitly in time, so the intervention operator is applied to $V^{n-1}$ rather than to the unknown vector $V^n$. A substitution into \eqref{eqn: QVI I (Ch.6)} gives
+\begin{align*}
+    0 = \min \bigg\{ - \left( \frac{(\mathcal{I}_{\Delta x} V^{n-1})(x_i+\mu_i^n \Delta t) - V_i^n}{\Delta t} + \frac{1}{2} (\sigma_i^n)^2 (\mathcal{D}_2 V^n)_i + f_i^n \right), \\
+    V_i^n - (\mathcal{M}_n V^{n-1})_i \bigg\},
+\end{align*}
+which is equivalent to
+\begin{align}
+    0 = \max \bigg\{ (\mathcal{I}_{\Delta x} V^{n-1})(x_i+\mu_i^n \Delta t) - V_i^n + \frac{1}{2} (\sigma_i^n)^2 (\mathcal{D}_2 V^n)_i \Delta t + f_i^n \Delta t, \nonumber \\
+    (\mathcal{M}_n V^{n-1})_i - V_i^n \bigg\},
+    \label{eqn: Num. scheme temp. result}
+\end{align}
+because $\Delta t > 0$. 
+
+Now the vector $V^n$ in \eqref{eqn: Num. scheme temp. result} is unknown and to isolate it on the left-hand side, we add an error term $\mathcal{O}(\Delta t)$ in the form of $\frac{1}{2}(\sigma_i^n)^2 (\mathcal{D}_2 V^n)_i \Delta t$ to the impulse branch in \eqref{eqn: Num. scheme temp. result}. In other words,
+\begin{align*}
+    0 &= \max \bigg\{ (\mathcal{I}_{\Delta x} V^{n-1})(x_i+\mu_i^n \Delta t) - V_i^n + \frac{1}{2} (\sigma_i^n)^2 (\mathcal{D}_2 V^n)_i \Delta t + f_i^n \Delta t, \\
+    & \qquad \qquad \qquad \qquad \qquad \qquad (\mathcal{M}_n V^{n-1})_i - V_i^n + \frac{1}{2} (\sigma_i^n)^2 (\mathcal{D}_2 V^n)_i \Delta t \bigg\} \\ 
+    &= \max \left\{ (\mathcal{I}_{\Delta x} V^{n-1})(x_i+\mu_i^n \Delta t) + f_i^n \Delta t, (\mathcal{M}_n V^{n-1})_i - V_i^n \right\}\\ 
+    & \quad - V_i^n + \frac{1}{2} (\sigma_i^n)^2 (\mathcal{D}_2 V^n)_i \Delta t,
+\end{align*}
+Hence, the explicit-impulse scheme is
+\begin{align}
+    V_i^n - \frac{1}{2} (\sigma_i^n)^2 (\mathcal{D}_2 V^n)_i \Delta t = \max \left\{ (\mathcal{I}_{\Delta x} V^{n-1})(x_i+\mu_i^n \Delta t) + f_i^n \Delta t, (\mathcal{M}_n V^{n-1})_i - V_i^n \right\},
+    \label{eqn: (2.20) in Azimzadeh}
+\end{align}
+for $n=1, \ldots, N_t$ and $i=0,1,\ldots, N_x$. 
+
+Finally, note that \eqref{eqn: (2.20) in Azimzadeh} is the $i$-th row of the linear system
+\begin{equation}
+    A^nV^n = y^n,
+    \label{eqn: (2.21) in Azimzadeh}
+\end{equation}
+where $y_i^n$ is given by
+\begin{equation*}
+    y_i^n := \max \big\{ (\mathcal{I}_{\Delta x} V^{n-1})(x_i+\mu_i^n \Delta t) + f_i^n \Delta t, (\mathcal{M}_n V^{n-1})_i \big\},
+\end{equation*}
+and the matrix $A^n$ by
+\begin{equation*}
+    A^n = I + \frac{\Delta t}{2 (\Delta x)^2}
+    \begin{pmatrix}
+        0 \\
+        -(\sigma_1^n)^2 & 2(\sigma_1^n)^2 & -(\sigma_1^n)^2 \\
+        & -(\sigma_2^n)^2 & 2(\sigma_2^n)^2 & -(\sigma_2^n)^2 \\
+        & & \ddots & \ddots & \ddots \\
+        & & & -(\sigma_{M-1}^n)^2 & 2(\sigma_{M-1}^n)^2 & -(\sigma_{M-1}^n)^2 \\
+        & & & & & 0
+    \end{pmatrix}
+    %\label{eqn: (2.22) in Azimzadeh}
+\end{equation*}
+on a uniform grid. The matrix $A^n$ is strictly diagonally dominant, i.e. 
+\begin{equation*}
+    |a_{jj}| > \sum_{k \neq j} |a_{jk}| \quad \text{for all } j = 1, \ldots, N_x + 1.
+\end{equation*}
+Hence, by \cite[Theorem 1.21]{varga2000matrix}, $A^n$ by is non-singular for every $n = 1, \ldots, N_t$ and, as such, invertible, meaning that the linear system in \eqref{eqn: (2.21) in Azimzadeh} has a solution and we can recover $V^n$. Moreover, the right-hand side $y^n$ depends only on the known vector $V^{n-1}$. Therefore, each time step consists of computing the semi-Lagrangian continuation values, evaluating the discrete intervention operator, and solving the linear system \eqref{eqn: (2.21) in Azimzadeh}. 
+
