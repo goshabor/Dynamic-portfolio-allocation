@@ -1,39 +1,9 @@
 %\section{Data and Calibration Results}
+This appendix presents European call option and stock data used as well as the estimated marginal parameters from the calibration procedure presented in Appendix \ref{appendix: Calibration Procedure}. 
+
 \section{Data}
 \label{appendix: Data}
-The data used for calibration are obtained from the LSEG Workspace terminal. As such, the data set is assumed to be clean, and no additional data preprocessing is performed. Stock price data are collected over the period from 2024‑05‑14 to 2026‑05‑13 at a daily frequency at market close, resulting in a total of 498 observations per stock. Option prices are collected on 2026‑05‑13 at market close, with times to maturity of at most one year. An overview of the collected data is provided in Tables \ref{tab: stock data} and \ref{tab: option-sample-overviews}.
-
-\begin{table}[h]
-    \centering
-    \begin{tabular}{lcrr}
-        \toprule
-        Asset & Ticker & Initial Price & Final Price \\
-        \midrule
-        ABB Ltd & ABBN & 46.88 & 82.86 \\
-        Alcon AG & ALCC & 73.06 & 49.61 \\
-        Compagnie Financière Richemont SA & CFR & 155.75 & 156.55 \\
-        Galderma Group AG & GALD & 97.95 & 158.35 \\
-        Geberit AG & GEBN & 597.20 & 503.40 \\
-        Givaudan SA & GIVN & 3997.00 & 2683.00 \\
-        Holcim AG & HOLN & 49.50 & 76.26 \\
-        Lonza Group AG & LONN & 572.20 & 474.20 \\
-        Nestlé SA & NESN & 85.21 & 76.88 \\
-        Novartis AG & NOVN & 90.52 & 116.80 \\
-        Partners Group Holding AG & PGHN & 1187.50 & 883.60 \\
-        Roche Holding AG & ROPC & 259.30 & 320.00 \\
-        Sandoz Group AG & SDZ & 38.15 & 67.76 \\
-        SGS SA & SGSN & 85.70 & 84.68 \\
-        Sika AG & SIKA & 217.80 & 140.95 \\
-        Swiss Life Holding AG & SLHN & 826.20 & 837.60 \\
-        Swisscom AG & SCMN & 538.00 & 678.00 \\
-        Swiss Re AG & SRENH & 147.25 & 119.45 \\
-        UBS Group AG & UBSG & 27.23 & 36.22 \\
-        Zurich Insurance Group AG & ZURN & 573.00 & 563.00 \\
-        \bottomrule
-    \end{tabular}
-    \caption{Summary of stock price data from 2024-05-14 through 2026-05-13. Prices are quoted in the Swiss Franc (CHF).}
-    \label{tab: stock data}
-\end{table}
+The data used for calibration are obtained from the LSEG Workspace terminal. As such, the data set is assumed to be clean, and no additional data preprocessing is performed. Stock price data are collected over the period from 2024‑05‑14 to 2026‑05‑13 at a daily frequency at market close, resulting in a total of 498 observations per stock. Option prices are collected on 2026‑05‑13 at market close, with times to maturity of at most one year. An overview of the collected data is provided in Tables \ref{tab: stock data} and \ref{tab: option-sample-overviews}, while the data itself can be found in \cite{mycode}.
 
 \begingroup
 \scriptsize
@@ -237,6 +207,38 @@ The data used for calibration are obtained from the LSEG Workspace terminal. As 
 
 \endgroup
 
+\begin{table}[h]
+    \centering
+    \begin{tabular}{lcrr}
+        \toprule
+        Asset & Ticker & Initial Price & Final Price \\
+        \midrule
+        ABB Ltd & ABBN & 46.88 & 82.86 \\
+        Alcon AG & ALCC & 73.06 & 49.61 \\
+        Compagnie Financière Richemont SA & CFR & 155.75 & 156.55 \\
+        Galderma Group AG & GALD & 97.95 & 158.35 \\
+        Geberit AG & GEBN & 597.20 & 503.40 \\
+        Givaudan SA & GIVN & 3997.00 & 2683.00 \\
+        Holcim AG & HOLN & 49.50 & 76.26 \\
+        Lonza Group AG & LONN & 572.20 & 474.20 \\
+        Nestlé SA & NESN & 85.21 & 76.88 \\
+        Novartis AG & NOVN & 90.52 & 116.80 \\
+        Partners Group Holding AG & PGHN & 1187.50 & 883.60 \\
+        Roche Holding AG & ROPC & 259.30 & 320.00 \\
+        Sandoz Group AG & SDZ & 38.15 & 67.76 \\
+        SGS SA & SGSN & 85.70 & 84.68 \\
+        Sika AG & SIKA & 217.80 & 140.95 \\
+        Swiss Life Holding AG & SLHN & 826.20 & 837.60 \\
+        Swisscom AG & SCMN & 538.00 & 678.00 \\
+        Swiss Re AG & SRENH & 147.25 & 119.45 \\
+        UBS Group AG & UBSG & 27.23 & 36.22 \\
+        Zurich Insurance Group AG & ZURN & 573.00 & 563.00 \\
+        \bottomrule
+    \end{tabular}
+    \caption{Summary of stock price data from 2024-05-14 through 2026-05-13. Prices are quoted in the Swiss Franc (CHF).}
+    \label{tab: stock data}
+\end{table}
+
 \section{Calibration results}
 \label{appendix: calibration results}
 \subsection{Estimated parameters}
@@ -274,7 +276,7 @@ To estimate the parameters $\mu$, $\sigma$, $\theta$, and $\nu$, we use the cali
     \label{tab: parameter estimates percent appendix}
 \end{table}
 
-\begin{figure}[h]
+\begin{figure}[!htbp]
   \centering
   \includegraphics[width=\textwidth]{Plots/Calibration/log_return_corr_matrix.png}
   \caption{Log-return correlation matrix}
@@ -295,7 +297,10 @@ The error metrics used to evaluate the estimated parameters across all strikes a
     \text{MAPE} = \frac{100}{MN} \sum_{m=1}^M\sum_{n=1}^N \left| \frac{C_{T_m}^{\text{Model}}(s,K_n) - C_{m,n}^{\text{Market}}}{C_{m,n}^{\text{Market}}} \right|.
     \label{eqn: MAPE}
 \end{equation}
-The error metrics above have different interpretations. MAE captures the average magnitude of pricing deviations without considering the direction of the deviation. It provides a measure for overall model accuracy. RMSE emphasizes larger errors, making it particularly sensitive to large mispricings. Finally, MAPE expresses errors relative to market prices, making it particularly useful for assessing whether low-priced instruments are accurately matched. Pricing errors for each underlying can be found in Table~\ref{tab: error-metric-overviews}. Note that pricing errors are relatively small across all underlying assets except for Parnters Group Holding (PGHN).
+
+The error metrics \eqref{eqn: MAE}--\eqref{eqn: MAPE} have different interpretations. MAE captures the average magnitude of pricing deviations without considering the direction of the deviation. It provides a measure for overall model accuracy. RMSE emphasizes larger errors, making it particularly sensitive to large mispricings. Finally, MAPE expresses errors relative to market prices, making it particularly useful for assessing whether low-priced instruments are priced accurately. 
+
+Pricing errors for each underlying can be found in Table~\ref{tab: error-metric-overviews}. Note that pricing errors are relatively small across all underlying assets except Partners Group Holding (PGHN).
 
 \begingroup
 \scriptsize

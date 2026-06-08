@@ -1,6 +1,6 @@
 %\section{Impulse Control of Jump-Diffusion Processes}
 \label{section: Impulse Control of Jump-Diffusion Processes}
-This chapter formulates the finite-horizon impulse control problem for jump-diffusion processes, where the uncontrolled jump-diffusion $X$ introduced in Chapter \ref{section: Preliminaries} is turned into a controlled process through impulse controls. The theory presented in this chapter is taken from \cite[Chapters 9 and 10]{oksendal2007applied}. However, some proofs and intermediate arguments have been expanded in order to provide more clarity to the reader. In Chapter \ref{section: A Primer on Deep Reinforcement Learning}, we present the impulse control problem and state a verification theorem. Chapter \ref{section: Dynamic Programming Principle and Related Results} then reformulates the impulse control problem as an iterated optimal stopping time problem using the dynamic programming principle.
+This chapter formulates the finite-horizon impulse control problem for jump-diffusion processes, where the uncontrolled jump-diffusion $X$ introduced in Chapter \ref{section: Preliminaries} is turned into a controlled process through impulse controls. The theory presented in this chapter is taken from \cite[Chapters 9 and 10]{oksendal2007applied}. However, some proofs and intermediate arguments have been expanded in order to provide more clarity to the reader. In Chapter \ref{section: A Primer on Impulse Control Problems}, we present the impulse control problem and state a verification theorem. Chapter \ref{section: Dynamic Programming Principle and Related Results} reformulates the impulse control problem as an iterated optimal stopping time problem using the dynamic programming principle.
 
 \section{A primer on impulse control}
 \label{section: A Primer on Impulse Control Problems}
@@ -30,9 +30,8 @@ In a finite-horizon impulse control problem, the process $X$ is controlled with 
 \end{definition}
 
 \begin{definition}[Post-Jump, Pre-Intervention State]
-% Må kanskje skrive om at jeg antar at jeg kan ta impulser etter hopp?
 \label{def: Post-Jump, Pre-Intervention State}
-    Let $\alpha=\{(\tau_j, \zeta_j)\}_{j=1}^M$, where $M \leq \infty$, be as in Definition \ref{def: Impulse Control}. We denote by $\check{X}^{(\alpha)}$ the state immediately after any exogenous Poisson jump at time $\tau_j$, but before the possible impulse at $\tau_j$, and define it as
+    Let $\alpha$ be the impulse control from Definition \ref{def: Impulse Control}. We denote by $\check{X}^{(\alpha)}$ the state immediately after any exogenous Poisson jump at time $\tau_j$, but before the possible impulse at $\tau_j$, and define it as
     \begin{equation*}
         \check{X}^{(\alpha)}(\tau_j^-) = \Xa (\tau_j^-) + \Delta_N X(\tau_j),
     \end{equation*}
@@ -51,7 +50,7 @@ In a finite-horizon impulse control problem, the process $X$ is controlled with 
 
 \begin{definition}[Post-intervention Function]
 \label{def: Post-intervention Function}
-    Let $(t,x) \in [0,T] \times \Solvency$ be fixed, $\Solvency \subseteq \R^d$ be the state space and $\mathcal Z$ the set of admissible impulses. The post-intervention function
+    Let $(t,x) \in [0,T] \times \Solvency$ be fixed, $\Solvency \subset \R^d$ be the state space and $\mathcal Z$ the set of admissible impulses. The post-intervention function
     \begin{equation*}
         \Gamma: [0,T) \times \Solvency \times \mathcal Z(t,x) \rightarrow \Solvency
     \end{equation*}
@@ -64,7 +63,7 @@ In a finite-horizon impulse control problem, the process $X$ is controlled with 
     We note that in \cite{oksendal2007applied}, the function $\Gamma$ is assumed to be a Borel-measurable function. In \cite{seydel2010generalexistenceuniquenessviscosity}, however, a stronger assumption\footnote{Note that any continuous function is Borel-measurable, but the converse implication does not always hold.} of continuity is needed to prove the existence and uniqueness of a viscosity solution. We therefore adopt the stronger continuity assumption on $\Gamma$.
 \end{remark}
 
-With Definitions \ref{def: Impulse Control}, \ref{def: Post-Jump, Pre-Intervention State}, and \ref{def: Post-intervention Function} in mind, suppose now that at any time $t$ and any state $x$, we are free to intervene and give the system an impulse $\zeta \in \mathcal Z \subset \R^d$. Here $\mathcal Z$ denotes the set of admissible impulse values, and is assumed to be non-empty and given at any time $t$ and any state $x$. Let $\alpha$ denote an impulse control. Furthermore, suppose that sending an impulse of size $\zeta$ to the state $X(\tau^-)$ immediately moves the state from $X(\tau^-)$ to $\Gamma(\tau,\check{X}^{(\alpha)}(\tau^-),\zeta) \in \Solvency$. Then, for some initial time $0 \leq t \leq T$, we define the corresponding controlled process $\Xa$ by
+Let $\alpha=\{\tau_j,\zeta_j\}_{j \geq 1}^M$, $m\leq \infty$, be the impulse control from Definition \ref{def: Impulse Control}. Each of the impulse values $\zeta$ satisfies $\zeta \in \mathcal Z$, where $\mathcal Z$ denotes the non-empty set of admissible impulse values. Suppose now that at any time $t$, we can control the stochastic process $X$ using the control $\alpha$, and denote by $\Xa$ the controlled process.  Furthermore, suppose that applying an impulse $\zeta$ to the state $X(\tau^-)$ immediately moves the state from $\Xa(\tau^-)$ to $\Gamma(\tau,\check{X}^{(\alpha)}(\tau^-),\zeta) \in \Solvency$. Then, for some initial time $0 \leq t \leq T$, we define the controlled process $\Xa$ by
 \begin{align}
     & \Xa (t^-) = x \quad \text{and } \quad \Xa(s) = X(s), \quad \text{for } t \leq s \leq \tau_1, \label{eqn: (9.1.2) in ØS} \\
     & \Xa (\tau_j) = \Gamma(\tau_j, \check{X}^{(\alpha)}(\tau_j^-), \zeta_j), \quad j=1,2, \ldots \label{eqn: (9.1.3) in ØS} \\
@@ -176,7 +175,7 @@ Let $T > 0$ be a fixed, finite time horizon, recall $\tauS$ from Definition \ref
             \end{equation*}
             exists for all $(t,x) \in [0,T) \times \Solvency$ and $\hat{\zeta}(\cdot, \cdot)$ is a Borel measurable selection.
         \end{enumerate}
-        Put $\hat \tau_0 = s$ and define $\hat \alpha= (\hat \tau_1, \hat \tau_2, \cdots; \hat \zeta_1, \hat \zeta_2, \ldots)$ inductively by \newline $\hat \tau_{j+1} = \inf \{ t > \hat \tau_j: \big( t, X^{(\hat a)} \notin D \big) \} \wedge \tau$ and $\hat \zeta_{j+1} = \hat \zeta(\hat \tau_{j+1}, X^{(\hat a_j)}(\hat \tau_{j+1}^-))$ if $\hat \tau_{j+1} < \tau$, where $X^{\hat a_j}$ is the result of applying $\hat a_j:=(\hat \tau_1, \ldots, \hat \tau_j; \hat \zeta_1, \ldots, \hat \zeta_j)$ to $X$. 
+        Put $\hat \tau_0 = s$ and define $\hat \alpha= (\hat \tau_1, \hat \tau_2, \ldots; \hat \zeta_1, \hat \zeta_2, \ldots)$ inductively by $\hat \tau_{j+1} = \inf \{ t > \hat \tau_j: \big( t, X^{(\hat a)} \notin D \big) \} \wedge \tau$ and $\hat \zeta_{j+1} = \hat \zeta(\hat \tau_{j+1}, X^{(\hat a_j)}(\hat \tau_{j+1}^-))$ if $\hat \tau_{j+1} < \tau$, where $X^{\hat a_j}$ is the result of applying $\hat a_j:=(\hat \tau_1, \ldots, \hat \tau_j; \hat \zeta_1, \ldots, \hat \zeta_j)$ to $X$. 
         
         Finally, suppose 
         \begin{enumerate}[label=(\roman*), start=12]
@@ -194,7 +193,7 @@ Let $T > 0$ be a fixed, finite time horizon, recall $\tauS$ from Definition \ref
 \end{proof}
 
 
-\section{The Dynamic Programming Principle}
+\section{Impulse control via dynamic programming}
 \label{section: Dynamic Programming Principle and Related Results}
 % Motivere bruk av iterated stopping times, 
 This section is based on the work of \textcite[Chapter 10.1]{oksendal2007applied}. As the authors argue, in general, an impulse control problem cannot be reformulated as a single optimal stopping problem, because the first intervention action, i.e. the initial intervention time $\tau_1$ and the corresponding impulse $\zeta_1$, affects the subsequent state evolution and therefore changes the structure of all future decisions.
@@ -213,7 +212,7 @@ For $n=1, 2, \ldots,$ let $\AdmissibleSet_n$ denote the set of all $\alpha \in \
 \end{equation*}
 for all $n \in \mathbb N$. This is because truncation removes potential optimal impulses that may have been taken after the $n$-th intervention and reduces the cardinality of the truncated set. Denote the value function of at most $n$ interventions by $v_n$ and define it as
 \begin{equation}
-    v_n(t,x) = \sup_{\alpha_n \in \AdmissibleSet_n} J^{(\alpha)}(t,x), \quad n=1,2, \ldots \;.
+    v_n(t,x) = \sup_{\alpha_n \in \AdmissibleSet_n} J^{(\alpha_n)}(t,x), \quad n=1,2, \ldots \;.
     \label{eqn: value function for at most n interventions}
 \end{equation}
 Finally, to distinguish the time of insolvency related to the non-truncated control $\alpha$ from the one related to the truncated control $\alpha_n$, we write denote these stopping times by $\tauS^{(\alpha)}$ and $\tauS^{(\alpha_n)}$ respectively, and define $\tau^{(\alpha_n)} := \tauS^{(\alpha_n)}\wedge T$ and $\tau^{(\alpha)} := \tauS^{(\alpha)} \wedge T$. The lemma below follows.
@@ -325,8 +324,11 @@ and inductively, for $j=1,2,\ldots,n$,
     \varphi_j(t,x) = \sup_{\tau \in \mathcal{T}_t} \Etx \left[\int_t^{\tau} f\big(s,X(s)\big) \diff s + \InterveneOper \varphi_{j-1}\big(\tau, X(\tau)\big) \right],
     \label{eqn: (10.1.12) in ØS}
 \end{equation}
-where $\mathcal{T}_t$ denotes the set of stopping times $\tau$ satisfying $\tau \leq \tauS \wedge T$ and $j$ denotes the number of interventions left. Equations \eqref{eqn: (10.1.11) in ØS} and \eqref{eqn: (10.1.12) in ØS} are referred to as the iterated optimal stopping representation. We now show that the truncated impulse control problem may indeed be represented by an iterative optimal stopping representation.
-\begin{definition}[{\cite[Definition 2.1]{seydel2010generalexistenceuniquenessviscosity}} Space of Polynomially Bounded Functions] 
+where $\mathcal{T}_t$ denotes the set of stopping times $\tau$ satisfying $\tau \leq \tauS \wedge T$ and $j$ denotes the remaining number of interventions. Equations \eqref{eqn: (10.1.11) in ØS} and \eqref{eqn: (10.1.12) in ØS} are referred to as the iterated optimal stopping representation. 
+
+Our objective now is to show that the iterated optimal stopping representation is an approximation of the truncated impulse control problem \eqref{eqn: value function for at most n interventions}. This result takes shape in Theorem \ref{trm: Theorem 10.2 in ØS}, where Definition \ref{def: Space of Polynomially Bounded Functions} is used.
+
+\begin{definition}[Space of Polynomially Bounded Functions] 
 \label{def: Space of Polynomially Bounded Functions}
     We denote the space of polynomially bounded functions by $\PB = \PB([0,T) \times \R^d)$ and it is the space of all measurable functions $h: [0,T) \times \R^d \rightarrow \R$ such that 
     \begin{equation*}
@@ -334,7 +336,7 @@ where $\mathcal{T}_t$ denotes the set of stopping times $\tau$ satisfying $\tau 
     \end{equation*}
     for a time-independent constant $C_h>0$ and $m \in \mathbb N$. If $m$ is fixed, we write $\PB_m$. 
 \end{definition}
-\begin{theorem}[Iterated optimal stopping representation, see {\cite[Theorem 10.2]{oksendal2007applied}}]
+\begin{theorem}[{\cite[Theorem 10.2]{oksendal2007applied}} Iterated optimal stopping representation]
     \label{trm: Theorem 10.2 in ØS}
     Suppose 
     \begin{equation}
@@ -347,11 +349,11 @@ where $\mathcal{T}_t$ denotes the set of stopping times $\tau$ satisfying $\tau 
     \end{equation*}
 \end{theorem}
 
-Theorem \ref{trm: Theorem 10.2 in ØS} provides a way to formulate the truncated impulse control problem into a sequence of standard optimal stopping problems. In particular, when the controller is restricted to at most $n$ interventions, the value function can be computed via backward recursion. After each intervention, the controller optimally selects when to intervene next and takes the solution from the previous step as the continuation value. This representation lets us replace a single, globally coupled impulse optimisation with an iterated sequence of simpler timing problems. To prove Theorem \ref{trm: Theorem 10.2 in ØS}, a few more auxiliary results are required. We therefore begin by presenting Lemma \ref{lemma: DPP} and Corollary \ref{cor: Corollary 10.5 in ØS}, in which $X$ denotes an uncontrolled stochastic process.
+Theorem \ref{trm: Theorem 10.2 in ØS} formulates the truncated impulse control problem into a sequence of standard optimal stopping problems. In particular, when the controller is restricted to at most $n$ interventions, the value function can be computed by backward recursion. After each intervention, the controller optimally selects when to intervene next and takes the solution from the previous step as the continuation value. This representation lets us replace a single, globally coupled impulse optimisation with an iterated sequence of simpler timing problems. However, to prove Theorem \ref{trm: Theorem 10.2 in ØS}, we need to consider a few auxiliary results about the Dynamic Programming Principle, which are stated in Lemma \ref{lemma: DPP} and Corollary \ref{cor: Corollary 10.5 in ØS}. 
 
-\begin{lemma}[Dynamic Programming Principle (DPP), see {\cite[Lemma 10.3]{oksendal2007applied}}]
+\begin{lemma}[{\cite[Lemma 10.3]{oksendal2007applied}}, Dynamic Programming Principle]
 \label{lemma: DPP}
-    Suppose $G \in \PB([0,T)\times \R^d)$. Define 
+    Let $X$ denote an uncontrolled jump-diffusion process, with $X(t^-)=x$. Suppose $G \in \PB([0,T)\times \R^d)$ and define 
     \begin{equation}
         \psi(t,x) = \sup_{\tau \in \mathcal{T}_t}\E^{(t,x)}\left[ \int_t^\tau f(s,X(s)) \diff s + G(\tau, X(\tau)) \right].
         \label{eqn: (10.1.15) in ØS}
@@ -377,11 +379,12 @@ Theorem \ref{trm: Theorem 10.2 in ØS} provides a way to formulate the truncated
     \end{enumerate}
 \end{lemma}
 \begin{proof}
-    As the proof of Lemma \ref{lemma: DPP} relies on theoretical results that lie beyond the scope of this thesis, we refer the reader to \cite[Section 4]{ishikawa2004optimal} for a complete proof.
+    As the proof of Lemma \ref{lemma: DPP} is based on theoretical results that are beyond the scope of this thesis, we refer the reader to \cite[Section 4]{ishikawa2004optimal} for a complete proof.
 \end{proof}
 
 \begin{corollary}[{\cite[Corollary 10.5]{oksendal2007applied}}]
 \label{cor: Corollary 10.5 in ØS}
+    Let $X$ denote an uncontrolled jump-diffusion process, with $X(t^-)=x$. 
     \begin{enumerate}[label=(\alph*)]
         \item For each given $\tau \in \mathcal{T}_t$, the process 
         \begin{equation*}
@@ -603,12 +606,12 @@ With the help of Lemma \ref{lemma: DPP} and Corollary \ref{cor: Corollary 10.5 i
     \begin{equation*}
         \varphi_n(t,x) \leq \sup_{\alpha_n \in \AdmissibleSet_n} = v_n(y).
     \end{equation*}
-    Combined with \eqref{eqn: (10.1.28) in ØS}, the result above proves Theorem \ref{trm: Theorem 10.2 in ØS}.
+    Combined with \eqref{eqn: (10.1.28) in ØS}, the above result proves Theorem \ref{trm: Theorem 10.2 in ØS}.
 \end{proof}
 
 Theorem \ref{trm: Theorem 10.2 in ØS} shows that the truncated impulse-control problem with at most $x$ interventions can be represented by the iterated optimal stopping sequence $\{\varphi_j\}_{j=0}^n$. More precisely, the iterative optimal stopping approach produces exactly the value function $v_n$ of the truncated problem \eqref{eqn: value function for at most n interventions}.
 
-It remains to connect the truncated impulse control problem with the unrestricted impulse control problem, which is done through the following two corollaries. Corollary \ref{cor: Corollary 10.7 in ØS} combines Lemma \ref{lemma: Lemma 10.1 in ØS} with Theorem \ref{trm: Theorem 10.2 in ØS} to show that the iterated optimal stopping functions \eqref{eqn: (10.1.11) in ØS}--\eqref{eqn: (10.1.12) in ØS} monotonically converge to the value function $v$. Finally, Corollary \ref{cor: Corollary 10.8 in ØS} translates the impulse control problem \eqref{eqn: impulse control problem} into a non-linear optimal stopping problem.
+It remains to connect the truncated impulse control problem with the unrestricted impulse control problem, which is done through the following two corollaries. Corollary \ref{cor: Corollary 10.7 in ØS} combines Lemma \ref{lemma: Lemma 10.1 in ØS} with Theorem \ref{trm: Theorem 10.2 in ØS} to show that the iterated optimal stopping functions \eqref{eqn: (10.1.11) in ØS}--\eqref{eqn: (10.1.12) in ØS} monotonically converge to the value function $v$. Finally, Corollary \ref{cor: Corollary 10.8 in ØS} translates the impulse control problem \eqref{eqn: optimal value function} into a non-linear optimal stopping problem.
 \begin{corollary}[{\cite[Corollary 10.7]{oksendal2007applied}}]
 \label{cor: Corollary 10.7 in ØS}
     Assume $g\geq 0$. Moreover, suppose that $\varphi_n$, defined in \eqref{eqn: (10.1.11) in ØS}--\eqref{eqn: (10.1.12) in ØS}, satisfies condition \eqref{eqn: (10.1.14) in ØS}. Then
@@ -685,4 +688,4 @@ It remains to connect the truncated impulse control problem with the unrestricte
     \end{equation*}
 \end{proof}
 
-We conclude this chapter by noting that, after time discretisation, the dynamic programming principle may be applied to Markov decision process and, consequently, to reinforcement learning (see Chapter \ref{section: Deep Reinforcement Learning for Impulse Control Problems}). As such, the results shown in this section represent the core idea behind large parts of this thesis.
+We conclude this chapter by noting that, after time discretisation, the dynamic programming principle may be applied to Markov decision processes and, consequently, to reinforcement learning. This is done in Chapter \ref{section: Deep Reinforcement Learning for Impulse Control Problems}. As such, the results shown in this section represent the core idea behind much of this thesis.

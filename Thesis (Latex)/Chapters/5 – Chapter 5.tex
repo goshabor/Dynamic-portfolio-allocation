@@ -1,18 +1,18 @@
 %\section{Viscosity Solution for Impulse Control: Uniqueness}
 \label{section: Viscosity Solution for Impulse Control: Uniqueness}
-With the proof of the existence in the previous chapter, we now aim to prove that the previously established viscosity solution is unique. The main result of this chapter is the \textit{Comparison Principle}, which subsequently lets us prove the uniqueness of the viscosity solution. However, the proof of the Comparison Principle requires a few additional assumptions, a transition from the original defintion of the viscosity solution given by Definition \ref{def: Definition 4.1 in Seydel (Viscosity solution)}, and a maximum principle. These topics are treated in Chapters \ref{section: Preliminary Results for the Proof of Uniqueness}, \ref{section: Equivalent Definitions of Viscosity Solutions}, and \ref{section: Maximum Principle} respectively. Chapter \ref{section: Proof of the Uniqueness} then proves the Comparison Principle and the uniqueness result. 
+Having shown in the previous chapter that the value function is a viscosity solution of \eqref{eqn: QVI}, we now prove that it is the unique viscosity solution by means of the \textit{comparison principle}. As the uniqueness argument requires detailed analysis of the integral term in the infinitesimal generator, a few additional assumptions are stated in Section \ref{section: Preliminary Results for the Proof of Uniqueness}. Then, in Sections \ref{section: Equivalent Definitions of Viscosity Solutions} and \ref{section: Maximum Principle}, the original definition of the viscosity solution (see Definition \ref{def: Definition 4.1 in Seydel (Viscosity solution)}) is expressed in terms of functionals and the maximum principle for the parabolic QVI is stated. Finally, the comparison principle and the uniqueness result are proven in Section \ref{section: Proof of the Uniqueness}. 
 
-As in Chapter \ref{section: Viscosity Solution for Impulse Control: Existence}, this chapter closely follows the work of \textcite[Section 5]{seydel2010generalexistenceuniquenessviscosity}. In addition, we also use \cite{barles2008second}. It should be noted that although many of the results provided in this chapter are taken directly from \cite{seydel2010generalexistenceuniquenessviscosity}, some proofs were not as detailed as the ones we provide. Moreover, the parabolic, non-local Jensen-Ishii Lemma \ref{lemma: Parabolic, nonlocal Jensen-Ishii Lemma} we apply to prove the Comparison Principle may be seen as a combination of the works of \textcite[Lemma 1]{barles2008second}, \textcite{jakobsen2006maximum}, and \textcite[Theorem 8.3]{crandall1992user}.
+As in Chapter \ref{section: Viscosity Solution for Impulse Control: Existence}, this chapter closely follows the work of \textcite[Section 5]{seydel2010generalexistenceuniquenessviscosity}. In addition, we also use \cite{barles2008second, jakobsen2006maximum}. It should be noted that although many of the results provided in this chapter are taken directly from \cite{seydel2010generalexistenceuniquenessviscosity}, some proofs did not consider the parabolic case and were therefore not as detailed as the ones we provide.
 
 \section{Preliminary results and further assumptions}
 \label{section: Preliminary Results for the Proof of Uniqueness}
-Throughout this chapter, $v$ no longer denotes the value function, and some other variables may serve new purposes as well. With this in mind, recall the parabolic QVI \eqref{eqn: QVI} and the infinitesimal generator \eqref{eqn: infinitesimal generator (short form)}. As we study the infinitesimal generator $\InfinitesimalGenerator$ more closely in this chapter, we introduce, for $0<\delta<1$, $t \in [0,T)$, $x,p \in \R^d$, $X \in \R^{d \times d}$, and $r,l \in \R$, the following functionals:
-\begin{align*}
-    F(t,x,p,X,l) &= - \frac{1}{2} \Tr\{ \sigma (t,x) \sigma^\top (t,x) X \} - \langle \mu (t,x), p \rangle - f(t,x) - l \\
-    \mathcal{I}^{1,\delta}[t,x,\varphi] &= \int\limits_{|z|<\delta} \big[ \varphi(t,x+\gamma(t,x,z)) - \varphi(t,x) - \langle \nabla_x \varphi (t,x), \gamma(t,x,z) \rangle \big] \nu(\diff z) \\
-    \mathcal{I}^{2,\delta}[t,x,p,\varphi] &= \int\limits_{|z|\geq \delta} \big[ \varphi(t,x+\gamma(t,x,z)) - \varphi(t,x) - \langle p, \gamma(t,x,z) \rangle \ind{|z|<1} \big] \nu(\diff z) \\
-    \mathcal{I}[t,x,\varphi] &= \mathcal I^{1,\delta}[t,x,\varphi] + \mathcal  I^{2,\delta}[t,x,\nabla_x \varphi(t,x),\varphi]. 
-\end{align*}
+Throughout this chapter (and this chapter only), $v$ no longer denotes the value function, $\alpha$ no longer denotes the impulse control, and some other variables may serve new purposes as well. With this in mind, recall the infinitesimal generator \eqref{eqn: infinitesimal generator (short form)} and the parabolic QVI \eqref{eqn: QVI}. As we study the infinitesimal generator $\InfinitesimalGenerator$ more closely in this chapter, we introduce, for $0<\delta<1$, $t \in [0,T)$, $x,p \in \R^d$, $X \in \R^{d \times d}$, and $r,l \in \R$, the following functionals:
+\begin{align}
+    F(t,x,p,X,l) &= - \frac{1}{2} \Tr\{ \sigma (t,x) \sigma^\top (t,x) X \} - \langle \mu (t,x), p \rangle - f(t,x) - l \label{eqn: functional F} \\
+    \mathcal{I}^{1,\delta}[t,x,\varphi] &= \int\limits_{|z|<\delta} \big[ \varphi(t,x+\gamma(t,x,z)) - \varphi(t,x) - \langle \nabla_x \varphi (t,x), \gamma(t,x,z) \rangle \big] \nu(\diff z) \label{eqn: functional I1} \\
+    \mathcal{I}^{2,\delta}[t,x,p,\varphi] &= \int\limits_{|z|\geq \delta} \big[ \varphi(t,x+\gamma(t,x,z)) - \varphi(t,x) - \langle p, \gamma(t,x,z) \rangle \ind{|z|<1} \big] \nu(\diff z) \label{eqn: functional I2} \\
+    \mathcal{I}[t,x,\varphi] &= \mathcal I^{1,\delta}[t,x,\varphi] + \mathcal  I^{2,\delta}[t,x,\nabla_x \varphi(t,x),\varphi]. \label{eqn: functional I} 
+\end{align}
 Then, the problem \ref{eqn: QVI} now reads as
 \begin{align}
     \min \Big \{ F\big(t,x, \nabla_x u(t,x), H_x u(t,x), \mathcal{I}[t,x,u(t,\cdot)]\big), \nonumber \\
@@ -20,7 +20,7 @@ Then, the problem \ref{eqn: QVI} now reads as
     \min \big\{ u(t,x) - g(t,x), u(t,x) - \InterveneOper u(t,x) \big\} &= 0, \quad \text{for } (t,x) \in \partial^+ \Solvency_T,
     \label{eqn: QVI with functionals}
 \end{align}
-where the notation $u(t, \cdot)$ in the integral means that nonlocal terms different from $x$ are used on $u$. Note that the functional $F$ does not directly depend on the zeroth order derivative (i.e. the function $u$ itself) in our case. However, results provided in this chapter are still applicable to cases when the zeroth order derivative is present in the functional $F$, see \cite[Section 5]{seydel2010generalexistenceuniquenessviscosity}. Properties of the functionals $F$ and $\mathcal{I}$ can be found below.
+where the notation $u(t, \cdot)$ in the integral means that nonlocal terms different from $x$ are used on $u$. Note that the functional $F$ does not directly depend on the zeroth order derivative (i.e. the function $u$ itself) in our case. However, results provided in this chapter are still applicable to cases when the zeroth order derivative is present in the functional $F$, see the elliptical case in \cite[Section 5]{seydel2010generalexistenceuniquenessviscosity}. Properties of the functionals $F$ and $\mathcal{I}$ can be found below.
 \begin{remark}[{\cite[Remark 5.1]{seydel2010generalexistenceuniquenessviscosity}}]
 \label{remark: Remark 5.1 in Seydel}
     The following properties hold for the functionals $F$ and $\mathcal I$:
@@ -52,15 +52,13 @@ For $(t,x) \in [0,T) \times \Solvency$ and $\delta > 0$, define the region $U_\d
     \end{enumerate}
 \end{assumption}
 
-Let us briefly discuss conditions \assitemref{ass: B1} and \assitemref{ass: B2}. \assitemref{ass: B1} imposes an ``integrated'' Lipschitz condition on the jump amplitude $\gamma$, which ensures that the nonlocal Lévy integral varies continuously when comparing it to nearby points. \assitemref{ass: B2} is the corresponding local Lipschitz condition for the diffusion, drift, and running payoff functions. Together, these assumptions provide the regularity needed to apply the doubling-of-variables argument in the proof of the comparison principle, both for the local differential terms and for the nonlocal jump term in the infinitesimal generator $\InfinitesimalGenerator$.
+Let us briefly discuss conditions \assitemref{ass: B1} and \assitemref{ass: B2}. \assitemref{ass: B1} imposes an ``integrated'' Lipschitz condition on the jump amplitude $\gamma$, which ensures that the nonlocal Lévy integral varies continuously when comparing it to nearby points. \assitemref{ass: B2} is the corresponding local Lipschitz condition for the diffusion, drift, and running payoff functions seen in Chapter \ref{section: Preliminaries}. Together, these assumptions provide regularity conditions for the application of the \textit{doubling-of-variables} argument in the proof of the comparison principle, both for the local differential terms and for the nonlocal jump term in the infinitesimal generator $\InfinitesimalGenerator$.
 
-make the nonlocal and local parts of the QVI stable under the doubling-of-variables argument used to prove the Comparison Principle.
-
-We now consider the following result, which will be useful for the maximum principle in Chapter \ref{section: Maximum Principle}. 
+We now consider the following result, which is needed in the proof of the maximum principle in Chapter \ref{section: Maximum Principle}. 
 
 \begin{proposition}[{\cite[Proposition 5.1]{seydel2010generalexistenceuniquenessviscosity}}]
 \label{prop: Proposition 5.1 in Seydel}
-    Let $\{t_k\}_{k \geq 0} \subset [0,T)$ and $\{x_k\}_{k \geq 0}, \{p_k\}_{k \geq 0} \subset \R^d$, with $t_k \rightarrow t \in [0,T)$, $x_k \rightarrow x \in \R^d$, $p_k \rightarrow p$. 
+    Recall the functionals \eqref{eqn: functional F}--\eqref{eqn: functional I}. Let $\{t_k\}_{k \geq 0} \subset [0,T)$ and $\{x_k\}_{k \geq 0}, \{p_k\}_{k \geq 0} \subset \R^d$, with $t_k \rightarrow t \in [0,T)$, $x_k \rightarrow x \in \R^d$, $p_k \rightarrow p$. 
 
     \begin{enumerate}[label=(\roman*)]
         \item If $u \in \PB \cap USC([0,T)\times \R^d)$ and $v \in \PB \cap LSC([0,T)\times \R^d)$, with $u(t_k,x_k) \rightarrow u(t,x)$ and $v(t_k,x_k) \rightarrow v(t,x)$, then
@@ -141,13 +139,13 @@ We now consider the following result, which will be useful for the maximum princ
 
     \item Outside of the singularity of  $\nu$, the result follows from the first result $(i)$. In the neighbourhood of $(t,x)$, the Taylor expansion \eqref{eqn: (12) in Seydel} gives the upper bound for the application of DCT. Note that the local boundedness of $U_\delta(t,x)$ holds by \assitemref{ass: V4} which states that for each fixed $\delta > 0$, the set of small jump sizes is uniformly bounded locally in $(t,x)$. 
 
-    \item This is a direct result from (i), (ii), and \assitemref{ass: P1}. 
+    \item This is a direct result from (i), (ii), and \assitemref{ass: P1}. \hfill $\qedhere$
     \end{enumerate}
 \end{proof}
 
 \section{Equivalent definitions of viscosity solutions}
 \label{section: Equivalent Definitions of Viscosity Solutions}
-Recall the functionals $F$, $\mathcal{I}^{1,\delta}$, $\mathcal{I}^{2,\delta}$, and $\mathcal{I}$ defined in the previous section. We now restate Definition \ref{def: Definition 4.1 in Seydel (Viscosity solution)} (Viscosity Solution) using the aforementioned functionals. 
+In this section, we restate the definitions of a viscosity solution using the functionals \eqref{eqn: functional I}--\eqref{eqn: functional I}.
 
 \begin{definition}[{\cite[Definition 5.2]{seydel2010generalexistenceuniquenessviscosity}} Viscosity solution 1]
 \label{def: Viscosity solution 1}
@@ -158,7 +156,7 @@ Recall the functionals $F$, $\mathcal{I}^{1,\delta}$, $\mathcal{I}^{2,\delta}$, 
         \min \big\{ u^* - g, u^* - \InterveneOper u^* \big\} & \leq 0 \quad \text{in } (t_0,x_0) \in \partial^+ \Solvency_T.
     \end{align*}
 
-    A function $u \in \PB)$ is a (viscosity) supersolution of \eqref{eqn: QVI with functionals} if for all $(t_0,x_0) \in [0,T) \times \R^d$ and $\varphi \in \PB \cap C^{1,2}([0,T) \times \R^d)$ such that $u_* - \varphi$ has a global minimum in $(t_0,x_0)$, 
+    A function $u \in \PB$ is a (viscosity) supersolution of \eqref{eqn: QVI with functionals} if for all $(t_0,x_0) \in [0,T) \times \R^d$ and $\varphi \in \PB \cap C^{1,2}([0,T) \times \R^d)$ such that $u_* - \varphi$ has a global minimum in $(t_0,x_0)$, 
     \begin{align*}
         \min \Big\{ - \partial_t \varphi + F\big(t_0,x_0, \nabla_x \varphi, H_x \varphi, \mathcal{I}[t_0,x_0,\varphi(t_0,\cdot)] \big), \\
         u_* - \InterveneOper u_* \Big\} &\geq 0 \quad \text{in } (t_0,x_0) \in [0,T) \times \Solvency \\
@@ -168,7 +166,7 @@ Recall the functionals $F$, $\mathcal{I}^{1,\delta}$, $\mathcal{I}^{2,\delta}$, 
     A function $u$ is a viscosity solution if it is sub- and supersolution. 
 \end{definition}
 
-We now introduce another definition of the viscosity solution. We motivate this by noting that the Lévy measure is typically singular near the origin, so we split $\mathcal I$ into a small-jump part $\mathcal I^{1,\delta}$, evaluated on a smooth test function $\varphi$ on points $(t,x) \in [0,T] \times U_\delta(t,x)$, and a large-jump part $\mathcal I^{2,\delta}$, evaluated on $u$ and preserving monotonicity and semincontinuity under limits. 
+We now introduce another definition of the viscosity solution. We motivate this by noting that the Lévy measure $\nu$ is typically singular near the origin, so we split $\mathcal I$ into a small-jump part $\mathcal I^{1,\delta}$, evaluated on a smooth test function $\varphi$ at points $(t,x) \in [0,T] \times U_\delta(t,x)$, and a large-jump part $\mathcal I^{2,\delta}$, which evaluates $u$ and preserves monotonicity and semincontinuity under limits. 
 
 \begin{definition}[{\cite[Definition 5.3]{seydel2010generalexistenceuniquenessviscosity}} Viscosity solution 2]
 \label{def: Viscosity solution 2}
@@ -210,19 +208,22 @@ With the second definition of viscosity solutions in place, we aim to find a thi
 
 \begin{definition}[Limiting parabolic semijets]
 \label{def: Limiting parabolic semijets}
-    Recall the definition of parabolic super- and subjets (see Definition \ref{def: Parabolic semijets}. Let $u: [0,T] \times \R^d \rightarrow \R$ be an USC function and $v:[0,T] \times \R^d \rightarrow \R$ be a LSC function. We define the set of limiting superjets of $u$ at $(t,x) \in [0,T] \times \R^d$ with
+    Recall Definition \ref{def: Parabolic semijets}, where parabolic super- and subjets are formalised. Let $u: [0,T] \times \R^d \rightarrow \R$ be an USC function and $v:[0,T] \times \R^d \rightarrow \R$ be an LSC function. We define the set of limiting superjets of $u$ at $(t,x) \in [0,T] \times \R^d$ with
     \begin{align*}
         \bar J^+ u(t,x) = \Big\{ (a,p,X) \in \R \times \R^d \times \mathbb S^d: \text{ there exist } (t_k,x_k,a_k,p_k,X_k) \rightarrow (t,x,a,p,X), \\
         (a_k,p_k,X_k) \in J^+ u(t_k,x_k)  \; \text{ such that } u(t_k,x_k) \rightarrow u(t,x) \Big\},
     \end{align*}
     and the set of limiting subjets of $u$ at $(t,x) \in [0,T] \times \R^d$ with
-    \begin{align*}
+    \begin{equation*}
+    \begin{aligned}
         \bar J^- u(t,x) = \Big\{ (a,p,X) \in \R \times \R^d \times \mathbb S^d: \text{ there exist } (t_k,x_k,a_k,p_k,X_k) \rightarrow (t,x,a,p,X), \\
         (a_k,p_k,X_k) \in J^- u(t_k,x_k)  \; \text{ such that } u(t_k,x_k) \rightarrow u(t,x) \Big\}.
-    \end{align*}
+    \end{aligned}
+    \end{equation*}
+    Here, $\mathbb S^d$ denotes the space of symmetric, $d$-dimensional matrices.
 \end{definition}
 
-The introduction of semijets provides a convenient way to generalise Taylor derivatives and allows us to describe the local behaviour of continuous, but potentially non-differentiable functions by acting as upper or lower parabolic approximations. While semijets decribe local lower and upper approximations at a given point, limiting semijets enlarge this notion by allowing limits of such approximations along convergent sequences, and are therefore useful when it comes to upper and lower semicontinuous envelopes. This brings us to the last definition of the viscosity solution in the form of Definition \ref{def: Viscosity solution 3}, which, as we will see in Proposition \ref{prop: Propositions 5.4 and 5.6 in Seydel}, is equivalent to all previous definitions of the viscosity solution. Moreover, Definition \ref{def: Viscosity solution 3} will play a big part in the proof of uniqueness in Chapter \ref{section: Proof of the Uniqueness}. 
+The introduction of semijets provides a convenient way to generalise Taylor derivatives and allows us to describe the local behaviour of continuous, but potentially non-differentiable functions by acting as upper or lower parabolic approximations. While semijets decribe local lower and upper approximations at a given point, limiting semijets enlarge this notion by allowing limits of such approximations along convergent sequences, and are therefore useful when it comes to upper and lower semicontinuous envelopes. This brings us to the last definition of the viscosity solution in the form of Definition \ref{def: Viscosity solution 3}, which, as shown in Proposition \ref{prop: Propositions 5.4 and 5.6 in Seydel}, is equivalent to all previous definitions of the viscosity solution. Moreover, Definition \ref{def: Viscosity solution 3} is used all remaining results provided throughout the rest of this chapter.
 
 \begin{definition}[{\cite[Definition 5.5]{seydel2010generalexistenceuniquenessviscosity}} Viscosity solution 3]
 \label{def: Viscosity solution 3}
@@ -250,57 +251,11 @@ The introduction of semijets provides a convenient way to generalise Taylor deri
 \begin{proof}
     For the proof of the equivalence of Definitions \ref{def: Viscosity solution 1} and \ref{def: Viscosity solution 2}, we refer to {\cite[Proposition 5.4]{seydel2010generalexistenceuniquenessviscosity}}. For the proof of the equivalence of Definitions \ref{def: Viscosity solution 2} and \ref{def: Viscosity solution 3}, we refer to {\cite[Proposition 5.6]{seydel2010generalexistenceuniquenessviscosity}} and \cite{barles2008second}.
 \end{proof}
-\begin{remark}
-    Note that Definitions \ref{def: Viscosity solution 1}, \ref{def: Viscosity solution 2}, and \ref{def: Viscosity solution 3} in Seydel \cite{seydel2010generalexistenceuniquenessviscosity} are all parabolic versions of Definitions 5.2, 5.3, and 5.5. However, the proof remains somewhat unchanged. Moreover, we note that Barles and Imbert \cite[Chapter 1]{barles2008second} also cover the different definitions of the viscosity solution.
-\end{remark}
 
 \section{The maximum principle}
 \label{section: Maximum Principle}
-We now introduce a concept that plays a central role in the proof of the Comparison Principle, namely the \emph{Maximum Principle}. In the context of local, fully nonlinear degenerate parabolic PDEs, this principle was first developed by \textcite{crandall1990maximum}. The maximum principle was then extended for nonlocal PIDEs by \textcite{jakobsen2006maximum} and later by \textcite{barles2008second}. In what follows, we refer to this result as the parabolic, nonlocal Jensen–Ishii lemma.
+We now introduce a concept that plays a central role in the proof of the comparison principle, namely the \emph{maximum principle}. Following \textcite{barles2008second} and \textcite{seydel2010generalexistenceuniquenessviscosity}, we begin by providing the parabolic, nonlocal Jensen-Ishii Lemma \ref{lemma: Parabolic, nonlocal Jensen-Ishii Lemma}. 
 
-We begin by considering a few properties of the intervention operator $\InterveneOper$, which will be needed for the Comparison Principle. 
-\begin{lemma}[{\cite[Lemma 5.7]{seydel2010generalexistenceuniquenessviscosity}}]
-\label{lemma: Lemma 5.7 in Seydel}
-    Recall the intervention operator $\InterveneOper$ in Definition \ref{def: Intervention Operator}. We have that
-    \begin{enumerate}[label=(\roman*)]
-        \item $\InterveneOper$ is convex, i.e. for $\lambda \in [0,1]$ and functions $a,b \in \PB$, 
-        \begin{equation*}
-            \InterveneOper \big( \lambda a(t,x) + (1-\lambda) b(t,x) \big) \leq \lambda \InterveneOper a(t,x) + (1-\lambda) \InterveneOper b(t,x),
-        \end{equation*}
-        for $(t,x) \in [0,T) \times \R^d$.
-
-        \item For $\lambda > 0$ and functions $a,b \in \PB$, 
-        \begin{equation*}
-            \InterveneOper \big(- \lambda (t,x) + (1-\lambda)b(t,x) \big) \leq \lambda \InterveneOper a(t,x) + (1+\lambda) \InterveneOper b(t,x).
-        \end{equation*}
-    \end{enumerate}
-\end{lemma}
-\begin{proof}
-    The proofs for $(i)$ and $(ii)$ are provided separately. 
-    
-    \begin{enumerate}[label=(\roman*)]
-        \item For $(t,x) \in [0,T) \times \R^d$,
-        \begin{align*}
-            \InterveneOper &\big(\lambda a(t,x) + (1-\lambda)b(t,x)\big) \\
-            &= \sup_{\zeta \in \mathcal{Z}(t,x)} \big\{ \lambda \big(a(t,\Gamma(x,\zeta))+ K(t,x,\zeta)\big) + (1-\lambda) \big(b(t,\Gamma(x,\zeta)) + K(t,x,\zeta)\big) \big\} \\
-            & \leq \lambda \sup_{\zeta \in \mathcal{Z}(t,x)} \big\{ \big( a(t,x,\Gamma(x,\zeta)) + K(t,x,\zeta \big) \big\} \\
-            & \qquad + (1-\lambda) \sup_{\zeta \in \mathcal{Z}(t,x)} \big\{ \big( b(t,x,\Gamma(x,\zeta)) + K(t,x,\zeta \big) \big\} \\
-            &= \lambda \InterveneOper a(t,x) + (1-\lambda) \InterveneOper b(t,x).
-        \end{align*}
-
-        \item For $(t,x) \in [0,T) \times \R^d$, 
-        \begin{align*}
-            \InterveneOper & \big( - \lambda a(t,x) + (1+\lambda) b(t,x) \big) \\
-            &= \sup_{\zeta \in \mathcal{Z}(t,x)} \big\{ -\big(\lambda a(t,\Gamma(x,\zeta)) +  K(t,x,\zeta)\big) + (1+\lambda) \big(b(t,\Gamma(x,\zeta)) + K(t,x,\zeta)\big) \big\} \\
-            & \geq - \lambda \sup_{\zeta \in \mathcal{Z}(t,x)} \big\{ a(t,\Gamma(x,\zeta)) + K(t,x,\zeta) \big\}\\
-            & \qquad + (1+\lambda) \sup_{\zeta \in \mathcal Z (t,x)} \big\{ b(t,\Gamma(x,\zeta)) + K(t,x,\zeta) \big\} \\
-            & = - \lambda \, \InterveneOper a(t,x) + (1+\lambda) \InterveneOper b(t,x).
-        \qedhere
-        \end{align*}
-    \end{enumerate}
-\end{proof}
-
-Let us now consider the parabolic, nonlocal Jensen-Ishii Lemma. 
 \begin{lemma}[Parabolic, nonlocal Jensen-Ishii Lemma]
 \label{lemma: Parabolic, nonlocal Jensen-Ishii Lemma}
     Let $u \in \USC([0,T) \times \R^d)$, $v \in \LSC([0,T) \times \R^d)$, and $\varphi \in C^{1,2}([0,T) \times \R^{2d})$. If $(t_0,x_0,y_0) \in [0,T) \times \R^{2d}$ is a zero global maximum point of $u(t,x) - v(t,y) - \varphi(t,x,y)$ and if $p = \nabla_x \varphi(t_0,x_0,y_0)$, $q = \nabla_y \varphi(t_0,x_0,y_0)$, then, for any $K>0$, there exists $\bar \alpha (K) > 0$ such that for any $0 <\alpha < \bar \alpha (K)$, we have: There exist sequences $t_k \rightarrow t_0$, $x_k \rightarrow x_0$, $y_k \rightarrow y_0$, $p_k \rightarrow p$, $q_k \rightarrow q$, matrices $X_k$ and $Y_k$, and a sequence of functions $\{\varphi_k\}_{k \geq 0}$, converging to the function 
@@ -326,16 +281,12 @@ Let us now consider the parabolic, nonlocal Jensen-Ishii Lemma.
 \begin{remark}[{\cite[Remark 5.4]{seydel2010generalexistenceuniquenessviscosity}}]
     The expression $\varphi_\alpha(t,x,y) = R^\alpha[\varphi]\big((x,y),(p,q)\big)$ is the ``modified sup-convolution'' as used by Barles and Imbert \cite{barles2008second}. For all compacts $C$, $\varphi_\alpha$ converges uniformly to $\varphi$ in $C^{1,2}(C)$ as $\alpha \rightarrow 0$.
 \end{remark}
-\begin{remark}
-    Note that the above lemma is taken in the sense of Barles and Imbert \cite{barles2008second}. More precisely, the nonlocal part, that is the block-matrix estimate with $\begin{psmallmatrix}X&0\\0&-Y\end{psmallmatrix}$, and the sign convention is given by Lemma 1 \cite{barles2008second} $(b,-q,Y)\in J^-v$) is given by \emph{Lemma 1} in \cite{barles2008second}. The corresponding parabolic extension is stated explicitly
-    as \emph{Corollary 2} in \cite{barles2008second}. For the underlying parabolic semijet theory and the local Theorem of Sums used in doubling-of-variables
-    arguments, we refer to Crandall--Ishii--Lions \cite[Theorem 8.3]{crandall1992user}.
-    
-    We also note that as an alternative, one may also apply the Maximum Principle for Semicontinuous Functions for PIDEs, see Jakobsen and Karlsen
-    \cite{jakobsen2006maximum}, which plays an analogous role in comparison proofs for viscosity solutions of fully nonlinear, nonlocal equations.
-\end{remark}
 
-Having established the relevant maximum principle, we now aim to apply it to our QVI problem. The following corollary shows how the preceding result applies to the present QVI.
+Before considering the maximum principle, we justify the use of the nonlocal Jensen-Ishii lemma in our nonlocal setting instead of the local version. In the local PDE case, the doubling-of-variables argument only requires limiting semijets for the sub- and supersolution. Since the operator is local, the continuity of the operator is sufficient to pass to the limit in the corresponding viscosity inequalities. 
+
+However, in the case of PIDEs, this argument requires an additional approximation step. Recall that the infinitesimal generator $\InfinitesimalGenerator$ contains the nonlocal integral operator $\mathcal I$, and that the small jump part of the integral operator is evaluated on a smooth test function. Since the Lévy measure may be singular at the origin (for example, the Variance-Gamma measure in Example \ref{ex: VG measure} is singular at mark $z=0$), limiting semijets alone cannot provide sufficient control on the integral term. Therefore, following \textcite{barles2008second}, we use the nonlocal version of the Jensen-Ishii Lemma. In particular, for fixed $\alpha>0$, Lemma \ref{lemma: Parabolic, nonlocal Jensen-Ishii Lemma} provides a sequence of smooth test functions $\{\varphi_k\}_{k\geq0}$ that converge over compact sets in $C^{1,2}$ to the ``modified sup convolution'' $\varphi_\alpha$. This will be important for the analysis of the singular small jump integral.
+
+Finally, we obtain the parabolic maximum principle for impulse control, which is a direct application of the nonlocal Jensen-Ishii Lemma \ref{lemma: Parabolic, nonlocal Jensen-Ishii Lemma}. The following result is taken from \textcite{barles2008second} and \textcite{seydel2010generalexistenceuniquenessviscosity}, while \textcite{jakobsen2006maximum} provide a similar result.
 
 \begin{corollary}[{\cite[Corollary 5.13]{seydel2010generalexistenceuniquenessviscosity}}, {\cite[Corollary 2]{barles2008second}}]
 \label{cor: Corollary 5.13 in Seydel}
@@ -386,11 +337,13 @@ Having established the relevant maximum principle, we now aim to apply it to our
         X_k \leq H_x \varphi_k(t_k,x_k,y_{k'}). 
     \end{equation*}
     As $y_{k'}$ was fixed, we may apply Definition \ref{def: Viscosity solution 3}, and, together with the translation invariance (see \assitemref{ass: P2} in Remark \ref{remark: Remark 5.1 in Seydel}), we obtain
-    \begin{align}
-        \min \big\{ - a_k + F\big(t_k,x_k,p_k,X_k,\mathcal{I}^{1,\delta}[t_k,x_k,\varphi(t_k,\cdot,y_k)] + \mathcal{I}^{2,\delta}[t_k,x_k,p_k,u^*(t_k,\cdot)]\big), \nonumber \\
-        u^*(t_k,x_k) - \InterveneOper u^*(t_k,x_k)\big\} \leq 0
-        \label{eqn: (42) in Seydel}
-    \end{align}
+    \begin{equation}
+        \begin{aligned}
+            \min \big\{ - a_k + F\big(t_k,x_k,p_k,X_k,\mathcal{I}^{1,\delta}[t_k,x_k,\varphi(t_k,\cdot,y_k)] + \mathcal{I}^{2,\delta}[t_k,x_k,p_k,u^*(t_k,\cdot)]\big), \nonumber \\
+            u^*(t_k,x_k) - \InterveneOper u^*(t_k,x_k)\big\} \leq 0
+            \label{eqn: (42) in Seydel}
+        \end{aligned}
+    \end{equation}
 
     We now aim to prove the convergence of the PIDE part $F$ in \eqref{eqn: (42) in Seydel} as $k \rightarrow \infty$. Recall that by Lemma \ref{lemma: Parabolic, nonlocal Jensen-Ishii Lemma}, $x_k \rightarrow x_0$, $u^*(t_k,x_k) \rightarrow u^*(t_0,x_0)$, $a_k \rightarrow a$, and $p_k \rightarrow p$, as $k \rightarrow \infty$. Also, the matrix sequence $\{X_k\}_{k \geq 0}$ is contained in a compact set in $\R^{d \times d}$ by \eqref{eqn: (40) in Seydel} because $\varphi_k \in C^{1,2}([0,T) \times \R^{2d})$, so it admits a convergent subsequence to an $X$ satisfying \eqref{eqn: (48) in Seydel}. Moreover, by Lemma \ref{lemma: Parabolic, nonlocal Jensen-Ishii Lemma}, $u^*(t_k,x_k) \rightarrow u^*(t_0,x_0)$, so it therefore remains to show that the integral part also converges as $k \rightarrow \infty$. 
 
@@ -445,23 +398,67 @@ Having established the relevant maximum principle, we now aim to apply it to our
     \end{align*}
     which, by Definition \ref{def: Viscosity solution 3}, is a subsolution. 
 
-    \textbf{Supersolution case:} The supersolution case is shown in an analogous way to the subsolution case, except that in this case we use \eqref{eqn: (34) in Seydel} for the convergence of the PIDE part. For the impulse part, we use the fact that $\InterveneOper v_*$ is LSC by Lemma \ref{lemma: Lemma 4.3 in Seydel} (i) so that
+    \textbf{Supersolution case:} The supersolution case is shown in an analogous way to the subsolution case, except that in this case we use \eqref{eqn: (34) in Seydel} for the convergence of the PIDE part. For the impulse part, we use the fact that $\InterveneOper v_*$ is LSC by Lemma \ref{lemma: Lemma 4.3 in Seydel}(i) so that
     \begin{equation*}
         \limsup_{k \rightarrow \infty} \big\{ v_*(t_k,y_k) - \InterveneOper v_*(t_k,y_k)\big\} = v_*(t_0,y_0) - \liminf_{k \rightarrow \infty} \InterveneOper v_*(t_k,y_k) \leq v_* - \InterveneOper v_*(t_0,y_0).
     \end{equation*}
     Hence,
-    \begin{align*}
-        0 \leq \min \Big\{ -b + F\big(t_0, y_0, q, Y, \mathcal{I}^{1, \delta} [t_0,y_0,-\varphi_\alpha (t_0, x_0, \cdot)] + \mathcal{I}^{2, \delta} [t_0,y_0,q,v_*(t_0,\cdot)] \big), \\
-        v_*(t_0,y_0) - \InterveneOper v_* (t_0,y_0) \Big\}.
-    \end{align*}
+    \begin{equation*}
+        \begin{aligned}
+            0 \leq \min \Big\{ -b + F\big(t_0, y_0, q, Y, \mathcal{I}^{1, \delta} [t_0,y_0,-\varphi_\alpha (t_0, x_0, \cdot)] + \mathcal{I}^{2, \delta} [t_0,y_0,q,v_*(t_0,\cdot)] \big), \\
+            v_*(t_0,y_0) - \InterveneOper v_* (t_0,y_0) \Big\}. 
+            \qedhere
+        \end{aligned}
+    \end{equation*}
 \end{proof}
+
 
 \section{Comparison principle and uniqueness}
 \label{section: Proof of the Uniqueness}
-Before considering the Comparison Principle, consider Lemma \ref{lemma: Lemma 5.10 in Seydel} the following result, which is a perturbation technique needed for the proof of the Comparison Principle.
+Before proving the comparison principle, we begin by considering some properties of the intervention operator $\InterveneOper$ in Lemma \ref{lemma: Lemma 5.7 in Seydel}, as well as the perturbation technique presented in Lemma \ref{lemma: Lemma 5.10 in Seydel}.
+\begin{lemma}[{\cite[Lemma 5.7]{seydel2010generalexistenceuniquenessviscosity}}]
+\label{lemma: Lemma 5.7 in Seydel}
+    Recall the intervention operator $\InterveneOper$ in Definition \ref{def: Intervention Operator}. We have that
+    \begin{enumerate}[label=(\roman*)]
+        \item $\InterveneOper$ is convex, i.e. for $\lambda \in [0,1]$ and functions $a,b \in \PB$, 
+        \begin{equation*}
+            \InterveneOper \big( \lambda a(t,x) + (1-\lambda) b(t,x) \big) \leq \lambda \InterveneOper a(t,x) + (1-\lambda) \InterveneOper b(t,x),
+        \end{equation*}
+        for $(t,x) \in [0,T) \times \R^d$.
+
+        \item For $\lambda > 0$ and functions $a,b \in \PB$, 
+        \begin{equation*}
+            \InterveneOper \big(- \lambda (t,x) + (1-\lambda)b(t,x) \big) \leq \lambda \InterveneOper a(t,x) + (1+\lambda) \InterveneOper b(t,x).
+        \end{equation*}
+    \end{enumerate}
+\end{lemma}
+\begin{proof}
+    The proofs for $(i)$ and $(ii)$ are provided separately. 
+    
+    \begin{enumerate}[label=(\roman*)]
+        \item For $(t,x) \in [0,T) \times \R^d$,
+        \begin{align*}
+            \InterveneOper &\big(\lambda a(t,x) + (1-\lambda)b(t,x)\big) \\
+            &= \sup_{\zeta \in \mathcal{Z}(t,x)} \big\{ \lambda \big(a(t,\Gamma(x,\zeta))+ K(t,x,\zeta)\big) + (1-\lambda) \big(b(t,\Gamma(x,\zeta)) + K(t,x,\zeta)\big) \big\} \\
+            & \leq \lambda \sup_{\zeta \in \mathcal{Z}(t,x)} \big\{ \big( a(t,x,\Gamma(x,\zeta)) + K(t,x,\zeta \big) \big\} \\
+            & \qquad + (1-\lambda) \sup_{\zeta \in \mathcal{Z}(t,x)} \big\{ \big( b(t,x,\Gamma(x,\zeta)) + K(t,x,\zeta \big) \big\} \\
+            &= \lambda \InterveneOper a(t,x) + (1-\lambda) \InterveneOper b(t,x).
+        \end{align*}
+
+        \item For $(t,x) \in [0,T) \times \R^d$, 
+        \begin{align*}
+            \InterveneOper & \big( - \lambda a(t,x) + (1+\lambda) b(t,x) \big) \\
+            &= \sup_{\zeta \in \mathcal{Z}(t,x)} \big\{ -\big(\lambda a(t,\Gamma(x,\zeta)) +  K(t,x,\zeta)\big) + (1+\lambda) \big(b(t,\Gamma(x,\zeta)) + K(t,x,\zeta)\big) \big\} \\
+            & \geq - \lambda \sup_{\zeta \in \mathcal{Z}(t,x)} \big\{ a(t,\Gamma(x,\zeta)) + K(t,x,\zeta) \big\}\\
+            & \qquad + (1+\lambda) \sup_{\zeta \in \mathcal Z (t,x)} \big\{ b(t,\Gamma(x,\zeta)) + K(t,x,\zeta) \big\} \\
+            & = - \lambda \, \InterveneOper a(t,x) + (1+\lambda) \InterveneOper b(t,x).
+        \qedhere
+        \end{align*}
+    \end{enumerate}
+\end{proof}
 \begin{lemma}%[{\cite[Lemma 5.10]{seydel2010generalexistenceuniquenessviscosity}}]
 \label{lemma: Lemma 5.10 in Seydel}
-    Assume that conditions \assitemref{ass: V1} and \assitemref{ass: V2} be satisfied. Let $u$ be a subsolution and $v$ a supersolution of \eqref{eqn: QVI with functionals}. Assume that there is a function $w \in \PB \cap C^{1,2}([0,T)\times \R^d)$ and a positive function $\kappa: [0,T] \times \R^d$ such that
+    Assume that conditions \assitemref{ass: V1} and \assitemref{ass: V2} are satisfied. Let $u$ be a subsolution and $v$ a supersolution of \eqref{eqn: QVI with functionals}. Suppose there exist a function $w \in \PB \cap C^{1,2}([0,T)\times \R^d)$ and a positive function $\kappa: [0,T] \times \R^d$ such that
     \begin{align*}
         \min \Big \{ - \big(\partial_t w - \InfinitesimalGenerator w - f, w - \InterveneOper w \big) \Big\} \geq \kappa & \quad \text{in } [0,T) \times \Solvency, \\
         \min \big\{ w - g, w - \InterveneOper w \big\} \geq \kappa & \quad \text{in } \partial^+ \Solvency
@@ -492,7 +489,7 @@ Before considering the Comparison Principle, consider Lemma \ref{lemma: Lemma 5.
     \end{equation}
 \end{lemma}
 \begin{remark}
-    Note that this is the parabolic extension to {\cite[Lemma 5.10]{seydel2010generalexistenceuniquenessviscosity}}. However, the proof remains the same as in \cite{seydel2010generalexistenceuniquenessviscosity}. 
+    Note that this is the parabolic extension to {\cite[Lemma 5.10]{seydel2010generalexistenceuniquenessviscosity}}.
 \end{remark}
 \begin{proof}[Proof of Lemma \ref{lemma: Lemma 5.10 in Seydel}]
     The proof is based on the first definition of the viscosity solution, see Definition \ref{def: Definition 4.1 in Seydel (Viscosity solution)}. We split the proof into two parts, corresponding to the supersolution and subsolution cases.
@@ -514,11 +511,13 @@ Before considering the Comparison Principle, consider Lemma \ref{lemma: Lemma 5.
         -\big(\partial_t \varphi + \InfinitesimalGenerator \varphi + f \big) \geq \frac{\kappa}{m}
     \end{equation*}
     holds on $[0,T) \times \Solvency$. Using the linearity of $\partial_t$ and $\InfinitesimalGenerator$, we obtain
-    \begin{align*}
-        0 &\geq \partial_t \varphi(t,x) + \InfinitesimalGenerator \varphi(t,x) + f \\
-        &= \partial_t \Big( \frac{m-1}{m} \big( \varphi_m(t,x) - \frac 1 m w(t,x) \big) \Big) + \InfinitesimalGenerator \Big( \frac{m-1}{m} \big( \varphi_m(t,x) - \frac 1 m w(t,x) \big) \Big) + f(t,x) \\
-        &= \frac{m-1}{m} \Big( \partial_t \varphi_m(t,x) - \frac 1 m w (t,x) \Big) + \frac{m-1}{m} \Big( \InfinitesimalGenerator \varphi_m(t,x) - \frac{1}{m} \InfinitesimalGenerator w(t,x) \Big) + f(t,x) \\
-    \end{align*}
+    \begin{equation*}
+        \begin{aligned}
+            0 &\geq \partial_t \varphi(t,x) + \InfinitesimalGenerator \varphi(t,x) + f \\
+            &= \partial_t \Big( \frac{m-1}{m} \big( \varphi_m(t,x) - \frac 1 m w(t,x) \big) \Big) + \InfinitesimalGenerator \Big( \frac{m-1}{m} \big( \varphi_m(t,x) - \frac 1 m w(t,x) \big) \Big) + f(t,x) \\
+            &= \frac{m-1}{m} \Big( \partial_t \varphi_m(t,x) - \frac 1 m w (t,x) \Big) + \frac{m-1}{m} \Big( \InfinitesimalGenerator \varphi_m(t,x) - \frac{1}{m} \InfinitesimalGenerator w(t,x) \Big) + f(t,x) 
+        \end{aligned}
+    \end{equation*}
     or, equivalently,
     \begin{align*}
         0 &\geq \partial_t \varphi(t,x) - \frac 1 m \partial_t w(t,x) + \InfinitesimalGenerator \varphi_m(t,x) - \frac 1 m \InfinitesimalGenerator w(t,x) + \frac{m}{m-1} f(t,x) \\
@@ -577,13 +576,6 @@ Before considering the Comparison Principle, consider Lemma \ref{lemma: Lemma 5.
     \end{equation}
     Hence, with \eqref{lemma: Lemma 4.22, temporary result 4}--\eqref{lemma: Lemma 4.22, temporary result 6}, we obtain \eqref{eqn: (43*) in Seydel} and have that $u_m$ is a subsolution according to Definition \ref{def: Definition 4.1 in Seydel (Viscosity solution)}.
 \end{proof}
-Lemma \ref{lemma: Lemma 5.10 in Seydel} is used to perturb the sub- and supersolutions in order to ensure that the maximum of $u_m - v_m$ is attained in the Comparison Principle.
-
-Recall that $\PB_m:=\PB_m ([0,T] \times \R^d)$ denotes the set of all function $u \in \PB$ for which there is a time-dependent constant $C_t$ such that
-\begin{equation*}
-    |u(t,x)| \leq C_t (1+|x|^m) \quad \text{for all } (t,x) \in [0,T]\times \R^d.
-\end{equation*}
-The lower and upper semicontinuous envelopes, $v_*$ and $u^*$ respectively, are taken from within $[0,T] \times \R^d$. 
 
 By \assitemref{ass: B2}, the functions $f$, $\mu$, and $\sigma$ are locally Lipschitz continuous. Hence, by classical results, see {\cite[Lemma V.7.1]{fleming2006controlled}}, our functional $F$ has the property:
 \begin{quote}
@@ -608,7 +600,14 @@ By \assitemref{ass: B2}, the functions $f$, $\mu$, and $\sigma$ are locally Lips
     \end{align*}
     where $o_\alpha(1)$ is once again independent of $\varepsilon$, and the first term is independent of $\alpha$. 
 \end{quote}
-In the proof of Theorem \ref{trm: 5.14 in Seydel}, $x_\varepsilon$ and $y_\varepsilon$ converge to the same limit $x_0$, so the requirement can be relaxed to local Lipschitz condition, as required by Assumption \ref{ass: Assumption 2.4 in Seydel}, and the property holds only for $x$ and $y$ in a suitable neighbourhood of $x_0$. 
+In the proof of Theorem \ref{trm: 5.14 in Seydel}, $x_\varepsilon$ and $y_\varepsilon$ converge to the same limit $x_0$, so the requirement can be
+relaxed to locally Lipschitz, as required by Assumption \ref{ass: Assumption 2.4 in Seydel}, and the property holds only for $x$ and $y$ in a suitable neighbourhood of $x_0$. 
+
+Finally, recall that $\PB_m:=\PB_m ([0,T] \times \R^d)$ denotes the set of all functions $u \in \PB$ for which there is a time-dependent constant $C_t$ such that
+\begin{equation*}
+    |u(t,x)| \leq C_t (1+|x|^m) \quad \text{for all } (t,x) \in [0,T]\times \R^d.
+\end{equation*}
+The comparsion principle is presented in Theorem \ref{trm: 5.14 in Seydel}. 
 
 \begin{theorem}[{\cite[Theorem 5.14]{seydel2010generalexistenceuniquenessviscosity}}, Comparison Principle]
 \label{trm: 5.14 in Seydel}
@@ -692,13 +691,16 @@ In the proof of Theorem \ref{trm: 5.14 in Seydel}, $x_\varepsilon$ and $y_\varep
     \end{align*}
     for all limit points $x_0$ of the sequence $\{x_\varepsilon\}$. We assume from now on that we have chosen a convergent subsequence of $\{x_\varepsilon\}$ and $\{y_\varepsilon\}$ converging to the same limit $x_0 \in C$. Let $\varepsilon$ be small enough such that $x_0,y_0 \in \Solvency$, and that all local estimates in \assitemref{ass: B1} and \assitemref{ass: B2} hold. Moreover, assume that $\{t_\varepsilon\}$ converges to $t_0 < T$. 
     
-    With the above assumptions in mind, we may apply Corollary \ref{cor: Corollary 5.13 in Seydel} in $(t_\varepsilon,x_\varepsilon,y_\varepsilon)$ for $\varphi(x,y) = \frac{1}{2\varepsilon} |x-y|^2$: For any $\delta > 0$, there is a range of $\alpha>0$ for which there are matrices $X,Y$ satisfying \eqref{eqn: (48) in Seydel}, $(p,-q) = \nabla \varphi(x_\varepsilon,y_\varepsilon)$, so that $p=q=\frac{1}{\varepsilon}(x_\varepsilon - y_\varepsilon)$, and $a+b= \partial_t \varphi(x_0,y_0) = 0$ such that
-    \begin{align*}
-        \min \big\{-a + F\big(t_\varepsilon, x_\varepsilon, p, X, \mathcal{I}^{1,\delta}[t_\varepsilon,x_\varepsilon,\varphi_\alpha(\cdot,y_\varepsilon)] + \mathcal{I}^{2,\delta}[t_\varepsilon,x_\varepsilon,p,u_m(t_\varepsilon,\cdot)]\big), \\
-        u_m(t_\varepsilon, x_\varepsilon) - \InterveneOper u_m(t_\varepsilon,x_\varepsilon) \big\} \leq 0 \\
-        \min \big\{-b + F\big(t_\varepsilon, y_\varepsilon, q, Y, \mathcal{I}^{1,\delta}[t_\varepsilon,y_\varepsilon,-\varphi_\alpha(x_\varepsilon, \cdot)] + \mathcal{I}^{2,\delta}[t_\varepsilon,y_\varepsilon,q,v_m(t_\varepsilon,\cdot)]\big), \\
-        v_m(t_\varepsilon, y_\varepsilon) - \InterveneOper v_m(t_\varepsilon,y_\varepsilon) \big\} \geq \frac{\kappa}{m}.
-    \end{align*}
+    With the above assumptions in mind, we may apply Corollary \ref{cor: Corollary 5.13 in Seydel} at $(t_\varepsilon,x_\varepsilon,y_\varepsilon)$ with $\varphi(x,y) = \frac{1}{2\varepsilon} |x-y|^2$. Then, for any $\delta > 0$, there is a range of $\alpha>0$ for which there are matrices $X$ and $Y$ satisfying \eqref{eqn: (48) in Seydel}, $(p,-q) = \nabla \varphi(x_\varepsilon,y_\varepsilon)$, so that $p=q=\frac{1}{\varepsilon}(x_\varepsilon - y_\varepsilon)$, and $a-b= \partial_t \varphi(x_0,y_0) = 0$ such that
+    \begin{equation*}
+        \begin{aligned}
+            \min \big\{-a + F\big(t_\varepsilon, x_\varepsilon, p, X, \mathcal{I}^{1,\delta}[t_\varepsilon,x_\varepsilon,\varphi_\alpha(\cdot,y_\varepsilon)] + \mathcal{I}^{2,\delta}[t_\varepsilon,x_\varepsilon,p,u_m(t_\varepsilon,\cdot)]\big), \\
+            u_m(t_\varepsilon, x_\varepsilon) - \InterveneOper u_m(t_\varepsilon,x_\varepsilon) \big\} \leq 0 \\
+            \min \big\{-b + F\big(t_\varepsilon, y_\varepsilon, q, Y, \mathcal{I}^{1,\delta}[t_\varepsilon,y_\varepsilon,-\varphi_\alpha(x_\varepsilon, \cdot)] + \mathcal{I}^{2,\delta}[t_\varepsilon,y_\varepsilon,q,v_m(t_\varepsilon,\cdot)]\big), \\
+            v_m(t_\varepsilon, y_\varepsilon) - \InterveneOper v_m(t_\varepsilon,y_\varepsilon) \big\} \geq \frac{\kappa}{m}.
+        \end{aligned}
+    \end{equation*}
+    
     This representation lets us split the proof into 2 cases that we need to consider for the proof: 
     \begin{enumerate}[label=\textbf{Case 2\alph*:}, leftmargin=*, labelsep=.6em]
         \item If $u_m(t_\varepsilon,x_\varepsilon) - \InterveneOper u_m(t_\varepsilon,x_\varepsilon) \leq 0$.
@@ -744,7 +746,7 @@ In the proof of Theorem \ref{trm: 5.14 in Seydel}, $x_\varepsilon$ and $y_\varep
     \begin{equation*}
         |x+\gamma(t,x,z)-y|^2 = |x-y|^2 + 2\langle x-y,\gamma(t,x,z)\rangle + |\gamma(t,x,z)|^2,
     \end{equation*}
-    we have, for the test function $\varphi(x,y) \frac{1}{2\varepsilon}|x-y|^2$ and fixed $t_\varepsilon < T$,
+    we have, for the test function $\varphi(x,y) = \frac{1}{2\varepsilon}|x-y|^2$ and fixed $t_\varepsilon < T$,
     \begin{align*}
         \mathcal{I}^{1,\delta} &[t_\varepsilon, x_\varepsilon, \varphi(\cdot, y_\varepsilon)]\\
         & = \int\limits_{|z|<\delta} \Big( \varphi \big( x_\varepsilon + \gamma(t_\varepsilon,x_\varepsilon,z) \big) - \varphi(x_\varepsilon,y_\varepsilon) - \langle \nabla_x \varphi(x_\varepsilon,y_\varepsilon), \gamma(t_\varepsilon,x_\varepsilon,z) \rangle \Big) \nu(\diff z) \\
@@ -906,9 +908,9 @@ Finally, and with the help of Theorem \ref{trm: 5.14 in Seydel}, we may prove th
     \begin{equation*}
         u=u_*=u^* \quad \text{on } [0,T] \times \R^d,
     \end{equation*}
-    which shows that there exist at most one viscosity solution of \eqref{eqn: QVI with functionals}.
+    which shows that there exists at most one viscosity solution of \eqref{eqn: QVI with functionals}.
 \end{proof}
 
-Taken together, the existence result in Chapter \ref{section: Viscosity Solution for Impulse Control: Existence} and the uniqueness result in this chapter, we may conclude that the QVI \eqref{eqn: QVI with functionals} admits a unique viscosity solution. Moreover, since the value function \eqref{eqn: impulse control problem} satisfies the QVI in the viscosity sense, it follows that the value function is uniquely determined by the QVI. 
+Together, from the existence result in Chapter \ref{section: Viscosity Solution for Impulse Control: Existence} and the uniqueness result in the form of Corollary \ref{cor: Corollary 5.15 in Seydel}, we find that QVI \eqref{eqn: QVI with functionals} admits a unique viscosity solution under mild assumptions on the underlying functions and polynomial growth conditions. Moreover, since the value function \eqref{eqn: impulse control problem} satisfies the QVI in the viscosity sense, it follows that the value function is uniquely determined by the QVI. 
 
-However, as it is often the case with (HJB)QVIs, a closed-form solution may not exist and often depends on the choice of the functions $f$, $g$, and $K$. This motivates us to apply numerical schemes to approximate the solution of \eqref{eqn: QVI with functionals} in the chapters that follow. 
+Although this gives a complete theoretical characterization, it generally does not yield a closed form representation. As is often the case with HJBQVIs, a closed-form solution may not exist and often depends on the choice of functions $f$, $g$, and $K$, as well as on the intervention operator $\InterveneOper$. This motivates the numerical schemes considered in the chapters to follow.

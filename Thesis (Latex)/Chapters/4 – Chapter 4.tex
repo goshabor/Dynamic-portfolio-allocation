@@ -12,7 +12,8 @@ must be satisfied. Combining these two choices yields QVI
 \begin{equation*}
     \min \big\{-(\partial_t u + \InfinitesimalGenerator u + f), u - \InterveneOper u \big\} = 0.
 \end{equation*}
-However, we need to show that the solution $u$ to the above QVI is indeed the value function, i.e., $u=v$. Moreover, the solution $u$ is not expected to be sufficiently smooth for a classical interpretation of the QVI\footnote{Or, at least, not everywhere in $[0,T] \times \R^d$.}. This is because the intervention operator produces kinks between the continuation and intervention regions, which results in the value function being non-differentiable on these points or regions. In addition, since the underlying state process is a jump-diffusion, the QVI contains a generator with a nonlocal integral term. In light of this, a weaker solution in the form of \textit{viscosity solutions} is required to treat the QVI.
+
+However, we need to show that the solution $u$ to the above QVI is indeed the value function, i.e., $u=v$. Moreover, the solution $u$ is not expected to be sufficiently smooth for a classical interpretation of the QVI\footnote{Or, at least, not everywhere in $[0,T] \times \R^d$.}. This is because the intervention operator produces kinks between the continuation and intervention regions, which causes the value function to be non-differentiable on these points or regions. In addition, since the underlying state process is a jump-diffusion, the QVI contains a generator with a nonlocal integral term. In light of this, a weaker solution in the form of \textit{viscosity solutions} is required to treat the QVI.
 
 Roughly speaking, viscosity solutions allow the QVI to be interpreted through smooth test functions without requiring the value function itself to be classically differentiable. In this chapter, we formulate the QVI and show that a viscosity solution to the QVI exists. We rely on the theory provided by \textcite{seydel2010generalexistenceuniquenessviscosity} and, as such, the structure of this chapter is identical to Section 4 in Seydel with the exception that we do not consider continuous controls. Nevertheless, some of the proofs presented in this chapter have, to some extent, been extended for clarity. 
 
@@ -25,13 +26,13 @@ Recall the finite-horizon impulse control problem \eqref{eqn: optimal value func
     v(t,x) = \sup_{\alpha \in \AdmissibleSet} J^{(\alpha)}(t,x), \quad \text{for } (t,x)\in [0,T]\times \Solvency.
     \label{eqn: impulse control problem}
 \end{equation}
-For a stopping time $\tau':=\tau_\Solvency \wedge T$, where $T<\infty$ the time horizon, the performance criterion $J$ is given by
+For a fixed impulse control $\alpha$ and a stopping time $\tau':=\tau_\Solvency \wedge T$, where $T<\infty$ the time horizon, the performance criterion $J^{(\alpha)}$ is given by
 \begin{equation*}
     J^{(\alpha)}(t,x) = \Etx \left[ \int_t^{\tau'} f(s,X^{(\alpha)}(s)) \diff s + g(\tau', X^{(\alpha)}(\tau')) + \sum_{t \leq \tau_j < \tau'} K(\tau_j, \check{X}^{(\alpha)}(\tau_j^-), \zeta_j) \right].
 \end{equation*}
-The functions $f$, $g$, and $K$ are assumed to satisfy the integrability conditions in \eqref{eqn: well-behavedness of f}–\eqref{eqn: well-behavedness of K}. These conditions ensure that the performance criterion is finite for every admissible control $\alpha \in \AdmissibleSet$ and every $(t,x) \in [0,T] \times \Solvency$. The uncontrolled process $X$ follows the SDE \eqref{eqn: jump-diffusion SDE}, with drift, diffusion, and jump-amplitude functions satisfying \eqref{eqn: Lipschitz condition}--\eqref{eqn: lgb condition}, and the controlled process $\Xa$ is given by \eqref{eqn: (9.1.2) in ØS}--\eqref{eqn: (9.1.4) in ØS}. Furthermore, recall that the intervention operator $\InterveneOper$, introduced in Definition \ref{def: Intervention Operator}, is given by
+The functions $f$, $g$, and $K$ are assumed to satisfy conditions \eqref{eqn: well-behavedness of f}–\eqref{eqn: well-behavedness of K}. The uncontrolled process $X$ follows the SDE \eqref{eqn: jump-diffusion SDE}, with the drift, diffusion, and jump-amplitude functions satisfying conditions \eqref{eqn: Lipschitz condition} and \eqref{eqn: lgb condition}. The controlled process $\Xa$ is given by \eqref{eqn: (9.1.2) in ØS}--\eqref{eqn: (9.1.4) in ØS}. Furthermore, recall that the intervention operator $\InterveneOper$, introduced in Definition \ref{def: Intervention Operator}, is given by
 \begin{equation*}
-    \InterveneOper v(t,x) = \sup_{\zeta \in \mathcal{Z}} \big\{ v\big(t,\Gamma(t,x,\zeta)\big) + K(t,x,\zeta) \big\}
+    \InterveneOper v(t,x) = \sup_{\zeta \in \mathcal{Z}(t,x)} \big\{ v\big(t,\Gamma(t,x,\zeta)\big) + K(t,x,\zeta) \big\}
 \end{equation*}
 and that the infinitesimal generator of the uncontrolled process $X$ is given by
 \begin{align}
@@ -58,7 +59,7 @@ We now provide an interpretation for the QVI \eqref{eqn: QVI}. Consider \eqref{e
 $$D=\{(t,x) \in [0,T)\times \Solvency: u(t,x)>\InterveneOper u(t,x)\}.$$
 Otherwise, the Hamiltonian is positive outside of the continuation region and the controller intervenes, see conditions $(ii)$ and $(vi)$ in Theorem \ref{trm: Verification for Impulse Control}. 
 
-The boundary condition \eqref{eqn: QVI b} compares the value of intervening outside of the solvency region $\Solvency$ versus immediately collecting the reward $g$. The reason we consider $v$ on $\R^d$, as opposed to the region of interest $\Solvency$, is because the process $X$ has jumps. As \textcite{seydel2010generalexistenceuniquenessviscosity} discusses, it is not possible to stay a positive amount of time outside $\Solvency$ since the problem is stopped at $\tau_\Solvency$. However, if we consider the infinitesimally small amount of time between an exogenous (Poisson) jump and an intervention, the controller can push the controlled state back into $\Solvency$ through an impulse before the stopping time $\tau_\Solvency$ takes notice. This is illustrated in Example \ref{ex: solvency time notice}. Hence, defining $v$ outside of $\Solvency$ is needed to be able to decide whether a jump back to solvency is worthwhile. 
+The boundary condition \eqref{eqn: QVI b} compares the value of intervening outside of the solvency region $\Solvency$ versus immediately collecting the reward $g$. The reason we consider $v$ on $\R^d$, as opposed to the region of interest $\Solvency$, is because the process $X$ has jumps. As \textcite{seydel2010generalexistenceuniquenessviscosity} discusses, it is not possible to stay a positive amount of time outside $\Solvency$ since the problem is stopped at $\tau_\Solvency$. However, if we consider the infinitesimally small amount of time between an exogenous (Poisson) jump and an intervention, the controller can push the controlled state back into $\Solvency$ through an impulse before the stopping time $\tau_\Solvency$ takes notice. This is illustrated in Example \ref{ex: solvency time notice}. Hence, defining $v$ outside of $\Solvency$ is needed in order to decide whether a jump back to solvency is worthwhile. 
 
 Finally, condition \eqref{eqn: QVI c} formalises the terminal condition, where one either collects a terminal reward $g$, or undertakes an impulse and collects $\InterveneOper g$. 
 
@@ -66,7 +67,7 @@ Finally, condition \eqref{eqn: QVI c} formalises the terminal condition, where o
 \label{ex: solvency time notice}
     Let $X^{(\alpha)}$ be a controlled process and recall that impulses are allowed to be taken only after the exogenous Poisson jump takes place, see Definition \ref{def: Post-Jump, Pre-Intervention State}. Before intervening, the state we consider is therefore the post-jump, pre-intervention state $\check{X}^{(\alpha)}$. At an intervention time $\tau$, the controlled process is moved to the post-intervention state $\Gamma(\tau, \check{X}^{(\alpha)}(\tau^-), \zeta) = \check{X}^{(\alpha)}(\tau^-) + \zeta$. 
 
-    Now suppose that $X^{(\alpha)}$ models the cash account of a profitable business. Let $\Solvency = (0,\infty)$ and $X^{(\alpha)}(\tau^-) = 1 \in \Solvency$ be such that the firm begins in a solvent state. If a negative size shock $-4$ occurs at time $\tau$, the post-jump pre-intervention state is $\check{X}^{(\alpha)}(\tau^-) = 1-4 = -3 \notin \Solvency$ and the profitable business has run out of capital. To push the state back into the solvency region, investors may inject capital into the firm through an impulse, say $\zeta=5$. Then the state jumps back into solvency, i.e. $\Gamma(\tau, \check{X}^{(\alpha)},\zeta) = -3 + 5 = 2 \in \Solvency$. Thus, the business becomes solvent again.
+    Now suppose that $X^{(\alpha)}$ models the cash account of a profitable business. Let $\Solvency = (0,\infty)$ and $X^{(\alpha)}(\tau^-) = 1 \in \Solvency$ be such that the firm begins in a solvent state. If a negative shock of size $-4$ occurs at time $\tau$, the post-jump pre-intervention state is $\check{X}^{(\alpha)}(\tau^-) = 1-4 = -3 \notin \Solvency$, and the profitable business has run out of capital. To push the state back into the solvency region, investors may inject capital into the firm through an impulse, say $\zeta=5$. Then the state jumps back into solvency, i.e. $\Gamma(\tau, \check{X}^{(\alpha)},\zeta) = -3 + 5 = 2 \in \Solvency$. Thus, the business becomes solvent again and an impulse was worthwhile, although the state jumped out of $\Solvency$.
 \end{example}
 
 \subsection{Further assumptions}
@@ -78,7 +79,12 @@ Let us now consider the conditions under which the terms $\InfinitesimalGenerato
 \end{align}
 for some $\tilde x \in B(x,\sup_{|z|<\delta} \gamma(t,x,z))$. Here, $B(x,\rho)$ denotes a (open) ball of radius $\rho>0$ around the point $x$. 
 
-As discussed in Chapter \ref{section: Preliminaries}, we assume that the basic regularity conditions \eqref{eqn: Lévy measure condition} and \eqref{eqn: assumption for chapter 4} are satisfied. Then, with \eqref{eqn: assumption for chapter 4} and according to \cite{seydel2010generalexistenceuniquenessviscosity}, the Hamiltonian $\partial_t u + \InfinitesimalGenerator u + f$ is well-defined if, for instance, the following conditions are satisfied
+As discussed in Chapter \ref{section: Preliminaries}, we assume that the basic regularity condition \eqref{eqn: Lévy measure condition} is satisfied for a given $\nu$. Furthermore, let $p^*>0$ and $q^*\geq 0$ be real numbers such that 
+\begin{equation}
+    \int_{|z|\geq 1} |z|^{p^*} \nu(\diff z) < \infty \quad \text{and} \quad \int_{|z|<1}|z|^{q^*}\nu(\diff z) < \infty
+    \label{eqn: assumption for chapter 4}
+\end{equation}
+Then, with \eqref{eqn: assumption for chapter 4} and according to \cite{seydel2010generalexistenceuniquenessviscosity}, the Hamiltonian $\partial_t u + \InfinitesimalGenerator u + f$ is well-defined if, for instance, the following conditions are satisfied
 \begin{enumerate}
     \item $u \in C^{1,2}([0,T) \times \R^d)$, and
     \item One of the following inequalities hold locally in $(t,x) \in [0,T) \times \Solvency$ for a constant $C_{t,x}$ dependent on $t$ and $x$:
@@ -155,7 +161,7 @@ Throughout, we denote by $\LSC(\mathcal{C})$ and $\USC(\mathcal{C})$ the set of 
 
 \begin{definition}[{\cite[Definition 4.1]{seydel2010generalexistenceuniquenessviscosity}} Viscosity Solution]
 \label{def: Definition 4.1 in Seydel (Viscosity solution)}
-    Denote $\PB = \PB([0,T]\times \R^d)$. A function $u \in \PB$ is a viscosity subsolution of \eqref{eqn: QVI} if for all $(t_0,x_0) \in [0,T] \times \R^d$ and $\varphi \in \PB \cap C^{1,2}([0,T]\times \R^d)$ with $\varphi(t_0,x_0) = u^*(t_0,x_0)$, where $u^*$ is the upper semi-continuous envelope of $u$ (see Definition \ref{def: upper semi-continuous functions}), and with $\varphi \geq u^*$ on $[0,T] \times \R^d$, we have
+    A function $u \in \PB$ is a viscosity subsolution of \eqref{eqn: QVI} if for all $(t_0,x_0) \in [0,T] \times \R^d$ and $\varphi \in \PB \cap C^{1,2}([0,T]\times \R^d)$ with $\varphi(t_0,x_0) = u^*(t_0,x_0)$, where $u^*$ is the upper semi-continuous envelope of $u$ (see Definition \ref{def: upper semi-continuous functions}), and with $\varphi \geq u^*$ on $[0,T] \times \R^d$, we have
     \begin{align*}
         \min \big\{-(\partial_t \varphi + \InfinitesimalGenerator \varphi + f), u^* - \InterveneOper u^* \big\} \leq 0 & \quad \text{in } (t_0,x_0) \in [0,T) \times \Solvency \\
         \min \{ u^*-g, u^* - \InterveneOper u^* \} \leq 0 & \quad \text{in } (t_0,x_0) \in \partial^+ \Solvency_T.
@@ -172,7 +178,8 @@ Throughout, we denote by $\LSC(\mathcal{C})$ and $\USC(\mathcal{C})$ the set of 
 \begin{remark}
     In Seydel \cite{seydel2010generalexistenceuniquenessviscosity}, the author remarks that the conditions on the parabolic boundary are included inside the viscosity solution definition (sometimes called ``strong viscosity solution'', see, e.g., Ishii \cite{ishii1993viscosity}) because of the implicit form of this ``boundary condition''. In $T$ , we choose the implicit form because, otherwise, the comparison result would not hold. The time derivative in $t = 0$ is to be understood as a one-sided derivative.
 \end{remark}
-With the definition of the viscosity solution in place, the below lemma, which is important for the existence proof, follow.
+With the definition of the viscosity solution in place, consider the following lemma, which is applied in the existence proof. 
+
 \begin{lemma}[{\cite[Lemma 4.3]{seydel2010generalexistenceuniquenessviscosity}}]
 \label{lemma: Lemma 4.3 in Seydel}
     Let \assitemref{ass: V1} and \assitemref{ass: V2} be satisfied. Let $u$ be a locally bounded function\footnote{The function $u$ is locally bounded if for every $x \in \R^d$, there is a neighbourhood $U$ of $x$ and a constant $C>0$ such that $|f(y)| \leq C$ for all $y \in U$.} on $[0,T] \times \R^d$. Then
@@ -199,7 +206,7 @@ With the definition of the viscosity solution in place, the below lemma, which i
             \liminf_{n \rightarrow \infty} \InterveneOper u_*(t_n,x_n) & \liminf_{n \rightarrow \infty} \Big\{ \sup_{\zeta \in \mathcal{Z}(t_n,x_n)}\big\{u_*(t,\Gamma(t_n,x_n,\zeta)) + K(t_n,x_n,\zeta)\big\} \Big\}\\
             & \geq \liminf_{n \rightarrow \infty} \big\{u_*(t,\Gamma(t_n,x_n,\zeta_n)) + K(t_n,x_n,\zeta_n)\big\} \\
             & \geq u_*(t,\Gamma(t,x,\zeta^{(\varepsilon)})) + K(t,x,\zeta^{(\varepsilon)}) \\
-            & \InterveneOper u_* (t,x) - \varepsilon.
+            & \geq \InterveneOper u_* (t,x) - \varepsilon.
         \end{align*}
         Since $\varepsilon > 0$ is arbitrary, it follows by the definition of lower semi-continuous functions (see Definition \ref{def: lower semi-continuous functions}), that 
         \begin{equation*}
@@ -432,10 +439,10 @@ Thus, localisation can be enforced with probability arbitrarily close to one by 
         \label{eqn: Theorem 4.8, initial assumption}
     \end{equation}
     one obtains
-    \begin{equation*}
+    \begin{equation}
         - (\partial_t \varphi + \InfinitesimalGenerator \varphi + f) \leq 0 \quad \text{in }(t_0,x_0) \in [0,T) \times \Solvency,
         \label{eqn: Theorem 4.8, main goal subsolution part}
-    \end{equation*}
+    \end{equation}
     where $\varphi \in \PB \cap C^{1,2}([0,T) \times \R^d)$. To this end, we argue by contradiction and assume that there is an $\eta > 0$ such that 
     \begin{equation}
         \partial_t \varphi(t_0,x_0) + \InfinitesimalGenerator \varphi(t_0,x_0) + f(t_0,x_0) < - \eta.
@@ -472,7 +479,7 @@ Thus, localisation can be enforced with probability arbitrarily close to one by 
     \end{equation*}
     for $X^{(a^n, t_n,x_n)}$ denoting the controlled process starting at $(t_n,x_n)$, and $\tau_1^n$ is the first time of intervention in the impulse control $\alpha^n$. 
     
-    With this in mind, we now aim to show that $\bar \tau_n \rightarrow t_0$ in probability. Therefore, we begin by observing that, for some $t,x) \in [0,T] \times \Solvency$, $\tau = \tauS \wedge T$, and $\tilde \tau \leq \tau$, the performance criterion satisfies the following inequality
+    With this in mind, we now aim to show that $\bar \tau_n \rightarrow t_0$ in probability. Therefore, for some $(t,x) \in [0,T] \times \Solvency$, $\tau = \tauS \wedge T$, and $\tilde \tau \leq \tau$, we observe that the performance criterion satisfies the following inequality
     \begin{align}
         J^{(\alpha)}&(t,x) = \E^{(t,x)} \left[ \int_t^{\tau} f(s,X^{(\alpha)}(s)) \diff s + g(\tau,X^{(\alpha)}(\tau)) + \sum_{\tau_j \leq \tau} K(\tau_j, \check{X}^{(\alpha)}(\tau_j^-), \zeta_j) \right] \nonumber \\
         &= \Etx \Bigg[ \int_t^{\tilde \tau} f(s,X^{(\alpha)}(s)) \diff s + \sum_{\tau_j \leq \tau} K(\tau_j, \check{X}^{(\alpha)}(\tau_j^-), \zeta_j) \nonumber  \\
@@ -512,7 +519,7 @@ Thus, localisation can be enforced with probability arbitrarily close to one by 
     \begin{align*}
         &(I): \{\bar \tau_n^\rho < \tau_1^n\} \\
         &(II): \{\bar \tau_n^\rho \geq \tau_1^n \} \cap A_n(\rho)^c \\
-        &(III): \{\bar \tau_n^\rho \geq \tau_1^n \} \cap A_n(\rho) \\
+        &(III): \{\bar \tau_n^\rho \geq \tau_1^n \} \cap A_n(\rho)
     \end{align*}
     We note that $(III)$ is the predominant set, i.e. it has maximum possible cardinality. To see this, note that 
     \begin{equation*}

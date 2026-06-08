@@ -1,7 +1,7 @@
 %\section{Economic Scenario Generator}
 \label{Appendix: Stock Scenario Generator}
 
-The method and algorithm presented in this appendix are used for the pathwise simulation of stock prices in Chapter \ref{section: Multi-dimensional Dynamic Portfolio Allocation}. We closely follow the approach presented in \cite{LUCIANO20101937, Luciano02072016}.
+The method and algorithm presented in this appendix are used for the pathwise simulation of stock prices in Chapter \ref{section: Multi-dimensional Dynamic Portfolio Allocation}. We closely follow the approach presented in \cite{Luciano02072016, LUCIANO20101937}.
 
 \section{Variance-Gamma processes and subordination}
 Let $S_i=\{S_i(t)\}_{t \geq 0}$ denote a one-dimensional price process of stock $i$, for $i=1,\ldots,d$, on a filtered probability space $(\Omega, \F, \{\F\}_{t \geq 0}, \Prob)$. Suppose that the initial condition $S_i(0^-) = s_i$ is known and that $S_i$ follows a pure-jump SDE
@@ -114,15 +114,18 @@ The correlation matrix $\mathbf{C}$ cannot be directly observed from stock marke
 \end{equation}
 where, for a Brownian motion correlation $\rho_{ij}$ in $\mathbf C$, $\rho_{\mathbf{Y}}(i,j)$ is given by
 \begin{equation}
-    \rho_{\mathbf{Y}}(i,j) = \frac{a \left(\rho_{ij} \sigma_i \sigma_j \sqrt{\nu_i \nu_j} + \theta_i \theta_j \nu_i \nu_j\right)}{\sqrt{(\sigma_i^2 + \theta_i^2 \nu_i)(\sigma_j^2 + \theta_j^2 \nu_j)}}.
+    \rho_{\mathbf{Y}}(i,j, \rho_{ij}) = \frac{a \left(\rho_{ij} \sigma_i \sigma_j \sqrt{\nu_i \nu_j} + \theta_i \theta_j \nu_i \nu_j\right)}{\sqrt{(\sigma_i^2 + \theta_i^2 \nu_i)(\sigma_j^2 + \theta_j^2 \nu_j)}}.
     \label{D: rho-model}
 \end{equation}
 
-Then, if $ \rho^{\text{Market}}_{\mathbf{Y}}(i,j)$ denotes the observed log-return correlation between assets $i, j$ and $\rho^{\text{Model}}_{\mathbf{Y}}(i,j)$ is given by \eqref{D: rho-model}, we estimate $\rho_{ij}$ via constrained minimisation. Specifically, we solve
-\begin{align*}
-    & \min_{\substack{\hat \rho_{ij} \\ i,j=1,\ldots, d}}\sum_{i<j}\left( \rho^{\text{Market}}_\mathbf{Y}(i,j) - \rho^{\text{Model}}_\mathbf{Y}(i,j) \right)^2 \quad  \text{s.t } \hat \rho_{ij} \in (-1,1) \; \text{for all } i,j = 1,\ldots, d, \, i\neq j.
-\end{align*}
-The correlation matrix $\hat{\mathbf{C}}$ is then constructed using the estimated correlation coefficients $\hat \rho_{ij}$. 
+Then, if $ \rho^{\text{Market}}_{\mathbf{Y}}(i,j)$ denotes the observed log-return correlation between assets $i, j$ and $\rho^{\text{Model}}_{\mathbf{Y}}(i,j)$ is given by \eqref{D: rho-model}, we estimate $\rho_{ij}$ via constrained minimisation. Specifically, we solve for
+\begin{equation}
+    \begin{aligned}
+        \min_{\substack{\hat \rho_{ij} \\ i,j=1,\ldots, d}} \quad & \sum_{i<j} \left( \rho^{\text{Market}}_\mathbf{Y}(i,j) - \rho^{\text{Model}}_\mathbf{Y}(i,j,\hat \rho_{ij}) \right)^2\\
+        \textrm{s.t.} \quad & \hat \rho_{ij} \in (-1,1) \; \text{ for all } i,j = 1,\ldots, d, \, i\neq j
+    \end{aligned}
+\end{equation}
+The correlation matrix $\hat{\mathbf{C}}$ \eqref{D: C-matrix} is then constructed using the estimated correlation coefficients $\hat \rho_{ij}$. 
 
 \subsection{Numerical scheme}
 \label{appendix: Numerical scheme}

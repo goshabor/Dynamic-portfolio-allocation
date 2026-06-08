@@ -16,7 +16,7 @@ The portfolio is self-financing, that is, no external cash is injected into or w
 \subsection{Financial environment and impulse controls}
 Let $(\Omega, \F, \{\F\}_{t \geq 0}, \Prob)$ be a filtered probability space with $\Prob$ denoting the real-world probability measure. The investment horizon is finite and denoted by $T>0$. All price, cash, and holding processes are assumed to be adapted and càdlàg. 
 
-Let $\mathbf{s}=(s_1, \ldots, s_d) \in \mathbb R_+^d$ denote the observed risky asset prices at time $t=0$. For $t>0$, let $\mathbf S(t) = (S_1(t), \ldots, S_d(t))\in \R_+^d$ denote the risky asset price process. Here $S_i(t)>0$ is the mid-price of asset $i$ at time $t$. The price process $\mathbf S$ is exogenous. The modelling and simulation of correlated stock prices are discussed in later sections of this chapter. 
+Let $\mathbf{s}=(s_1, \ldots, s_d) \in \mathbb R_+^d$ denote the observed risky asset prices at time $t=0$. For $t>0$, let $\mathbf S(t) = (S_1(t), \ldots, S_d(t))\in \R_+^d$ denote the risky asset price process. Here $S_i(t)>0$ is the mid-price of asset $i$ at time $t$. The price process $\mathbf S$ is assumed to be exogenous, meaning that the portfolio manager cannot control stock prices. The modelling and simulation of correlated stock prices are discussed in later sections of this chapter. 
 
 Let $\tau_j$ denote the $j$-th intervention time and $\zeta(\tau_j)=(\zeta_1(\tau_j), \ldots, \zeta_d(\tau_j)) \in \R^d$ denote the d-dimensional impulse. Not all risky assets present in the portfolio require an impulse at an intervention time. In light of this, we allow at most $d-1$ impulses in $\zeta(\tau_j)\in \R^d$ to be zero. The impulse control is then given by $\alpha = \{(\tau_j, \zeta(\tau_j))\}_{j = 0}^M$ for $M\leq \infty$. 
 
@@ -34,7 +34,7 @@ Let $B^{(\alpha)}(t)$ denote the time-$t$ gross cash balance given a trading str
 \end{equation*}
 where $\cdot$ denotes the Euclidean inner product. Between intervention times, $B^{(\alpha)}$ accrues at the risk-free rate $\delta$. That is, for $t \in [\tau_j, \tau_{j+1})$,
 \begin{equation*}
-    B^{(\alpha)}(t) = B(\tau_j) e^{\delta(t-\tau_j)}, \quad \text{for } j = 1, 2, \ldots. 
+    B^{(\alpha)}(t) = B^{(\alpha)}(\tau_j) e^{\delta(t-\tau_j)}, \quad \text{for } j = 1, 2, \ldots. 
 \end{equation*}
 For any cash amount $\tilde b$, the portfolio value function is defined as
 \begin{equation}
@@ -59,7 +59,7 @@ where $c,\kappa>0$ denote the fixed and proportional costs terms respectively. T
 \begin{equation*}
     K(t,\mathbf{s}, \zeta) = \sum_{i=1}^d \text{TC}(t,s_i,\zeta_i).
 \end{equation*}
-Since $\text{TC}(t,s_i,\zeta_i)$ is non-positive, it follows that $K(t,\mathbf{s}, \mathbf x)$ is non-positive as well. 
+Since $\text{TC}(t,s_i,\zeta_i)$ is negative, it follows that $K(t,\mathbf{s}, \mathbf x)$ is also negative. 
 
 Finally, let $\mathcal H \subseteq \R_+^d$ denote the admissible inventory region. This set contains the allowed risky holdings and includes upper position limits. The admissible impulse set is 
 \begin{equation}
@@ -78,7 +78,7 @@ The objective of the investor is to maximise the expected, discounted terminal p
 \end{equation}
 The portfolio process $\Pi^{(\alpha)}$ is defined as in \eqref{eqn: portfolio process} and $\pi_0$ denotes the initial portfolio value. The value function is 
 \begin{equation*}
-    v(\pi_0, \mathbf{s}) = \sup_\alpha J_0^{(\alpha)}(\pi_0, \mathbf s),
+    v(\pi_0, \mathbf{s}, \mathbf x) = \sup_{\alpha \in \mathcal V} J_0^{(\alpha)}(\pi_0, \mathbf s, \mathbf x),
 \end{equation*}
 where the supremum is taken over all admissible impulse controls. The value function is interpreted as the maximal expected discounted terminal portfolio value attainable from the initial portfolio value $\pi_0$ and stock prices $\mathbf s$. 
 
@@ -103,13 +103,12 @@ Then, the performance criterion \eqref{eqn: performance criterion continuous tim
 \begin{equation*}
     J^{(\alpha)}_0(\pi_0, \mathbf s, \mathbf x) \approx \pi_0 + \sum_{n=0}^{N_t}\E_\Prob^{(\pi_0, \mathbf s, \mathbf x)}\left[ r\big(t_n,\Pi^{(\alpha)}(t_n), \mathbf{S}(t_{n}), \zeta(t_n) \big) \right].
 \end{equation*}
-This representation is well-suited for the PPO-SIL algorithm, as it expresses the objective in terms of accumulated rewards along simulated paths. The corresponding PPO-SIL loss functions are computed as described in Chapter \ref{section: Policy-based approximation of impulse control problems}.
+This representation helps with the training of the PPO-SIL algorithm, as it expresses the objective in terms of accumulated rewards along a path rather than a single reward at the terminal time\footnote{Otherwise, the DRL algorithm might learn to execute all trades near the end of the investment horizon, leading to a suboptimal learned strategy.}. The corresponding PPO-SIL loss functions are computed as described in Chapter \ref{section: Policy-based approximation of impulse control problems}.
 
 \section{Implementation details}
-This subsection outlines the practical implementation of the PPO-SIL algorithm in the context of dynamic portfolio allocation. In particular, we describe the construction of the initial portfolio, the calibration and simulation of the underlying stock price models, and the training setup for the reinforcement learning agent. Together, these components define the environment in which we apply the PPO-SIL algorithm. The Python code used in this experiment can be found in \cite{mycode}.
 
 \subsection{Equity universe and initial portfolio}
-The stock universe is limited to the stocks found in the Exchange-Traded Fund (ETF) \textit{Xtrackers Switzerland ETF 1D fund}, which tracks the Swiss Market Index (SMI) and has an average annual return of 8\% over the past three years\footnote{I.e. from May 14th 2023 to May 14th 2026.}. The fund consists of 20 stocks and the ETF portfolio weights are used to construct the initial portfolio allocation. We set the initial portfolio value to be $\pi_0=50000$ CHF\footnote{CHF = Swiss franc}. The fixed part of transaction costs is $c=3$ CHF and the proportional part is $\kappa=0.1\%$. The initial portfolio weights, together with the corresponding asset names, tickers, and spot prices can be found in Table \ref{tab: initial portfolio weights}, while an overview of the initial portfolio composition can be found in Table \ref{tab: initial portfolio}.
+The stock universe is limited to the stocks found in the Exchange-Traded Fund (ETF) \textit{Xtrackers Switzerland ETF 1D fund}, which tracks the Swiss Market Index (SMI) and has an average annual return of 8\% over the past three years, i.e. from May 14th 2023 to May 14th 2026. The fund consists of 20 equities and the ETF portfolio weights are used to construct the initial portfolio allocation. We set the initial portfolio value to be $\pi_0=50000$ CHF\footnote{CHF = Swiss franc}. The fixed part of transaction costs is $c=1.5$ CHF and the proportional part is $\kappa=0.1\%$. The initial portfolio weights, together with the corresponding asset names, tickers, and spot prices can be found in Table \ref{tab: initial portfolio weights}, while an overview of the initial portfolio composition can be found in Table \ref{tab: initial portfolio}.
 
 \begin{table}[!htbp]
     \centering
@@ -164,7 +163,7 @@ The choice behind the aforementioned ETF is due to the fact that the Swiss Avera
 \subsection{Simulation and calibration of stock prices}
 Risky assets are modelled as correlated pure-jump processes, with marginal log-returns following Variance Gamma (VG) dynamics via multivariate subordination. The dependence between assets is introduced through linear correlation in the Brownian components and nonlinear dependence in the jump components via a common market-jump factor in the multivariate VG subordinator, see \cite{LUCIANO20101937, Luciano02072016}. This modelling choice captures the non-Gaussian returns and tail dependence observed in equity returns, which cannot be explained by linear correlation alone. Further theoretical details and the simulation scheme can be found in Appendix \ref{Appendix: Stock Scenario Generator} .
 
-The marginal VG parameters $\sigma_i$, $\theta_i$, and $\nu_i$ are calibrated to European call option prices using the Fast Fourier Transform, as described in Appendix \ref{appendix: Calibration Procedure}. Option prices were collected on May 14th 2026, and are as such current market data rather than historical observations. The drift coefficients $\mu_i$ are estimated from two years of historical stock price data, with the upper $5\%$ of log-returns trimmed to obtain more robust and conservative estimates. The estimated model parameters can be found in Table \ref{tab: parameter estimates percent}. An overview of the corresponding data used for calibration can be found in Tables \ref{tab: stock data} and \ref{tab: option-sample-overviews} in Appendix \ref{appendix: Data}. 
+The marginal VG parameters $\sigma_i$, $\theta_i$, and $\nu_i$ for each stock $i=1,\ldots,20$, are calibrated to European call option prices using the Fast Fourier Transform, as described in Appendix \ref{appendix: Calibration Procedure}. Option prices were collected on May 14th 2026, and are as such current market data rather than historical observations. The drift coefficients $\mu_i$ are estimated from two years of historical stock price data, with the upper $5\%$ of log-returns trimmed to obtain more robust and conservative estimates. The estimated model parameters can be found in Table \ref{tab: parameter estimates percent}. An overview of the corresponding data used for calibration can be found in Tables \ref{tab: stock data} and \ref{tab: option-sample-overviews} in Appendix \ref{appendix: Data}. 
 \begin{table}[!htbp]
     \centering
     \begin{tabular}{lrrrr}
@@ -205,15 +204,15 @@ These parameters are used to simulate the joint paths of the $d$-dimensional cor
 \end{figure}
 
 \subsection{PPO-SIL hyperparameters}
-Similarly to the FEX example in Chapter \ref{section: Numerical Experiment I: Impulse Control of the Foreign Exchange Rate}, the PPO-SIL algorithm employs two fully-connected feedforward neural networks with hyperbolic tangent activation functions. One network determines whether to intervene, while the other selects the corresponding impulse size. Both networks share the same architecture, given by
+Similarly to the FEX example in Chapter \ref{section: Numerical Experiment I: Impulse Control of the Foreign Exchange Rate}, the PPO-SIL algorithm employs two fully-connected feedforward neural networks with hyperbolic tangent activation functions. One network determines whether to intervene, while the other selects the corresponding impulse size. Both networks have the same architecture
 \begin{equation*}
-    \text{Input: } 2 \rightarrow 512 \rightarrow 256 \rightarrow 128 \rightarrow 256 \rightarrow 512 \rightarrow 2 \text{: Output}
+    \text{Input: } 21 \rightarrow 512 \rightarrow 256 \rightarrow 128 \rightarrow 256 \rightarrow 512 \rightarrow 1 \text{: Output}
 \end{equation*}
-As discussed earlier, the bottleneck neural network architecture helps reduce training time, while retaining the most relevant information. 
+As discussed earlier, the bottleneck neural network architecture helps reduce training time while retaining the most relevant information. 
 
 To ensure realistic trading behaviour and portfolio diversification, we impose several constraints. In particular, the agent must maintain at least $1\%$ of the initial portfolio value in each risky asset. Moreover, the maximum position in each asset is capped at $22\%$ of the initial portfolio value in each risky asset, and at most 25 shares in each equity can be traded in a single transaction\footnote{In other words, a total of $25 \times 20 = 500$ shares can at most be traded at each time step.}.
 
-Both neural networks are trained on the same data using $N_{\text{rollout}}=1024$ rollouts. Since a typical trading year consists of 252 days, we set the time grid size to $N_t=252$. To encourage sufficient exploration during training, the entropy regularisation weight is chosen as $\lambda_\mathcal{H}=0.5$. Other hyperparameters used for the training of the PPO-SIL algorithm can be found in Table \ref{tab: PPO training parameters pfolio}.
+Both neural networks are trained on the same data using $N_{\text{rollout}}=1024$ rollouts\footnote{Recall that a rollout is one simulation of the controlled process.}. This is fewer simulations than in the numerical experiment in Chapter \ref{section: Numerical Experiment I: Impulse Control of the Foreign Exchange Rate}, and was chosen to reduce computational time. Furthermore, since a typical trading year consists of 252 days, we set the time grid size to $N_t=252$. To encourage sufficient exploration during training, the entropy regularisation weight is chosen as $\lambda_\mathcal{H}=0.5$. Other hyperparameters used for the training of the PPO-SIL algorithm can be found in Table \ref{tab: PPO training parameters pfolio}.
 \begin{table}[!htbp]
     \centering
     \begin{tabular}{rcc}
@@ -222,16 +221,13 @@ Both neural networks are trained on the same data using $N_{\text{rollout}}=1024
         \hline
         Number of time steps & $N_t$ & 252 \\
         Number of rollout paths & $N_\text{rollout}$ & 1024 \\
+        Number of SIL batches & $N_\text{batch}$ & 4096 \\
         Number of training iterations & $N_\text{iter}$ & 200 \\
         SIL buffer capacity & $N_{\mathcal{B}_\text{good}}$ & 500'000 \\
         SIL loss weight & $\lambda_{\text{SIL}}$ & 0.05 \\
         Entropy regularisation weight & $\lambda_{\mathcal{H}}$ & 0.5 \\
         Actor loss weight & $\lambda_{\text{actor}}$ & 0.5 \\
         PPO clipping parameter & $\varepsilon$ & 0.3 \\
-        Decision network width & $L_{d_\chi}$ & 7 \\
-        Decision network hidden dimensions & $n_{d_\chi, \ell}$ & $\{512, 256, 128, 256, 256, 512\}$ \\
-        Impulse network width & $L_{u_\xi}$ & 7 \\
-        Impulse network hidden dimensions & $n_{u_\xi, \ell}$ & $\{512, 256, 128, 256, 256, 512\}$ \\
         Learning rate\footnote{For both decision and impulse networks.} & lr & 2e-04 \\
         Generalised advantage estimate parameter & $\lambda_\text{GAE}$ & 0.95\\
         \toprule
@@ -239,7 +235,8 @@ Both neural networks are trained on the same data using $N_{\text{rollout}}=1024
     \caption{Parameters used for the training of the PPO algorithm in the dynamic portfolio allocation example.}
     \label{tab: PPO training parameters pfolio}
 \end{table}
-The training and evaluation of the PPO-SIL algorithm is done on a Macbook Pro M2 with a 10-core CPU and a 10-core GPU, as well as 16GB unified RAM. The total training time is about 48 minutes for the PPO-SIL with hyperparameters shown in Table \ref{tab: PPO training parameters pfolio}.
+
+The training and evaluation of the PPO-SIL algorithm is done on a Macbook Pro M2 with a 10-core CPU and a 10-core GPU, as well as 16GB unified RAM. The total training time is about 48 minutes for the PPO-SIL with hyperparameters shown in Table \ref{tab: PPO training parameters pfolio}. The Python code can be found in \cite{mycode}.
 
 \section{Results and evaluation}
 We focus on training and evaluation phases. In particular, we compare the PPO-SIL algorithm against a buy-and-hold portfolio with weights reported in Table \ref{tab: initial portfolio weights}. The comparison is performed on both a single path simulation and on 5'000 simulated paths. 
@@ -253,7 +250,7 @@ As shown in Figure \ref{fig: training terminal wealth}, the training phase shows
     \label{fig: training terminal wealth}
 \end{figure}
 
-Figure \ref{fig: training total trades} shows that this improvement is not driven by an increase in trading activity. On the contrary, the total number of non-zero executed trades decreases sharply during the initial training period, falling from roughly 50 to around 40 trades per sampled path. After the initial decline in trading activity, the trading frequency remains relatively stable, fluctuating around a narrow range. The fluctuation can be explained by the relatively large entropy coefficient $\lambda_\mathcal{H}=0.5$, which encourages exploration but also causes sharp fluctuations in the actions. In general, however, the relatively constant amount of trades during training indicates that the policy learns to act more selectively, reducing unnecessary interventions while still improving terminal wealth.
+Figure \ref{fig: training total trades} shows that this improvement is not driven by an increase in trading activity. On the contrary, the total number of non-zero executed trades decreases sharply during the initial training period, falling from roughly 50 to around 40 trades per sampled path. After the initial decline in trading activity, the trading frequency remains relatively stable, fluctuating around a narrow range. The fluctuation can be explained by the relatively large entropy coefficient $\lambda_\mathcal{H}=0.5$, which encourages exploration but also causes sharp fluctuations of actions taken. In general, however, the relatively constant amount of trades during training indicates that the policy learns to act more selectively, reducing unnecessary interventions while still improving terminal wealth.
 \begin{figure}[!htbp]
     \centering
     \includegraphics[width=0.85\linewidth]{Plots/Portfolio/training_total_trades.png}
@@ -261,7 +258,7 @@ Figure \ref{fig: training total trades} shows that this improvement is not drive
     \label{fig: training total trades}
 \end{figure}
 
-Taken together, Figures \ref{fig: training terminal wealth} and \ref{fig: training total trades} suggest that the trained policy becomes both more profitable and more selective in its use of trades. The simultaneous increase in terminal wealth in terminal wealth and a slight decrease in trading activity is consistent with an improvement in the quality of trading-decisions rather than a simple expansion of market activity. The stabilization of both quantities in the later iterations provides empirical evidence that the training phase approaches a relatively stable policy, although the remaining fluctuations indicate that convergence is approximate rather than exact.
+Taken together, Figures \ref{fig: training terminal wealth} and \ref{fig: training total trades} suggest that the trained policy becomes more profitable and selective in its use of trades. The simultaneous increase in terminal wealth and a slight decrease in trading activity is consistent with an improvement in the quality of trading-decisions rather than a simple expansion of market activity. The stabilization of both quantities in the later iterations indicates that the training phase approaches a relatively stable policy. 
 
 \subsection{Single-scenario evaluation}
 For the single-scenario evaluation, we consider one fixed realisation of the stock price process over the trading horizon. The trained PPO-SIL policy is evaluated sequentially in this fixed price scenario. That is, at each time step, the policy observes the current portfolio value as well as current asset prices and decides whether to trade and how much to trade based on that state. We note that it neither observes future stock prices nor uses the SIL buffer to generate future price paths during evaluation. 
@@ -282,9 +279,9 @@ Figure \ref{fig: ppo vs buy and hold} compares the cumulative portfolio return o
     \label{fig: ppo vs buy and hold}
 \end{figure}
 
-In this scenario, the PPO-SIL strategy outperforms the buy-and-hold benchmark. The PPO-SIL portfolio increases relatively steadily and ends with a yearly return of approximately 9-10\%. The buy-and-hold portfolio ends with a yearly return of approximately 2-3\%. The gap in performance of both portfolios widens during the middle part of the horizon. This suggests that, on this scenario, the learned policy benefits from active reallocation rather than only from the average upward movement of the market. However, we note that this result is path-specific and should not be interpreted as a general performance conclusion.
+In this scenario, the PPO-SIL strategy outperforms the buy-and-hold benchmark. The PPO-SIL portfolio increases relatively steadily and ends with a yearly return of approximately 9-10\%. The buy-and-hold portfolio ends with a yearly return of approximately 2-3\%. The performance gap between both portfolios widens during the middle part of the trading horizon. This suggests that, in this particular scenario, the learned policy benefits from active reallocation rather than only from the average upward movement of the market. %However, we note that this result is path-specific and should not be interpreted as a general performance conclusion.
 
-Table \ref{tab: initial vs terminal portfolio weights} compares the initial and terminal prices, as well as portfolio weights. We observe that the terminal PPO-SIL allocation is concentrated in a small set of assets. Specifically, ABBN, GALD, HOLN, and SDZ receive large final weights. These assets also have relatively large positive drift estimates (see Table \ref{tab: parameter estimates percent}). As such, this may indicate that the agent favours assets with high model-implied drift. However, this interpretation should be treated with caution and the results shown in this subsection alone do not prove that the agent has learned the true long-term behaviour of the stocks. 
+Table \ref{tab: initial vs terminal portfolio weights} compares the initial and terminal prices, as well as portfolio weights. We observe that the terminal PPO-SIL allocation is concentrated in a small set of assets. Specifically, ABBN, GALD, HOLN, and SDZ receive large final weights. These assets also have relatively large positive drift estimates, see Table \ref{tab: parameter estimates percent}. As such, this may indicate that the agent favours assets with large model-implied drifts. %However, this interpretation should be treated with caution and the results shown in this subsection alone do not prove that the agent has learned the true long-term behaviour of the stocks. 
 \begin{table}[!htbp]
     \centering
     \small
@@ -335,7 +332,7 @@ Table \ref{tab: initial vs terminal portfolio weights} compares the initial and 
     \label{tab: initial vs terminal portfolio weights}
 \end{table}
 
-Figure \ref{fig: risky allocaion} gives a more detailed view of the risky allocation over time, with the plot showing the portfolio allocation across risky assets. As one immediately observes, the policy changes the portfolio substantially near the beginning of the horizon. This initial adjustment moves the portfolio away from the ETF allocation and toward the assets that the policy prefers under the learned model. After this initial phase, the allocation becomes more stable, with the policy maintaining a relatively broad exposure to a selected subset of assets. Occasional adjustments are made later in the horizon as well. 
+Figure \ref{fig: risky allocaion} gives a more detailed view of risky allocations over time. As one can note, the learned policy substantially changes the portfolio near the beginning of the horizon. This initial adjustment moves the portfolio away from the ETF allocation and toward the assets that the policy prefers under the learned model. After this initial phase, the allocation becomes more stable, with the policy maintaining a relatively broad exposure to a selected subset of assets. Occasional adjustments are made later in the horizon as well, but not at every time step, which implies that the algorithm has learned not to trade continuously. Instead, it waits for meaningful stock price movements before trading, which is consistent with the impulse-control interpretation of the dynamic portfolio allocation problem. Moreover, the admissibility constrains also shape the allocation. In particular, risk management constraints, such as maximum position limits, trade-size bounds, and the no-borrowing constraint, by design prevent the policy from taking too concentrated positions. 
 \begin{figure}[!htbp]
     \centering
     \includegraphics[width=0.85\textwidth]{Plots/Portfolio/one_path_ppo_sil_risky_allocation.png}
@@ -343,9 +340,7 @@ Figure \ref{fig: risky allocaion} gives a more detailed view of the risky alloca
     \label{fig: risky allocaion}
 \end{figure}
 
-We note that this behaviour is consistent with the impulse-control interpretation of the underlying trading problem, implying that the policy does not trade continuously. Instead, it performs a large initial repositioning and then waits for sufficiently meaningful changes before making further adjustments. Moreover, the admissibility constrains also shape the allocation. In particular, risk management constraints, such as maximum position limits, trade-size bounds, and the no-borrowing constraint, prevent the policy from taking too concentrated positions. 
-
-Figure \ref{fig: impulses} shows the impulse controls, i.e. trading sizes, over time. Recall that positive impulses correspond to a purchase of the corresponding asset, while a negative impulse corresponds to a sale. As previously discussed, the largest impulses occur near the beginning, and after this initial period, most impulses are close to zero, and non-zero trades occur only sparsely. The later trades are smaller and more localised, albeit a few larger adjustments still occur at selected dates, further indicating that frequent trading is not optimal due to transaction costs.
+Figure \ref{fig: impulses} shows the impulse controls, i.e. trading sizes, over time. Recall that positive impulses correspond to a purchase of the corresponding asset, while negative impulses correspond to a sale of the corresponding asset. As discussed previously, the largest impulses occur near the beginning of the investment horizon. After this initial period, most impulses are relatively small, with only occasional larger adjustments occurring comparatively rarely. This indicates that the algorithm has understood that frequent trading is not optimal due to transaction costs. In addition, note that some trade sizes are close to zero, a behaviour that can be explained by the minimum and maximum position constraints we set. 
 \begin{figure}[!htbp]
     \centering
     \includegraphics[width=0.85\textwidth]{Plots/Portfolio/one_path_ppo_sil_impulses.png}
@@ -402,15 +397,15 @@ Table \ref{tab: portfolio performance summary} compares the main performance sta
     \end{tabular}
     \end{adjustbox}
 
-    \caption{Summary performance statistics for the buy-and-hold and PPO-SIL portfolio strategies based on 5,000 simulated stock price paths.}
+    \caption{Summary performance statistics for the buy-and-hold and PPO-SIL portfolio strategies based on 5'000 simulated stock price paths.}
     \label{tab: portfolio performance summary}
 \end{table}
 
 Nevertheless, the high returns of the PPO-SIL portfolio are accompanied with greater annualised portfolio volatility compared to the buy-and-hold portfolio. For instance, the average volatility of the PPO-SIL is 3.12\%, while the passive strategy yields a volatility of 2.21\%. However, this behaviour is expected as the PPO-SIL strategy actively reallocates capital and takes more concentrated positions. Moreover, the agent's only goal is to maximise the stepwise profit-and-loss, as opposed to minimising the portfolio volatility. 
 
-The Sharpe ratio measures excess return per unit of volatility. A higher Sharpe ratio indicates that the portfolio earns more return for each unit of volatility, implying better risk‑adjusted performance.The average Sharpe ratio of the buy-and-hold portfolio is 2.01, while the average Sharpe ratio of the PPO-SIL portfolio is 3.26\footnote{According to Investopedia, Sharpe ratios of around 2 are ``very good'' portfolios, whereas a Sharpe ratio above 3 is counted as ``excellent''.}. This shows that the PPO-SIL not only achieves higher returns by taking more volatile positions. The worst Sharpe ratio is -1.46 for buy-and-hold and -0.73 for PPO-SIL, while the best Sharpe ratio is 5.98 for buy-and-hold and 7.69 for PPO-SIL. Thus, the PPO-SIL shows stronger portfolio performance in both average and extreme Sharpe-ratio outcomes than the passive strategy. 
+The Sharpe ratio measures excess return per unit of volatility. A higher Sharpe ratio indicates that the portfolio earns more return for each unit of volatility, implying better risk‑adjusted performance.The average Sharpe ratio of the buy-and-hold portfolio is 2.01, while the average Sharpe ratio of the PPO-SIL portfolio is 3.26\footnote{According to Investopedia, Sharpe ratios of around 2 are considered ``very good'' portfolios, whereas a Sharpe ratio above 3 is ``excellent''.}. This shows that the PPO-SIL not only achieves higher returns by taking more volatile positions. The worst Sharpe ratio is -1.46 for buy-and-hold and -0.73 for PPO-SIL, while the best Sharpe ratio is 5.98 for buy-and-hold and 7.69 for PPO-SIL. Thus, the PPO-SIL shows stronger portfolio performance in both average and extreme Sharpe-ratio outcomes than the passive strategy. 
 
-In addition to the Sharpe ratio, consider the Calmar ratio, which measures return relative to the maximum realised drop (drawdown). Hence, a high Calmar ratio indicates that the portfolio generates strong returns without suffering large drawdowns. As we can see, the PPO-SIL strategy yields higher Calmar ratios than the buy-and-hold strategy, both on average as well as in worst and favourable scenarios. 
+In addition to the Sharpe ratio, consider the Calmar ratio, which measures return relative to the maximum realised drop (drawdown). Hence, a high Calmar ratio indicates that the portfolio generates strong returns without suffering large drawdowns. As we can see, the PPO-SIL strategy yields larger Calmar ratios when compared to the buy-and-hold strategy, both on average as well as for worst and for favourable scenarios. 
 
 Finally, consider Table \ref{tab: risk metrics}, where tail-risk metrics are reported. The metrics are computed from the empirical distribution of terminal losses based on the formulas found in Appendix \ref{appendix: portfolio performance metrics}. Here, terminal loss is defined as initial wealth minus terminal wealth. Positive values therefore represent actual losses, while negative values represent gains. The empirical VaR at the 5\% tail gives the loss threshold that is exceeded only in the worst 5\% simulated paths. The empirical expected shortfall (ES) gives the average terminal loss inside this worst 5\% tail. 
 \begin{table}[!htbp]
@@ -434,10 +429,10 @@ On the other hand, the PPO-SIL portfolio has a 5\% VaR of -2'389 CHF and an ES o
 Overall, the multiple-path evaluation shows that the PPO-SIL outperforms buy-and-hold across almost all reported performance measures, and exhibits higher annualised returns, larger Sharpe and Calmar ratios, as well as better empirical tail-risk, despite trading and paying for transaction costs.
 
 \section{Remarks on the portfolio experiment}
-The results shown in Chapter \ref{section: Multiple-path evaluation} suggest that the PPO-SIL policy learns that the PPO-SIL policy learns a profitable active allocation strategy under the calibrated simulation time. Nevertheless, the results should be interpreted with care. For instance, the evaluation paths are simulated from the calibrated stock price model and not taken from realised future market data. Hence, the reported performance measures do not prove that the policy would outperform in the real market. The numerical experiment is therefore best understood as a "within-model" test of the PPO-SIL in a high-dimensional portfolio allocation problem with transaction costs and constraints. 
+The results shown in Chapter \ref{section: Multiple-path evaluation} suggest that the PPO-SIL policy learns that the PPO-SIL policy learns a profitable active allocation strategy under the calibrated simulation time. Nevertheless, the results should be interpreted with care. For instance, the evaluation paths are simulated from the calibrated stock price model and not taken from realised future market data. Hence, the reported performance measures do not prove that the policy would outperform in the real market. The numerical experiment is therefore best understood as a ``within-model'' test of the PPO-SIL in a high-dimensional portfolio allocation problem with transaction costs and constraints. 
 
-Our main concern is that the policy may have learned the asset-specific structure of the simulator, since the drift coefficients were kept fixed during both training and evaluation. Although these coefficients are not explicitly provided as inputs, the ordering assets in the state vector is fixed. For example, ABBN always appears first in the simulated stock price vector, while ZURN appears last. Over many training simulations, the reward signals can therefore reveal which assets tend to generate higher terminal wealth. As a result, the PPO–SIL algorithm may have learned to allocate capital toward assets with higher estimated drift, rather than developing a robust decision rule. At the same time, a wealth‑maximising policy would naturally exploit assets with higher expected returns. We therefore note that a limitation of this experiment is the potential sensitivity of the learned policy to misspecification of the drift parameters.
+Our main concern is that the policy may have learned the asset-specific structure of the simulator, since the drift coefficients were kept fixed during both training and evaluation. Although these coefficients are not explicitly provided as inputs, the ordering assets in the state vector are fixed. For example, ABBN always appears first in the simulated stock price vector, while ZURN is last. On many training simulations, the reward signals can therefore reveal which assets tend to generate higher terminal wealth. As a result, the PPO–SIL algorithm may have learned to allocate capital on assets with higher estimated drift, rather than developing a robust decision rule. At the same time, a wealth‑maximising policy would naturally exploit assets with higher expected returns. We therefore note that a limitation of this experiment is the potential sensitivity of the learned policy to misspecification of the drift parameters.
 
-The calibration procedure therefore becomes an important source of model risk. The drift coefficients are estimated using historical data. However, historical data does not always reflect future stock price paths. Moreover, expected future returns are hard to estimate (as otherwise, everyone would be rich by now), and small changes in the estimation window or market regime changes could drastically change the future drifts. In addition, historical option data are not available on the LSEG terminal and, as a result, it was not possible to perform a full backtest using out-of-sample data. We therefore had to rely on future price simulations from a single calibrated parameter set.
+The calibration procedure therefore becomes an important source of model risk. Recall that drift coefficients are estimated using historical data. However, historical data does not always reflect future stock price paths. Moreover, expected future returns are difficult to estimate (otherwise everyone would be rich by now), particularly over a one-year horizon, since short-term realized returns can be dominated by negative shocks rather than long-run trends. This makes projections highly sensitive to the chosen calibration period. Finally, we note that historical option data are not available on the LSEG terminal\footnote{Or at least not in abundance.} and, as a result, it was not possible to perform a full backtest using out-of-sample data. This explains why we had to rely on future price simulations from a single calibrated parameter set.
 
-Finally, we note that the dynamic portfolio allocation experiment is not limited to equities only, but can instead be combined with a broad universe of securities, such as fixed-income instruments, options, or even DeFi assets.
+Finally, we note that the dynamic portfolio allocation experiment is not limited to only equities and can be combined with a broad universe of securities, such as fixed-income instruments, options, (leveraged) bull and bear instruments, or even DeFi assets. In addition, the no-shorting, no-borrowing, and position constraints can be relaxed and, admittedly, a more realistic solvency region with liquidity constraints should be considered, see for example \textcite{ly2007model} and \textcite{frey2010optimal}.

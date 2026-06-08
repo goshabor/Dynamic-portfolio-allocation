@@ -5,7 +5,7 @@ This chapter introduces deep reinforcement learning (DRL) as an alternative appr
 
 We begin with a brief overview of reinforcement learning and its mathematical foundations, highlighting the connection between Markov decision processes, dynamic programming, and neural networks in Chapter \ref{section: A Primer on Deep Reinforcement Learning}. Chapter \ref{section: Value-based Approximation of the Impulse-Control Problem} considers the use of Double Deep Q-Networks, which is a method that directly approximates the value function, while a policy-based method, the Proximal Policy Optimsation algorithm, is considered in Chapter \ref{section: Policy-based approximation of impulse control problems}. 
 
-\section{A Primer on deep reinforcement learning}
+\section{A primer on deep reinforcement learning}
 \label{section: A Primer on Deep Reinforcement Learning}
 Reinforcement Learning (RL) is an area of machine learning and optimal control. The objective is to learn, from repeated interaction or simulated experience, how actions affect future rewards. The main decision-making entity, a so-called \emph{agent}, interacts with an environment through trial and error, using observed rewards to improve its decisions over time.
 
@@ -176,27 +176,8 @@ for all $(x,a) \in \mathcal{X} \times \mathcal{A}$, where $\theta$ denotes the n
 \begin{remark}[DRL as an approximation of the viscosity solution]
     Recall Chapters \ref{section: Viscosity Solution for Impulse Control: Existence} and \ref{section: Viscosity Solution for Impulse Control: Uniqueness}, where we proved that the value function $v$ is a viscosity solution of the QVI \eqref{eqn: QVI}, and that this viscosity solution is unique. This let us conclude that the QVI characterizes the impulse-control value function $v$. 
 
-    While the DRL methods considered in this chapter do not solve the QVI directly like the explicit-impulse scheme in Chapter \ref{section: The explicit-impulse scheme}, DRL uses dynamic programming and neural networks to approximate the value function. More precisely, after time discretization, the impulse-control problem can be interpreted as a Markov decision problem in which the agent learns when to continue and when to intervene. Depending on the DRL architecture, the value function is approximated using either a Q-network or through a method that learns both the value and the policy functions. The resulting policy, whether represented explicitly by an actor network or induced implicitly by maximizing the learned Q-function, determines the approximate continuation-versus-intervention strategy. If this learned policy is close to optimal and the discretization error is small, the learned value approximation can therefore be interpreted as a numerical approximation of $v$, and hence of the viscosity solution.
-
-    This interpretation is motivated by universal approximation theorems such as Theorem \ref{trm: Universal approximation theorem II}, as well as by the statistical consistency of neural networks. However, this should be understood as a heuristic approximation argument rather than a convergence proof. For this argument to hold, monotonicity, stability, and consistency results for the DRL schemes are needed. These results are not provided in this thesis and, to the best of our knowledge, are yet to be derived. A starting point for such a venture can be found in \cite{bayraktar2023approximate}. 
+    While the DRL methods considered in this chapter do not solve the QVI directly like the explicit-impulse scheme in Chapter \ref{section: The explicit-impulse scheme}, DRL uses dynamic programming and neural networks to approximate the value function. More precisely, after time discretization, the impulse-control problem can be interpreted as a Markov decision problem in which the agent learns a policy. The policy then decides when to continue and when to intervene. If this learned policy is close to optimal and the discretization error is small, the learned value approximation can therefore be interpreted as a numerical approximation of $v$, and hence of the viscosity solution. This is motivated by results such as Theorem \ref{trm: Universal approximation theorem II}, as well as by the statistical consistency of neural networks. However, this rationale should be understood as a heuristic approximation argument rather than a convergence proof. For this argument to hold, monotonicity, stability, and consistency results for the DRL algorithms are needed. These results are not provided in this thesis and, to the best of our knowledge, are yet to be derived. A starting point for such a venture can be found in \cite{bayraktar2023approximate}. 
 \end{remark}
-
-
-% \subsection{Classifications of DRL models}
-% %Explain offline and online models, explain off- and on-policies, explain value-based and policy/actor-critic-based approximations
-% There exist several ways to group DRL models depending on how the agent is trained and what part of the RL problem is represented by a neural network. A first useful distinction is between \emph{online} and \emph{offline} RL. In offline RL, the agent does not interact with the environment while learning. Instead it is trained using a fixed dataset of previously collected transitions or paths. While offline models are important in application where trying new actions can be expensive or risky, for example in healthcare or robotics, they also require that the available dataset is sufficiently informative about good decisions. In particular, since the agent cannot explore the environment on its own, its performance is limited by the quality and coverage of the data it is trained on.  
-
-% By contrast, in online RL, the agent learns by directly interacting with environment. By repeatedly observing the current state, selecting an action, receiving a rewards, and then using this newly generated experience, it improves its future behaviour to make optimal decisions. This setting is especially useful in simulated environments, where new states or paths can be generated at relatively low cost and the agent can gradually improve through trial and error. 
-
-% A common example of online DRL algorithms are policy-gradient methods. In these methods, the policy itself is parametrised by a neural network, that is $\pi_\theta(x|a) \approx \pi(x|a)$, and the parameters $\theta$ are updated using the gradient of the policy with respect to $\theta$. Thus, rather than first learning a value function and then deriving a policy from it, policy-gradient methods optimise the agent’s behaviour directly. This makes them particularly useful when the action space is continuous or when one wants to model stochastic decision-making.
-
-% Another important distinction is between \emph{on}- and \emph{off}-policy methods. An on-policy method learns from data generated by the same policy that is currently being updated, i.e. after each policy update, new trajectories are typically collected using the updated policy before further training is performed. Many policy-gradient methods, including the PPO algorithm which will be introduced later in this chapter, are commonly viewed as on-policy methods. On the other hand, off-policy methods are more flexible in the sense that they can learn from data generated by a different policy rather than the one currently being improved. This makes it possible to reuse old experiences, often stored in a replay buffer $\mathcal{B}_\text{replay}$, and can make learning more sample-efficient. Standard examples of an off-policy include the deep Q-learning network (DQN) and the double deep-Q-learning network (DDQN). 
-
-% With online and offline algorithms, as well as on- and off-policies in mind, we note that the key point in these models is that online and offline models describe whether the agent can collect new data during training, whereas on- and off-policies describe whether the training data must come from the current policy or not. 
-
-% Finally, DRL methods are also classified according to which methematical object is being approximated by a neural network. In \emph{value-based} methods, the neural network approximates the value function. For instance, in DQN models, the function $Q$ is approximated by the neural network and the value function is then computed by computing the expectation of the Q-functions over different states and actions via the Bellman equations \eqref{eqn: Bellman equations}. The policy is then obtained indirectly by choosing actions that give highest returns at each time step\footnote{Such an approach is often referred to as a greedy method.}. A common example of such methods are the DQN and the DDQN algorithms. In \emph{policy-based} methods, the policy itself is modeled directly as a parametrised function $\pi_\theta$, and the parameters are adjusted so as to increase expected future rewards for example via policy gradients. A third and very widely used class is given by \emph{actor-critic} methods. Actor-critic methods combine the two previous ideas so that the actor represents the policy and decided which actions to take, while the critic estimates a value function and evaluates how good those actions are. That way, actor-critic methods use value-function learning to guide direct policy optimisation. Many modern DRL algorithms, including PPO, fall into this category.
-
-% In the next parts of this chapter, we will relate the impulse control problem to value-based and to actor-critic methods. Specifically, in Chapter \ref{section: Value-based Approximation of the Impulse-Control Problem}, we will discuss the use of the DDQN algorithm to approximate the value function $v$ resulting from the impulse control problem, as well as the use of the PPO algorithm to both learn the optimal policy, i.e. when and how to intervene, and the value function. 
 
 \section{Value-based approximation of impulse control problems}
 \label{section: Value-based Approximation of the Impulse-Control Problem}
@@ -268,22 +249,22 @@ where the uncontrolled process $X$ evolves according to the jump-diffusion SDE \
 
 Let $Q_\theta$ denote the Q-function approximated by a neural network with parameters $\theta$. Inside the continuation region, the Q-value is given by
 \begin{equation}
-    Q_\theta(t_n,x,0) = \E^{(t_n,x)}\left[\int_{t_n}^{t_{n+1}} f(s,X(s)) \diff s + v(t_{n+1}, X(t_{n+1})) \right]
+    Q_\theta(t_n,x,0) = \E^{(t_n,x)}\left[\int_{t_n}^{t_{n+1}} f(s,X(s)) \diff s + Q_\theta(t_{n+1}, X(t_{n+1}), a_{n+1}) \right]
     \label{eqn: DDQN Q-func. temp 1}
 \end{equation}
 Using a left-point approximation of the integral, \eqref{eqn: DDQN Q-func. temp 1} becomes
 \begin{equation}
-    Q_\theta(t_n,x,0) \approx f(t_n,x) \Delta t + \E^{(t_n,x)}\left[V(t_{n+1}, X(t_{n+1})) \right]. 
+    Q_\theta(t_n,x,0) \approx f(t_n,x) \Delta t + \E^{(t_n,x)}\left[Q_\theta(t_{n+1}, X(t_{n+1}), a_{n+1}) \right]. 
     \label{eqn: Q-value no intervention}
 \end{equation}
 For an action $a_n \neq 0$, the Q-value is given by
 \begin{equation}
-    Q(t_n,x,a_n) = K(t_n,x,a_n) + V(t_n, \Gamma(t_n,x,a_n)),
+    Q(t_n,x,a_n) = K(t_n,x,a_n) + Q_\theta(t_n, \Gamma(t_n,x,a_n)),
     \label{eqn: Q-value intervention}
 \end{equation}
 where $K$ is the cost function and $\Gamma$ is the post-intervention function defined in Chapter \ref{section: A Primer on Impulse Control Problems}. Combining \eqref{eqn: Q-value no intervention} and \eqref{eqn: Q-value intervention}, the Q-value function reads as
 \begin{equation*}
-    Q_\theta(t_n,x,a) \approx r(t_n,x,a_n) + \E^{(t_n,x,a_n)}\left[v(t_{n+1}, X^{(\beta)}(t_{n+1})) \right],
+    Q_\theta(t_n,x,a) \approx r(t_n,x,a_n) + \E^{(t_n,x,a_n)}\left[Q_\theta(t_{n+1}, X^{(\beta)}(t_{n+1}),a_{n+1}) \right],
 \end{equation*}
 where the reward function $r$ is defined as
 \begin{equation*}
@@ -406,7 +387,7 @@ Thus far, we have considered a value-based approach in the form of the DDQN mode
 
 With this in mind, we turn to actor-critic methods. In an actor-critic method, the actor selects actions according to a policy $\pi$, while the critic evaluates these actions by estimating the corresponding value function in Definition \ref{def: Policy-value function}. Although the actor and the critic have distinct roles, their objectives are often related. As a result, it is often advantageous for them to use a single neural network with shared parameters and two outputs (one for the policy and one for the value function) rather than being trained on separate neural networks. This shared‑network structure often improves computational efficiency and can lead to faster and more stable training. 
 
-A prominent actor–critic algorithm that commonly employs a shared network is the Proximal Policy Optimisation (PPO) algorithm, which we further augment with Self‑imitation Learning (SIL) and entropy regularisation. As discussed later in this chapter, these augmentations provide additional stability and encourage effective exploration. The combination of PPO with SIL is inspired by the work of \textcite{oh2018self}, where it is shown to improve policy learning. Furthermore, the PPO-SIL approach was first applied on impulse control problems in finance by \textcite{jain2025impulse}, where it was empirically shown to be effective in market making applications.
+A prominent actor–critic algorithm that commonly employs a shared network is the Proximal Policy Optimisation (PPO) algorithm, which we further augment with Self‑imitation Learning (SIL) and entropy regularisation. As discussed later in this chapter, these augmentations provide additional stability and encourage effective exploration. The combination of PPO with SIL is inspired by the work of \textcite{oh2018self}, where it is shown to improve policy learning. Furthermore, the PPO-SIL approach we consider in this section can be found in \cite{jain2025impulsecode, jain2025impulse}. 
 
 \subsection{From the performance criterion to the PPO surrogate}
 As with many DRL models, it is common to work on a discrete time grid. As such, recall the partition $\mathcal{T}$ on the time interval $[t,T]$ \eqref{eqn: partition}. Also, recall the performance criterion $J$, which is given by
@@ -523,7 +504,7 @@ which we aim to minimise. Together with the actor loss \eqref{eqn: PPO actor los
 \end{equation*}
 where $\lambda_{\text{actor}}>0$ is a hyperparameter that scales the actor loss. 
 
-\subsection{Decomposition of the Impulse Control Problem}
+\subsection{Decomposition of the impulse control problem}
 Inspired by the auxiliary control formulations found in \cite{jain2025impulse, mguni2022timing}, and by the fact that an impulse control consists of both an intervention time and an impulse size, we approximate the impulse control problem by breaking it down into two components: when to intervene and, conditional on intervention, what impulse to apply. Specifically, we introduce two actor-critic networks:
 \begin{itemize}
     \item \textbf{A decision network $d_\chi$ (timing):} A network with parameters $\chi$ that determines \emph{when} to intervene, and;
@@ -533,46 +514,57 @@ Let us now recall that the intervention operation on the value function $v$ is g
 \begin{equation*}
     \InterveneOper v(t,x) = \sup_{\zeta \in \mathcal{Z}} \big \{ v(t,\Gamma(t,x,\zeta)) + K(t,x,\zeta) \big\}. 
 \end{equation*}
-The decision network is meant to approximate the intervention region. Heuristically, the optimal binary decision satisfies
+Heuristically, if $d^*(t,x)=0$ means continuation at time $t$ and state $x$, and if $d^*(t,x)=1$ means intervention, one can flag the intervention region by 
 \begin{equation*}
-    d^*(t,x) \approx \ind{\InterveneOper v(t,x) \geq v(t,x)}. 
+    d^*(t,x) = \ind{\InterveneOper v(t,x) \geq v(t,x)},
 \end{equation*}
-As the decision is binary, the network outputs an intervention probability
+given that $v$ and $\InterveneOper v$ are known at every point $(t,x) \in [0,T)\times \R^d$ (or a subset of the region of interest). In view of this, the decision network $d_\chi$ models the optimal decision function $d_\chi(t,x) \approx d^*(t,x)$. 
+In our case, the decision network outputs a scalar logit that is understood to be a quantile function of time and state. If $\ell_\chi: [0,T)\times \R^d \rightarrow \R$ denotes the logit function, parametrised using neural network weights $\chi$, the intervention probability is modeled via
+\begin{equation}
+    p_\chi (t,x) = \frac{1}{1+e^{-\ell_\chi(t,x)}}. 
+    \label{eqn: p chi}
+\end{equation}
+We note that for the intervention policy $\pi_\chi$, we have 
 \begin{equation*}
-    p_\chi(t,x) := \pi_\chi \left(d=1 | x\right),
+    \pi_\chi(d_\chi(t,x) | x):=p_\chi (t,x).
 \end{equation*}
-where $\pi_\chi(d|x)$ for $d \in \{0,1\}$ is the decision policy and $d:=d(t,x)$. The binary decision $d$ is sampled through
+The binary decision $d_\chi(t,x)$ is then sampled through
 \begin{equation*}
-    d_n \sim \text{Bernoulli} \left(p_\chi(t,x)\right). 
-\end{equation*}
-Thus, $d = 0$ means continuation, while $d = 1$ means intervention. 
-
-On the other hand, the impulse-size network samples, conditionally on $d = 1$, an impulse 
-\begin{equation*}
-    \zeta \sim \pi_\xi \left( \cdot | x \right). 
-\end{equation*}
-If $d = 0$, no impulse is applied. Using the critic $V_{\chi, \xi}$, which is the approximation of the policy-value function under the current joint policy $\pi_{\chi, \xi}$ (see Definition \ref{def: Policy-value function}), the actor network approximates
-\begin{equation*}
-    u_\xi(t,x) \approx \argmax_{\zeta \in \mathcal{Z}} \big\{ V_{\chi, \xi}(t,\Gamma(t,x,\zeta)) + K(t,x,\zeta) \big\}. 
+    d_\chi(t,x) \sim \text{Bernoulli} \left(p_\chi(t,x)\right). 
 \end{equation*}
 
-Now because action the action $a$ essentially contains the outputs of two neural networks, we define the action to be a pair 
+On the other hand, impulses are sampled from the impulse-network $u_\xi$, conditional on the output of the decision network $d_\chi$. In essence, if $d_\chi(t,x) = 0$, no impulse is taken and if $d_\chi(t,x)=1$, an impulse of size $u_\xi(t,x)$ is applied in time and state $(t,x)$. In particular, the impulse-network aims to approximate the impulse applied by the intervention operator $\InterveneOper$, that is, 
+\begin{equation*}
+    u_\xi(t,x) \approx \argmax_{\zeta \in \mathcal{Z}} \big\{ V_{\chi, \xi}(t,\Gamma(t,x,\zeta)) + K(t,x,\zeta) \big\},
+\end{equation*}
+where $V_{\chi, \xi}$ is the critic under the joint policy $\pi_{\chi, \xi}$. We note that $V_{\chi, \xi}$ is given by Definition \ref{def: Policy-value function}, while the joint policy is addressed below. 
+
+We assume ``raw'' impulses follow a normal distribution with a mean function $\mu_\xi: [0,T) \times \R^d \rightarrow \R^d$ and a standard deviation function $\sigma_\xi: [0,T) \times \R^d \rightarrow \R^d \times \R^d$. In practical implementations, the standard deviation function returns a diagonal matrix, but this rule can be relaxed to have some correlation between impulses. The functions $\mu_\xi$ and $\sigma_\xi$ are the modeled by the impulse-size network. The ``raw'' impulses are then sampled with 
+\begin{equation*}
+    \zeta_\text{raw} \sim \mathcal{N}(\mu_\xi(t,x), \sigma_\xi(t,x)).
+\end{equation*}
+Then, given some (constant) impulse threshold $\zeta_{\max} \in \R^d$, the impulse network picks impulses using
+\begin{equation*}
+    u_\xi(t,x) = \zeta_{\max} \odot \text{Tanh}(\zeta_\text{raw}),
+\end{equation*}
+where $\odot$ denotes componentwise multiplication and $\text{Tanh}$ is the hyperbolic tangent function \eqref{eqn: Tanh activation}. 
+
+Since the action $a$ now contains the output of two neural networks, we define the action as a pair 
 \begin{equation*}
     a := \begin{cases}
-        (0,0) & \text{when } d = 0 \\[1ex]
-        (1,\zeta) & \text{when } d = 1 \\
+        (0,0) & \text{when } d_\chi(t,x) = 0 \\[1ex]
+        (1,\zeta) & \text{when } d_\chi(t,x) = 1 \\
     \end{cases}
 \end{equation*}
 The joint policy is then
 \begin{equation}
     \pi_{\chi, \xi}(a | x) = 
     \begin{cases}
-        \pi_\chi \big(0| x\big), & \quad \text{when } d = 0, \\[1ex]
-        \pi_\chi \big(1|x \big) \pi_\xi(\zeta | x), & \quad \text{when } d = 1.
+        \pi_\chi \big(0| x\big), & \quad \text{when } d_\chi(t,x) = 0, \\[1ex]
+        \pi_\chi \big(1|x \big) \pi_\xi(\zeta | x), & \quad \text{when } d_\chi(t,x) = 1.
     \end{cases}
     \label{eqn: PPO joint policy}
 \end{equation}
-When it comes to the neural network parameter updates, we note that the impulse-size network $u_\xi$ is updated using only time steps at which the switch $d$ was active (i.e. when intervention was made). In contrast, the decision network $d_\chi$ is updated at every time step because every time step requires a decision between continuation and intervention. 
 
 The PPO loss \eqref{eqn: L-PPO-surrogate} for the two-headed policy is then given by
 \begin{align}
@@ -580,14 +572,12 @@ The PPO loss \eqref{eqn: L-PPO-surrogate} for the two-headed policy is then give
     & \qquad \text{clip}\left( \frac{\pi_{\chi, \xi}(a_n | X^{(\beta)}_n)}{\pi_{\chi_\text{old}, \xi_\text{old}}(a_n |X^{(\beta)}_n)}, 1-\varepsilon, 1+\varepsilon \right)\Bigg\} \Bigg],
     \label{eqn: L-PPO-surrogate with 2 heads}
 \end{align}
-where $\hat G_n$ is given by \eqref{eqn: GAE}.
-
-The SIL objective is 
+where $\hat G_n$ is given by \eqref{eqn: GAE}. The SIL loss is 
 \begin{equation}
-    L^{\text{SIL}}(\chi, \xi) = -\sum_{n=0}^{N_t}\E_{(a_n, X^{\beta}_n, R_n) \sim \mathcal{B}_{\text{good}}} \left[ \ind{R_n > V_{\chi, \xi}(t_n,X^{(\beta)}_n)} \log \pi_{\chi, \xi}(a_n | X^{(\beta)}_n) \right].
+    L^{\text{SIL}}(\chi, \xi) = -\sum_{n=0}^{N_t}\E_{(a_n, X^{\beta}_n, R_n) \sim \mathcal{B}_{\text{good}}} \left[ \ind{R_n > V_{\chi, \xi}(t_n,X^{(\beta)}_n)} \log \pi_{\chi, \xi}(a_n | X^{(\beta)}_n) \right],
     \label{eqn: L-SIL with 2 heads}
 \end{equation}
-Finally, for a fixed time $t$ and state $x$, the entropy \eqref{eqn: entropy regularisation} is derived via
+where $R_n$ denotes the pathwise return-to-go starting at time step $t_n$ \eqref{eqn: return-to-go}.  Finally, for a fixed time $t$ and state $x$, the entropy \eqref{eqn: entropy regularisation} for the joint policy \eqref{eqn: PPO joint policy} is given by
 \begin{align}
     \mathcal{H}(\pi_{\chi, \xi}) &:= - \int_\mathcal{A} \pi_{\chi, \xi}(a|x) \log \pi_{\chi, \xi}(a|x) \diff a \nonumber \\
     &= - \sum_{d_\chi(t,x)\in \{0,1\}} \int_\mathcal{Z} \pi_{\chi, \xi}\big((d_\chi(t,x), \zeta) | x\big) \log \pi_{\chi, \xi}\big((d_\chi(t,x), \zeta) | x\big) \diff \zeta \nonumber \\
@@ -596,7 +586,14 @@ Finally, for a fixed time $t$ and state $x$, the entropy \eqref{eqn: entropy reg
     &= \mathcal{H}(\pi_\chi) + p_\chi(t,x) \mathcal{H}(\pi_\xi).
     \label{eqn: L-entropy with 2 heads} 
 \end{align}
-The entropies $\mathcal{H}(\pi_\chi)$ and $\mathcal{H}(\pi_\xi)$ in \eqref{eqn: L-entropy with 2 heads} are computed using \eqref{eqn: entropy regularisation}.
+The entropy $\mathcal{H}(\pi_\chi)$ is given by 
+\begin{equation*}
+    \mathcal{H}(\pi_\chi) = - p_\chi(t,x) \log p_\chi(t,x) - \big(1-p_\chi(t,x)\big)\log \big(1-p_\chi(t,x)\big),
+\end{equation*}
+while the entropy $\mathcal{H}(\pi_\xi)$ is
+\begin{equation*}
+    \mathcal{H}(\pi_\xi) = \frac{1}{2} \sum_{i=1}^d \log(2 \pi e \sigma_{\xi,i}^2).
+\end{equation*}
 
 Combining \eqref{eqn: L-PPO-surrogate with 2 heads}--\eqref{eqn: L-entropy with 2 heads}, the actor loss of the two-headed PPO-SIL policy is given by
 \begin{equation*}
@@ -615,11 +612,11 @@ Hence, the total loss of the actor-critic is
 \end{equation}
 
 \subsection{Implementation and training procedure}
-As in the DDQN model discussed in Chapter \ref{section: Value-based Approximation of the Impulse-Control Problem}, we use two feedforward neural networks with identical architecture and initial weights $\chi_\text{init}$ and $\xi_\text{init}$, respectively. However, the main difference is now that one network outputs the decision $d_\chi \in \{0,1\}$ and the other network outputs the impulse-size $u_\xi \approx \zeta$. Both networks use the hyperbolic tangent \eqref{eqn: Tanh activation} as activation function. For the implementation, the code written by \textcite{jain2025impulse} is used, see \cite{jain2025impulsecode}.
+We use two feedforward neural networks with identical architecture and initial weights $\chi_\text{init}$ and $\xi_\text{init}$, respectively. Both networks use the hyperbolic tangent \eqref{eqn: Tanh activation} as the activation function.
 
-The PPO-SIL algorithm is trained using simulated rollouts\footnote{A rollout is one simulation of the controlled process.}. Each rollout produces a full path of states, actions, rewards, and pointwise value function estimates. Then, at the beginning of each training iteration, a sample of paths of the uncontrolled process $X$ is generated. Conditional on these paths, the current joint policy $\pi_{\chi, \xi}$, which is given by \eqref{eqn: PPO joint policy}, is applied step by step along the time grid. That is, at each time step $t_n$, the policy observes the current controlled state $X_n^{(\beta)}$ and samples an action $a_n$. If intervention is chosen, the state is moved from $X_n^{(\beta)}$ to $\Gamma(t_n,\check{X}_n^{(\beta)},\zeta_n)$. Otherwise, the process evolves without intervention until the next decision time. This approach results in a pathwise realisation of the controlled process, and the corresponding rewards, actions, value estimates, and log-probabilities are collected and stored inside the SIL buffer.
+The PPO-SIL algorithm is trained using simulated rollouts\footnote{A rollout is one simulation of the controlled process.}. Each rollout produces a full path of states, actions, rewards, and pointwise value-function estimates. Then, at the beginning of each training iteration, a sample of paths of the uncontrolled process $X$ is generated. Conditionally to these paths, the current joint policy $\pi_{\chi, \xi}$, which is given by \eqref{eqn: PPO joint policy}, is applied step by step along the time grid. That is, at each time step $t_n$, the policy observes the current controlled state $X_n^{(\beta)}$ and samples an action $a_n$. If intervention is chosen, the state is moved from $X_n^{(\beta)}$ to $\Gamma(t_n,\check{X}_n^{(\beta)},\zeta_n)$. Otherwise, the process evolves without intervention until the next decision-time. This approach results in a pathwise realisation of the controlled process, and the corresponding rewards, actions, value estimates, and log-probabilities are collected and stored inside the SIL buffer.
 
-Let the superscript $m$ denote the $m$-th rollout path of the controlled process $X^{(\beta)}$ and let $\beta^m=(a_0^m, a_1^m, \ldots, a_{N_t}^m)$ denote the corresponding strategy. Return-to-go \eqref{eqn: return-to-go} and generalised advantage estimate \eqref{eqn: GAE} are computed for each simulated path. The PPO loss is then approximated using
+Let the superscript $m=1,...,N_\text{rollout}$ denote the $m$-th rollout of the controlled process $X^{(\beta)}$ and let $\beta^m=(a_0^m, a_1^m, \ldots, a_{N_t}^m)$ denote the PPO-SIL strategy applied to the $m$-th rollout. Using the return-to-go \eqref{eqn: return-to-go} and the generalised advantage estimate \eqref{eqn: GAE}, the PPO-loss \eqref{eqn: L-PPO-surrogate with 2 heads} is approximated using the Monte Carlo estimate
 \begin{align}
     L^{\text{PPO}}(\chi, \xi) \approx-\frac{1}{N_{\text{rollout}}} \sum_{n=0}^{N_t}\sum_{m=1}^{N_{\text{rollout}}} \hat G_n^m & \min \Bigg\{ \frac{\pi_{\chi, \xi}(a_n^m | X^{(\beta^m,m)}_n)}{\pi_{\chi_\text{old}, \xi_\text{old}}(a_n^m |X^{(\beta^m,m)}_n)}, \nonumber \\ 
     & \quad \text{clip}\left( \frac{\pi_{\chi, \xi}(a_n^m | X^{(\beta^m,m)}_n)}{\pi_{\chi_\text{old}, \xi_\text{old}}(a_n^m |X^{(\beta^m,m)}_n)}, 1-\varepsilon, 1+\varepsilon \right)\Bigg\}.

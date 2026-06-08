@@ -1,9 +1,9 @@
 %\section{Numerical Experiment I: Impulse Control of the Foreign Exchange Rate}
 \label{section: Numerical Experiment I: Impulse Control of the Foreign Exchange Rate}
-The optimal impulse control of foreign exchange (FEX) rates constitutes one of the simplest and earliest financial applications of impulse control, with research made in the late 1990s, see \cite{mundaca1998optimal, cadenillas1999optimal, cadenillas2000classical}. In our case, we were inspired by \cite[Chapter 5]{azimzadeh2018impulsecontrolfinancenumerical}. In this chapter, we apply the deep reinforcement learning methods discussed in Chapter \ref{section: Deep Reinforcement Learning for Impulse Control Problems} to approximate the solution of a simplified version of the FEX rate problem. We use the explicit-impulse scheme derived in Chapter \ref{section: Numerical solution of the QVI} as a benchmark solution to compare with the DRL methods. The Python code used in this experiment can be found in \cite{mycode}.
+In this chapter, we apply the deep reinforcement learning methods discussed in Chapter \ref{section: Deep Reinforcement Learning for Impulse Control Problems} to approximate the solution of a simplified version of the FEX rate problem. We use the explicit-impulse scheme derived in Chapter \ref{section: Numerical solution of the QVI} as a benchmark solution to compare with the DRL methods. As such, this chapter's main purpose is to empirically compare the value function learned the DRL algorithms against the finite-difference scheme approximation, and subsequently to see whether both DRL models are suitable approximators to impulse control problems.
 
 \section{Problem formulation}
-Consider a central bank that can intervene in the FEX market by buying or selling foreign currency in large quantities. Let $w$ be a constant and denote the difference between the domestic and foreign interest rates over the time interval $[t,T]$. In addition, let $t \leq \tau_1 \leq \tau_2 \leq \ldots \leq \infty$ be the times when the central bank intervenes in the FEX market with the corresponding intervention sizes $\zeta_1, \zeta_2, \ldots$, with $\zeta_j \in \mathbb R$ for every $j = 1, 2, \ldots$. We denote impulse controls using the sequence $\alpha=\{(\tau_j, \zeta_j)_{j=1}^M\}$ for $M \leq \infty$. The solvency and the admissible impulse sets are given by $\Solvency:= \R$ and $\mathcal{Z}(t,x) := \R$, respectively.
+Consider a central bank that can intervene in the FEX market by buying or selling foreign currency in large quantities. Let $w$ be a constant and denote the difference between the domestic and foreign interest rates over the time interval $[t,T]$. In addition, let $t \leq \tau_1 \leq \tau_2 \leq \ldots \leq \infty$ be the times when the central bank intervenes in the FEX market with the corresponding intervention sizes $\zeta_1, \zeta_2, \ldots$, with $\zeta_j \in \mathbb R$ for every $j = 1, 2, \ldots$. We denote impulse controls using the sequence $\alpha=\{(\tau_j, \zeta_j)\}_{j=1}^M$, for $M \leq \infty$. The solvency set and the admissible impulse set are given by $\Solvency:= \R$ and $\mathcal{Z}(t,x) := \R$, respectively.
 
 In this model, a positive value for $\zeta$ represents the purchase of foreign currency, while a negative value for $\zeta$ indicates the sale of a foreign currency. We assume that the market is \emph{liquid}, roughly meaning that there will always be a buyer (seller) side willing to execute trades at the prevailing market price without causing significant price impact.
 
@@ -29,7 +29,7 @@ The central bank's objective is to keep the FEX rate as close as possible to som
     K(t,x,\zeta) = -e^{-\delta t}(c + \kappa |\zeta|) 
     \label{eqn: FEX transaction costs}
 \end{equation}
-Here, $\delta \in \R$ denotes the constant, risk-free rate, and $c>0$ and $\kappa>0$ are the fixed and proportional transaction costs respectively. The profit and bequest functions, $f$ and $g$ respectively, are defined as
+Here, $\delta \in \R$ denotes the constant risk-free rate, and $c>0$ and $\kappa>0$ are the fixed and proportional transaction costs, respectively. The profit and bequest functions, $f$ and $g$, respectively, are defined as
 \begin{equation*}
     f(t,x) := e^{-\delta t} \left( -(x-m)^2 + \gamma w^2 \right) \quad \text{and} \quad g(t,x) := 0,
 \end{equation*}
@@ -42,7 +42,7 @@ Here, the term $(x-m)^2$ penalises the central bank from straying from the targe
 
 The definition of the value function $v$ remains unchanged and is given by
 \begin{equation*}
-    v(t,x) = \sup_{\alpha} J^{(\alpha)}(t,x).
+    v(t,x) = \sup_{\alpha \in \mathcal V} J^{(\alpha)}(t,x).
 \end{equation*}
 In this problem, the value function is understood to be the present value of the total costs a central bank must pay in total in an effort to keep the FEX rate as close to the target $m$ as possible. 
 
@@ -85,11 +85,9 @@ where the intervention operator is now
 Recall that we set $\Solvency:= \R$ and $\mathcal{Z} := \R$. This is numerically infeasible, so we truncate $\Solvency$ to $(-R,R)$ and $\mathcal{Z}(t,x)$ to $(-R-x,R-x)$ for $R>0$. Specifically, let $\Omega = [0,T) \times (-R,R)$, $\partial_R^+ \Omega = [0,T)\times \{-R,R\}$, and $\partial_T^+ \Omega = \{T\} \times [-R,R]$. The truncated QVI is
 \begin{subequations}\label{eqn: FEX example QVI}
 \begin{align}
-    \min \Big\{ - \Big( \partial_t v - \mu w \partial_x v + \frac{1}{2} \sigma^2 \partial_{xx} v - e^{-\delta t} \big( (x-m)^2 + \gamma w^2 \big) \Big), \nonumber\\
-    v - \InterveneOper v \Big\} = 0 && \text{on } \Omega \label{eqn: FEX example QVI a}\\
-    \min \Big\{ - \Big( \partial_t v - e^{-\delta t} \big( (x-m)^2 + \gamma w^2 \big) \Big), \nonumber\\
-    v - \InterveneOper v \Big\} = 0 && \text{on } \partial_R^+ \Omega\label{eqn: FEX example QVI b}\\
-    v = 0 && \text{on } \partial_T^+ \Omega \label{eqn: FEX example QVI c}
+    \min \Big\{ - \Big( \partial_t v - \mu w \partial_x v + \frac{1}{2} \sigma^2 \partial_{xx} v - e^{-\delta t} \big( (x-m)^2 + \gamma w^2 \big) \Big), v - \InterveneOper v \Big\} = 0 \quad \text{on } \Omega \label{eqn: FEX example QVI a}\\
+    \min \Big\{ - \Big( \partial_t v - e^{-\delta t} \big( (x-m)^2 + \gamma w^2 \big) \Big), v - \InterveneOper v \Big\} = 0 \quad \text{on } \partial_R^+ \Omega\label{eqn: FEX example QVI b}\\
+    v = 0 \quad \text{on } \partial_T^+ \Omega \label{eqn: FEX example QVI c}
 \end{align}
 \end{subequations}
 where \eqref{eqn: FEX example QVI b} corresponds to imposing artificial Neumann boundary conditions
@@ -184,9 +182,9 @@ Finally, the replay buffer has a capacity of 1'000'000 transitions and, at each 
 \subsection{PPO-SIL}
 The PPO-SIL algorithm uses two fully connected feedforward neural networks, one for the decision network and one for the impulse network, with architecture
 \begin{equation*}
-    \text{Input: }2 \rightarrow 512 \rightarrow 512 \rightarrow 512 \rightarrow 2 \text{: Output}
+    \text{Input: }2 \rightarrow 512 \rightarrow 512 \rightarrow 512 \rightarrow 1 \text{: Output}
 \end{equation*}
-for each network. The input for each of the networks is the timestep $t_n$ and controlled state $X^{(\beta)}$, while the outputs are the stochastic policies $\pi_\chi$ and $\pi_\xi$, as well as the values $d_\chi$ and $u_\xi$ for each of the networks. 
+for each network. The input for each of the networks is the timestep $t_n$ and controlled state $X^{(\beta)}$, while the outputs are the decision $d_\chi(t_n,x)$ and impulses $u_\xi(t_n,x)$.
 
 Rewards are computed via the function
 \begin{equation*}
@@ -204,6 +202,7 @@ The neural networks are trained on Monte Carlo samples of size $N_{\text{rollout
         \hline
         Number of time steps & $N_t$ & 252 \\
         Number of rollout paths & $N_\text{rollout}$ & 4096 \\
+        Number of SIL batches & $N_\text{batch}$ & 4096 \\
         Number of training iterations & $N_\text{iter}$ & 300 \\
         SIL buffer capacity & $N_{\mathcal{B}_\text{good}}$ & 400'000 \\
         SIL loss weight & $\lambda_{\text{SIL}}$ & 0.05 \\
@@ -211,9 +210,9 @@ The neural networks are trained on Monte Carlo samples of size $N_{\text{rollout
         Actor loss weight & $\lambda_{\text{actor}}$ & 0.5 \\
         PPO clipping parameter & $\varepsilon$ & 0.3 \\
         Decision network width & $L_{d_\chi}$ & 5 \\
-        Decision network hidden dimensions & $n_{d_\chi, \ell}$ & $\{512, 512, 512\}$ \\
+        Decision network hidden dimensions & $n_{d_\chi, \ell}$ & $\{2,512, 512, 512,1\}$ \\
         Impulse network width & $L_{u_\xi}$ & 5 \\
-        Impulse network hidden dimensions & $n_{u_\xi, \ell}$ & $\{512, 512, 512\}$ \\
+        Impulse network hidden dimensions & $n_{u_\xi, \ell}$ & $\{2,512, 512, 512,1\}$ \\
         Learning rate\footnote{For both decision and impulse networks.} & lr & 2e-04 \\
         Generalised advantage estimate parameter & $\lambda_\text{GAE}$ & 1.0\\
         \toprule
@@ -223,10 +222,10 @@ The neural networks are trained on Monte Carlo samples of size $N_{\text{rollout
 \end{table}
 
 \section{Results}
-For all numerical results found in this section, we use the parameter values reported in Table \ref{tab: FEX rate params}. We perform a convergence test on the explicit-impulse scheme to validate that the numerical scheme indeed converges to a solution as the numerical grid is refined. The DDQN and PPO algorithm are trained using the hyperparameters found in Tables \ref{tab: DDQN training parameters} and \ref{tab: PPO training parameters}, respectively. We will compare each of the DRL algorithms against the explicit-impulse control scheme. All numerical experiments were implemented on the same computer, specifically on a MacBook Pro M2, with 10 CPU and 10 GPU cores, and 16GB of unified RAM. 
+For all numerical results found in this section, we use the parameter values reported in Table \ref{tab: FEX rate params}. We perform a convergence test on the explicit-impulse scheme to validate that the numerical scheme indeed converges to a solution as the numerical grid is refined. The DDQN and PPO algorithm are trained using the hyperparameters found in Tables \ref{tab: DDQN training parameters} and \ref{tab: PPO training parameters}, respectively, and are compared against the explicit-impulse control scheme. All numerical experiments were implemented on the same computer, specifically on a MacBook Pro M2, with 10 CPU and 10 GPU cores, and 16GB of unified RAM. 
 
 \subsection{Explicit-impulse scheme and convergence test}
-Figure \ref{fig: explicit impulse 2D plot} shows the numerical approximation $V$ of the value function at time $t=0$. The numerical grid used for the approximation consists of $N_t=252$, $N_x=401$, and $N_\zeta=101$ points. The solution has a curved profile near the target level $m$, corresponding to the continuation region where no impulse is applied. Outside of this region, the profile becomes approximately affine. This is consistent with immediate intervention. As $x$ is sufficiently far from the target, the optimal impulse moves the state back to the continuation region, and the value is given by the post-intervention value minus the fixed and proportional transaction costs. The proportional term $\kappa |\zeta|$ in the cost function $K$ produces an affine tail. The transition points between the curved part and the affine tails are the free boundaries that separate the continuation and intervention regions.
+Figure \ref{fig: explicit impulse 2D plot} shows the numerical approximation $V$ of the value function at time $t=0$. The numerical grid used for the approximation consists of $N_t=252$, $N_x=401$, and $N_\zeta=101$ points. The numerical solution has a curved profile near the target $m$, which corresponds to the continuation region where no impulses are applied. However, if the state $x$ moves sufficiently far from $m$, the value becomes approximately affine due to interventions and the corresponding affine transaction costs. A kink can therefore be observed the boundary of between both regions, where the curved part meets the affine tails.
 \begin{figure}[H]
     \centering
     \includegraphics[width=0.75\textwidth]{Plots/FEX/explicit_impulse_2D.png}
@@ -234,7 +233,7 @@ Figure \ref{fig: explicit impulse 2D plot} shows the numerical approximation $V$
     \label{fig: explicit impulse 2D plot}
 \end{figure}
 
-Figure \ref{fig: explicit impulse 3D plot} shows the behaviour of the value function across time. Similarly to the results shown in \ref{fig: explicit impulse 2D plot}, the value function approximation across time is curved around the target $m$, which corresponds to the continuation region, while for sufficiently large deviations from $m$, the value becomes approximately affine in $x$, corresponding to intervention. As $t$ approaches the terminal time, the value function moves towards the terminal condition $g\equiv 0$, reflecting that fewer future running costs remain to be accumulated. Indeed, as \textcite[Chapter 5.1.4]{azimzadeh2018impulsecontrolfinancenumerical} notes, the continuation and intervention regions are separated by time-dependent free boundaries and as such can be modelled with some function $\eta$. 
+Figure \ref{fig: explicit impulse 3D plot} shows the behaviour of the value function across time. Similarly to the results shown in \ref{fig: explicit impulse 2D plot}, the value function approximation across time is curved around the target $m$, which corresponds to the continuation region, while for sufficiently large deviations from $m$, the value becomes approximately affine in $x$, corresponding to intervention. As $t$ approaches the terminal time, the value function moves towards the terminal condition $g\equiv 0$, reflecting that fewer future running costs remain to be accumulated.
 \begin{figure}[h]
     \centering
     \includegraphics[width=0.6\textwidth]{Plots/FEX/explicit_impulse_3D.png}
@@ -263,14 +262,12 @@ Table \ref{tab: impulse control convergence test} presents the approximations of
 \end{table}
 
 Because the convergence test shows stable approximation results, and since the computed value
-function exhibits the expected continuation and intervention structure, these observations support the use of the explicit-impulse scheme as a numerical benchmark comparison with the DRL algorithms. 
+function exhibits the expected continuation and intervention structure, we may apply the explicit-impulse scheme as a benchmark for comparison against the aforementioned DRL algorithms.
 
 \subsection{DDQN approximation}
-Comparison plots between the DDQN approximation and the explicit-impulse scheme can be found in Figures \ref{fig: DDQN vs FD 2D plot}--\ref{fig: DDQN vs FD error plot}. The explicit-impulse scheme is used as a benchmark.
+Consider Figure \ref{fig: DDQN vs FD 2D plot}, where the DDQN and explicit-impulse schemes are compared for time $t=0$ and $x \in [-2,2]$. As one can observe, the DDQN algorithm reproduces a value function approximation comparable to the benchmark. In particular, the DRL algorithm is able to approximate the value function near the target $m$ with a curve, while the part where the value function transitions from a curve to the affine tails is also captured by the DRL algorithm. Furthermore, the agreement between both schemes is strongest in the central part of the domain, where the value function is smooth and where the simulated training data are more concentrated. The learned value function also captures the kinks at the boundary between the continuation and intervention regions, albeit not as precisely as the finite-difference scheme. In general, the DDQN is able to learn both the shape of the value function and the impulse controls required for different values for the log-FEX rate $x$. 
 
-Consider Figure \ref{fig: DDQN vs FD 2D plot}, which compares the approximations at $t=0$ and for $x \in [-2,2]$. As one can observe, the DDQN algorithm reproduces a value function approximation comparable to the benchmark. In particular, the DRL algorithm captures the curved continuation region near the target $m$, as well as the approximately affine tails corresponding to an intervention. The agreement between both schemes is strongest in the central part of the domain, where the value function is smooth and where the simulated training data are more concentrated. Furthermore, the DDQN curve also captures the change in slope near the transition between the continuation and intervention regions. This indicates that the network has learned not only the general shape of the value function, but also the intervention region of the impulse-control problem.
-
-However, there are small visible irregularities in the DDQN curve, with the most visible irregularity being the local oscillations, especially near the transition between the cured and affine parts of the value function. This behaviour is expected, as the plotted DDQN approximation is obtained using the greedy impulse selection in \eqref{eqn: DDQN greedy impulse choice}, together with a Monte Carlo approximation of the continuation value. Specifically, the maximisation step in the greedy impulse choice can amplify small sampling errors, particularly near the free boundary. Hence, the online Q-network output \eqref{eqn: Q output vector} may have similar estimated values for several impulses. As a consequence, small perturbations in the learned value function may lead to different selected impulses, which leads to small
+When it comes to the separations between both approximations in Figure \ref{fig: DDQN vs FD 2D plot}, largest errors happen around the (non-differentiable) kink. This is in part because the DDQN curve shown in the aforementioned figure is obtained by greedy impulse selection \eqref{eqn: DDQN greedy impulse choice} and Monte Carlo approximation. Specifically, if neighbouring impulses yield similar values on the free boundary, the maximisation step in \eqref{eqn: DDQN greedy impulse choice} chooses the impulse with the largest implied value estimate, so that small errors may yield suboptimal impulses. As a consequence, small perturbations in the learned value function may lead to different selected impulses, which lead to small
 local irregularities in the plotted approximation.
 
 \begin{figure}[h]
@@ -280,7 +277,7 @@ local irregularities in the plotted approximation.
     \label{fig: DDQN vs FD 2D plot}
 \end{figure}
 
-Figure \ref{fig: DDQN vs FD 3D plot} gives the corresponding comparison over the time interval $t \in [0,T]$. The DDQN surface is qualitatively close to the explicit-impulse surface. Both approximations axhibit a continuation region around the target $m$, affine behaviour for large deviations from the target, and movement towards the terminal condition as $t$ approaches $T$. This indicates that the DDQN approximation therefore captures the time-dependent structure of the value function, including the evolution of the intervention and continuation regions. Furthremore, the largest visible deviations occur close to the free boundary and in regions that are less frequently visited during simulation. Regions that are visited less frequently correspond to large values of $x$, as the negative drift reduces the likelihood that the stochastic process $X$ moves into and remains in these regions. In addition, areas near the domain boundaries are also visited less frequently.
+Figure \ref{fig: DDQN vs FD 3D plot} gives the corresponding comparison over the time interval $t \in [0,T]$. We observe that the DDQN surface approximation is qualitatively close to the explicit-impulse surface, and that the DDQN surface moves towards the terminal condition $g \equiv 0$ as $t$ approaches $T$. This indicates that the DDQN approximation captures the time-dependent structure of the value function, including the evolution of the intervention and continuation regions. When compared to the explicit-impulse scheme, the largest visible deviations seem to occur close to the free boundary and in regions that are less frequently visited during simulation. The regions that are visited less frequently are those in which $x$ takes large positive values since the negative drift in \eqref{eqn: FEX problem controlled X c} reduces the likelihood that the stochastic process $X$ takes positive values as time goes by.
 
 \begin{figure}[h]
     \centering
@@ -298,16 +295,12 @@ Figure \ref{fig: DDQN vs FD error plot} shows the pointwise error between the DD
     \label{fig: DDQN vs FD error plot}
 \end{figure}
 
-Besides the computational correctness, another important aspect to consider is the computation cost, which in our case differs substantially between the two methods. The DDQN training time was approximately 122 minutes, whereas the explicit-impulse scheme only needed 36.6 ms to compute the value function. Another aspect worth mentioning is the training stability of the DDQN algorithm. As the algorithm involves a large number of hyperparameters, the set of possible configurations is extensive. In practice, we therefore selected the first set of hyperparameters that produced satisfactory results, although further tuning could lead to improvements in performance and computational efficiency. We also observe that the DDQN algorithm is highly sensitive to these choices, as even small changes in hyperparameters can result in significantly worse performance.
+Besides the numerical accuracy, another important aspect to consider is the computation cost, which in our case differs substantially between the two methods. The DDQN training time was approximately 122 minutes, whereas the explicit-impulse scheme only needed 36.6 ms to compute the value function. Another aspect worth mentioning is the training stability of the DDQN algorithm. As the algorithm involves a large number of hyperparameters, the set of possible configurations is extensive. In practice, we therefore selected the first set of hyperparameters that produced satisfactory results, although further tuning could lead to improvements in performance and computational efficiency. We also observe that the DDQN algorithm is highly sensitive to these choices, as even small changes in hyperparameters can result in significantly worse performance.
 
-Overall, the DDQN approximation is consistent with the explicit-impulse benchmark. The algorithm is able to reproduce the continuation region, the affine intervention tails, the time evolution of the surface, and the approximate location of the free boundary. Although the DDQN  is substantially more expensive to train and exhibits larger errors near the boundary and in under-sampled regions, both methods show similar results. As such, we may conclude that the DDQN has learned to approximate the value function well enough.
+Overall, the DDQN approximation is consistent with the explicit-impulse benchmark. The algorithm is able to reproduce the continuation region, the affine intervention tails, the time evolution of the surface, and the approximate location of the free boundary. Although the DDQN is substantially more expensive to train and exhibits larger errors near the boundary and in under-sampled regions, both methods show similar results. The DDQN algorithm can therefore be seen as an alternative approach for the approximation of value functions.
 
 \subsection{PPO-SIL approximation}
-The PPO-SIL approximation is compared with the explicit-impulse scheme in Figures \ref{fig: PPO vs FD 2D plot}--\ref{fig: PPO vs FD error plot}. As before, the explicit-impulse scheme is used as a benchmark and the reported errors should be interpreted as errors relative to this benchmark rather than errors relative to the exact value function.
-
-Figure \ref{fig: PPO vs FD 2D plot} compares the approximation at $t=0$ and for $x \in [-2,2]$. On the first look, the PPO-SIL algorithm's value function approximation is comparable to the benchmark. Indeed, the central, curved part of the value function, which corresponds to the continuation region, is well approximated. The agreement between both schemes is particularly strong around the target level \(m\), where the value function is smooth and simulated trajectories provide relatively informative training data. In addition, the figure indicates that the learned policy can effectively capture the intervention structure of the problem, as the learned value function stays relatively close to the explicit-impulse approximation.
-
-However, we note that local, small errors, near the free boundary between the continuation and intervention regions, can be observed. These are expected as the value function plotted from the PPO-SIL algorithm is obtained from a learned stochastic policy and a Monte Carlo approximation of the value function. Furthermore, the decision between continuation intervention is sensitive near the free boundary. Hence, small irregularities are observed at the free boundary in Figure \ref{fig: PPO vs FD 2D plot}. 
+Figure \ref{fig: PPO vs FD 2D plot} compares the approximation at $t=0$ and for $x \in [-2,2]$. At the first glance, the PPO-SIL algorithm's value function approximation is comparable to the benchmark. Indeed, the agreement between both schemes is particularly strong around the target level $m$, where the value function is smooth, and path simulations of the log-FEX rate provide relatively informative training data. In addition, the figure indicates that the learned policy can effectively capture the intervention structure of the problem, as the value function stays relatively close to the explicit-impulse approximation, with small errors present near the intervention boundary.
 
 \begin{figure}[h]
     \centering
@@ -318,7 +311,7 @@ However, we note that local, small errors, near the free boundary between the co
 
 Figure \ref{fig: PPO vs FD 3D plot} compares the approximation of the surfaces of the value functions of both schemes over the time interval $t \in [0,1]$. The PPO-SIL surface reproduces the main qualitative structure of the explicit-impulse scheme, with the value being largest near the target $m$ and the tails being approximately affine in $x$. The surface moves towards the terminal condition as $t$ approaches 1. Thus, the PPO-SIL has learned the broad time-dependent continuation structure of the impulse-control problem. 
 
-However, the PPO-SIL approximation does not come without numerical errors, which mostly appear in the outer regions, especially for positive $x$-values and later times. These errors are most likely caused by the combination of the trajectory-based training, Monte Carlo noise, and under-sampling of parts of the state space. In particular, the FEX process has a negative drift in this experiment, meaning that simulated paths tend to move towards negative $x$-values. Consequently, the algorithm observes fewer samples with positive $x$-values, which makes the approximation less reliable in that part of the domain. 
+However, the PPO-SIL approximation still has errors, which appear mostly in the outer regions, especially for positive $x$-values and later times. These errors are most likely caused by the combination of simulation-based training and under-sampling of parts of the state space. In particular, the FEX process has a negative drift in this experiment, meaning that simulated paths tend to move towards negative $x$-values. Consequently, the algorithm observes fewer samples with positive $x$-values, making the approximation less reliable in that part of the domain. 
 
 \begin{figure}[h]
     \centering
@@ -327,7 +320,7 @@ However, the PPO-SIL approximation does not come without numerical errors, which
     \label{fig: PPO vs FD 3D plot}
 \end{figure}
 
-This interpretation is further suggested by the error plot shown in Figure \ref{fig: PPO vs FD error plot}. The error is small for most of the computational domain, especially in the central region around the target. The largest errors can be found near the free boundary and in the under-sampled positive-$x$ region. The free boundary is visible in the heatmap as the region where the error changes more sharply. Because the boundary is relatively smooth, the policy tends to wait rather than intervene immediately, acting only once the boundary becomes more clearly defined. This behaviour is also amplified by small numerical errors in the learned approximation.
+This observation is further supported by the error plot in Figure \ref{fig: PPO vs FD error plot}. Although errors are small for most of the computational domain, especially in the central region around the target, the largest errors can be found in the under-sampled positive $x$ region, as well as near the boundary of the continuation and intervention regions. Moreover, we observe that the learned policy tends to wait rather than intervene immediately, acting only once the boundary becomes more clearly defined. This behavior may possibly explain why the policy learns an almost linear boundary between the continuation and intervention regions.
 
 \begin{figure}[H]
     \centering
@@ -336,9 +329,6 @@ This interpretation is further suggested by the error plot shown in Figure \ref{
     \label{fig: PPO vs FD error plot}
 \end{figure}
 
-Although the PPO–SIL algorithm requires less training time than DDQN, its computational cost still differs significantly from that of the explicit‑impulse scheme, with the PPO-SIL training time being approximately 24 minutes. Similarly to the DDQN algorithm, the PPO-SIL is sensitive to hyperparameter changes and we therefore selected the first set of hyperparameters that produced satisfactory results. As such, further tuning may improve the approximation accuracy and computational efficiency.
+When it comes to training time, the PPO–SIL model with specifications found in Table \ref{tab: PPO training parameters} needs around 24 minutes, which is significantly less than the DDQN algorithm. However, the explicit‑impulse scheme remains a faster alternative in this particular problem.
 
-However, in general, the PPO-SIL algorithm approximates the value function well enough for comparison purposes. It captures the continuation region, the affine intervention tails, the
-time evolution of the value surface, and the approximate free-boundary structure.
-However, the error heatmap and the three-dimensional plot show that the approximation
-is less reliable near the free boundary and in under-sampled regions of the state space. But, rather than being an issue of the algorithm itself, these errors are mostly caused by the simulation-based nature of the method. Hence, this issue can be fixed by means of, for instance, over-sampling the state variable in certain regions. 
+In general, the PPO-SIL algorithm approximates the value function well enough for comparison purposes. It captures the continuation region, the affine intervention tails, the time evolution of the value surface, and the approximate free boundary structure. The error heatmap and three-dimensional plot show that the approximation is less reliable near the free boundary and in under-sampled regions of the state space. However, rather than being an issue of the algorithm itself, these errors are mostly caused by the simulation-based nature of the method. Hence, this issue can most likely be addressed by over-sampling the state variable in certain regions. 

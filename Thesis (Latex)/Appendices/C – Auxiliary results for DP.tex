@@ -178,7 +178,7 @@ We note that with \assitemref{C: I1}--\assitemref{C: I3}, the continuation regio
     \end{align*}
     To determine an upper bound for the residual term, we consider the terms $A_1$ and $A_2$ separately. 
 
-    Let us begin with the term $A_1$. Recall that by \assitemref{C: S1}, \assitemref{C: S2}, and \assitemref{C: I3}, the Hamiltonian is well-defined. Furthermore, the Hamiltonian is polynomially bounded by \assitemref{C: H2}, while \assitemref{C: S4} ensures that $X$ has a bounded $p$-th moment. Applying these assumptions on $A_1$ therefore yields
+    Let us begin with the term $A_1$. Recall that by \assitemref{C: S1}, \assitemref{C: S2}, and \assitemref{C: I3}, the Hamiltonian is well-defined. Furthermore, the Hamiltonian is polynomially bounded by \assitemref{C: H2}, while \assitemref{C: S4} ensures that $X$ has a bounded $p$-th moment. Therefore, $A_1$ is bounded by
     \begin{align*}
         A_1 &= \left(\Etx \left[ \left| \int_{t+\tau_D}^{t+h} \partial_s v(s, X(s)) + \InfinitesimalGenerator v(s,X(s)) + f(s,X(s)) \diff s \right|^2 \right]\right)^{1/2} \\
         & \leq h \left(\Etx \left[  \sup_{t \leq s \leq t+h}\big|\partial_s v(s, X(s)) + \InfinitesimalGenerator v(s,X(s)) + f(s,X(s))\big|^2 \right]\right)^{1/2} \\

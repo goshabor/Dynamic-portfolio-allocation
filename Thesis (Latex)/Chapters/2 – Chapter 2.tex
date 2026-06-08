@@ -1,10 +1,10 @@
 %\section{Preliminaries}
 \label{section: Preliminaries}
-This chapter introduces the preliminary concepts from stochastic analysis that are required to formulate and analyse finite-horizon impulse control problems, including filtereed probability spaces, jump-diffusions, and stopping times. Much of the theory presented in this chapter can be found in \cite{applebaum2009levy, jarrow2018continuous, oksendal2007applied}.
+This chapter introduces the preliminary concepts from stochastic analysis that are needed to formulate and analyse finite-horizon impulse control problems, including filtered probability spaces, jump-diffusions, and stopping times. Much of the theory presented in this chapter can be found in \cite{applebaum2009levy, jarrow2018continuous, oksendal2007applied}.
 
 \section{Stochastic setup}
 \label{section: stochastic setup}
-Throughout this thesis, we denote by $0\leq T<\infty$ a finite time horizon and work with a filtered probability space $(\Omega, \F, \{\F\}_{0 \leq t \leq T}, \Prob)$. Here, $\Omega$ denotes the sample space, $\F$ the $\sigma$-algebra of events, $\Prob$ the real-world probability measure, and $\{\F_t\}_{0 \leq t \leq T}$ the filtration. The interpretation of the filtration is that $\F_t$ contains the information available up to time $t\geq 0$. In many financial problems, decisions should depend only on past and present information, but not on future information. Thus, filtrations provide a way to capture this restriction on the flow of information.
+Throughout this thesis, we denote by $0\leq T<\infty$ a finite time horizon and work with a filtered probability space $(\Omega, \F, \{\F\}_{0 \leq t \leq T}, \Prob)$. Here, $\Omega$ denotes the sample space, $\F$ the $\sigma$-algebra of events, $\Prob$ the real-world probability measure, and $\{\F_t\}_{0 \leq t \leq T}$ the filtration. The interpretation of the filtration is that $\F_t$ contains the information available up to time $t\geq 0$. In impulse control problems, decisions should depend only on past and present information, and not on future information. Thus, filtrations provide a way to capture this restriction on the flow of information.
 
 The filtration is assumed to satisfy the usual hypotheses. That is, $\F_0$ contains all $\Prob$-null sets of $\F$, and the filtration is right-continuous, i.e.
 \begin{equation*}
@@ -21,14 +21,14 @@ In addition to the filtered probability space, we commonly use terminologies suc
     Let $X$ be a stochastic process. For a fixed atom $\omega \in \Omega$, the function $t \mapsto X(t,\omega)$ is called a sample path of $X$. 
 \end{definition}
 
-In this thesis, we adopt the short-hand notation $X(t):=X(t,\omega)$, for $\omega \in \Omega$, to denote a time-$t$ sample path of $X$. Furthermore, we will assume that every stochastic process mentioned in this paper is adapted to the filtration $\{\F_t\}_{0 \leq t \leq T}$ and is càdlàg\footnote{The abbreviation càdlàg stands for \emph{continu à droite, limite à gauche}, i.e. \emph{right-continuous with left limits}.}. In the following, if $X$ is a jump process, we denote by $X(t^-)$ a sample of $X$ before a potential jump occurs at time $t$. We use the short-hand notation $\E$ to denote the expectation taken under the probability measure $\Prob$, i.e. $\E[\cdot] := \E_\Prob [\cdot]$.
+In this thesis, we adopt the short-hand notation $X(t):=X(t,\omega)$, for $\omega \in \Omega$, to denote a sample path of $X$. Furthermore, we will assume that every stochastic process mentioned in this paper is adapted to the filtration $\{\F_t\}_{0 \leq t \leq T}$ and is càdlàg\footnote{The abbreviation càdlàg stands for \emph{continu à droite, limite à gauche}, i.e. \emph{right-continuous with left limits}.}. In the following, if $X$ is a jump process, we denote by $X(t^-)$ a sample of $X$ before a potential jump occurs at time $t$. We use the short-hand notation $\E$ to denote the expectation taken under the probability measure $\Prob$, i.e. $\E[\cdot] := \E_\Prob [\cdot]$.
 
 \section{Brownian motions, Poisson random measures, and Lévy processes}
 \label{section: Brownian motions, Poisson random measures, and Lévy processes}
 We assume that stochastic processes are driven by continuous and discontinuous jump noises. Specifically, the continuous noise is modelled by Brownian motions, while the discontinuous jump part is a Lévy process. 
 
 \begin{definition}[Brownian motion]
-    An $m$-dimensional Brownian motion is an adapted, continuous stochastic process $W=\{W\}_{0 \leq t \leq T}$ with values in $\R^m$, satisfying
+    An $m$-dimensional Brownian motion is an adapted, continuous stochastic process $W=\{W(t)\}_{0 \leq t \leq T}$ with values in $\R^m$, satisfying
     \begin{enumerate}[label=(\roman*)]
         \item $W(0) = 0$ a.s.\footnote{The acronym \textit{a.s.} stands for \textit{almost surely}.},
         \item $W(t)-W(s)$ is $\F_s$-independent for $0\leq s < t \leq T$, and
@@ -49,17 +49,13 @@ We assume that stochastic processes are driven by continuous and discontinuous j
 \end{definition}
 Comparing the Brownian motion definition with Lévy processes, it can be shown that the Brownian motion is a Lévy process, see \cite[Example 1.3.8]{applebaum2009levy}.
 
-The Lévy measure $\nu$ satisfies
+In essence, a Lévy process $L$ can be uniquely determined by a triplet consisting of the drift, diffusion, and Lévy measure, see \cite{applebaum2009levy}. In particular, the Lévy measure, denoted by $\nu$, satisfies
 \begin{equation}
     \int_{\R^\ell \backslash \{0\}} \big( |z| \wedge 1 \big) \nu(\diff z) < \infty. 
     \label{eqn: Lévy measure condition}
 \end{equation}
-Furthermore, we assume that for a given $\nu$, there exist real numbers $p^*>0$ and $q^*\geq 0$ such that 
-\begin{equation}
-    \int_{|z|\geq 1} |z|^{p^*} \nu(\diff z) < \infty \quad \text{and} \quad \int_{|z|<1}|z|^{q^*}\nu(\diff z) < \infty
-    \label{eqn: assumption for chapter 4}
-\end{equation}
-holds. This assumption is needed for the existence proof of viscosity solutions in Chapter \ref{section: Viscosity Solution for Impulse Control: Existence}. 
+An example of a Lévy measure satisfying \eqref{eqn: Lévy measure condition} is presented below. 
+
 \begin{example}[The Variance-Gamma Lévy measure]
 \label{ex: VG measure}
     A recurring Lévy measure used throughout this thesis is the Variance-Gamma Lévy measure, defined by
@@ -100,12 +96,12 @@ Throughout the thesis, we refer to \eqref{eqn: jump-diffusion} in its differenti
     \label{eqn: jump-diffusion SDE chapter 2}
 \end{align}
 
-To guarantee the well-posedness of the SDE \eqref{eqn: jump-diffusion SDE chapter 2}, i.e the SDE has a unique and stable solution, we assume that there exist $C>0$ such that
+To guaranty the well-posedness of the SDE \eqref{eqn: jump-diffusion SDE chapter 2}, i.e the SDE has a unique and stable solution, we follow the work of \textcite{seydel2010generalexistenceuniquenessviscosity} and assume that there exist $C>0$ such that
 \begin{equation}
     \int_{\R^\ell}|\gamma(t,x,z)|^2 \nu(\diff z) \leq C < \infty,
     \label{eqn: gamma condition}
 \end{equation}
-and that the Lipschitz and linear growth bound-like conditions 
+and that the Lipschitz-like and linear growth bound-like conditions 
 \begin{align}
     |\mu(t,x) - \mu(&t,y)|^2 + |\sigma(t,x) - \sigma(t,y)|^2 \nonumber\\
     & + \int_{\R^\ell} |\gamma(t,x,z) - \gamma(t,y,z)|^2 \nu(\diff z) \leq C |x-y|^2.
@@ -114,7 +110,7 @@ and that the Lipschitz and linear growth bound-like conditions
     &+ \int_{\R^\ell}|\gamma(t+h,x,z) - \gamma(t,x,z)|^2 \leq C (1+|x|^2) b(h)
     \label{eqn: lgb condition}
 \end{align}
-hold for $x,y \in \R^d$, $t \in [0,T]$, and a positive function $b(h) \downarrow 0$ for $h \rightarrow 0$. Note that conditions \eqref{eqn: gamma condition}--\eqref{eqn: lgb condition} need not hold globally for all $x,y \in \R^d$, and may be relaxed to hold locally on a compact set $U \subset \R^d$.
+hold for $x,y \in \R^d$, $t \in [0,T]$, and a positive function $b(h) \downarrow 0$ for $h \rightarrow 0$. Note that conditions \eqref{eqn: gamma condition}--\eqref{eqn: lgb condition} need not be satisfied for all $x,y \in \R^d$, and may be relaxed to be local on a compact set $U \subset \R^d$. Furthermore, conditions \eqref{Lipschitz condition} and \eqref{eqn: lgb condition} can be interpreted as the Lipschitz and linear-growth bound conditions, see \cite{pham1998optimal}. 
 
 Let $u \in C^{1,2}([0,T] \times \R^d)$ be a function once differentiable in time and twice differentiable in space. The infinitesimal generator of the jump-diffusion process $X$ is given by
 \begin{align}
@@ -131,7 +127,7 @@ The corresponding parabolic operator is $\partial_t + \InfinitesimalGenerator$. 
 Stochastic processes following common SDEs can be found in Examples \ref{ex: GBM} and \ref{ex: VG process}. These will be used in the numerical experiments presented in Chapters \ref{section: Numerical Experiment I: Impulse Control of the Foreign Exchange Rate} and \ref{section: Multi-dimensional Dynamic Portfolio Allocation}.
 \begin{example}[Geometric Brownian motion]
 \label{ex: GBM}
-    The possibly most famous SDE in finance is the geometric Brownian motion (without jumps). Let $S$ denote a one-dimensional stock price process with initial condition $S(0)=s$, and define, by abuse of notation, $\mu(t,s) := \mu s$ and $\sigma(t,s):=\sigma s$, where $\mu \in \R$ and $\sigma>0$ are one-dimensional constants.
+    The possibly most famous SDE in finance is the geometric Brownian motion (without jumps). Let $S$ denote a one-dimensional stock price process with the initial condition $S(0)=s$, and define, by abuse of notation, $\mu(t,s) := \mu s$ and $\sigma(t,s):=\sigma s$, where $\mu \in \R$ and $\sigma>0$ are one-dimensional constants.
     
     Then, the geometric Brownian motion SDE is given by 
     \begin{equation*}
@@ -167,21 +163,21 @@ Stochastic processes following common SDEs can be found in Examples \ref{ex: GBM
 \label{section: Stopping times}
 Stopping times formalise random times at which decisions may be taken without looking into the future, and as such are important to impulse control problems. Stopping times are defined as follows:
 \begin{definition}[Stopping time]
-    A random time $\tau: \Omega \rightarrow [0,\infty]$ is an $\F_t$-stopping time if \newline $\{\tau \leq t\} \in \F_t$ for every $t \geq 0$. 
+    A random time $\tau: \Omega \rightarrow [0,\infty]$ is an $\F_t$-stopping time if $\{\tau \leq t\} \in \F_t$ for every $t \geq 0$. 
 \end{definition}
-For an adapted process $X$ and a stopping time $\tau$, $X(t \wedge \tau)$ is a stopped process. The $\sigma$-algebra at the stopping time $\tau$ is $\F_\tau = \{A \in \F: A \cap \{\tau \leq t\} \in \F_t \; \forall t \geq 0\}$. 
+For an adapted process $X$ and a stopping time $\tau$, $X(t \wedge \tau)$ is a stopped process. Furthermore, the $\sigma$-algebra at the stopping time $\tau$ is $\F_\tau = \{A \in \F: A \cap \{\tau \leq t\} \in \F_t \; \forall t \geq 0\}$. 
 \begin{example}[First exit time]
     A recurring example of stopping times used throughout this thesis is the so-called first exit time. Let $G \subset \R^d$ be an open set and $X$ be a càdlàg adapted process with initial condition $X(0^-)=x \in D$. Then, the first exit time from $G$ is given by 
     \begin{equation*}
         \tau_G = \inf\{t \geq 0: X(t) \notin G\}. 
     \end{equation*}
-    Under the usual assumption on the filtration, $\tau_G$ is a stopping time. 
+    Under the usual assumptions on the filtration $\{\F_t\}_{0 \leq t \leq T}$, $\tau_G$ is a stopping time. 
 \end{example}
 
 An important result involving the stopping time, infinitesimal generator, and jump-diffusion is the Dynkin formula. 
 \begin{theorem}[{\cite[Theorem 1.24]{oksendal2007applied}}, Dynkin formula]
 \label{trm: Dynkin formula}
-    Let $X(s) \in \R^d$ be a jump diffusion with initial condition $X(t^-)=x$, $G \subset \R^d$ be an open set and let $u \in C^{1,2}([0,T] \times \R^d)$. Let $\tau < \infty$ be a stopping time. Suppose that 
+    Let $X(s) \in \R^d$ be a jump diffusion with initial condition $X(t^-)=x$, $G \subset \R^d$ be an open set, $u \in C^{1,2}([0,T] \times \R^d)$, and $\tau < \infty$ be a stopping time. Suppose that 
     \begin{align*}
         \tau \leq \tau_G := \inf \{t\geq 0: X(t) \notin G\}
     \end{align*}
